@@ -2,7 +2,6 @@
  *	Copyright 1996, University Corporation for Atmospheric Research
  *	See netcdf/COPYRIGHT file for copying and redistribution conditions.
  */
-/* "$Id: ncx.h,v 1.65 2010/05/26 18:11:08 dmh Exp $" */
 
 #ifndef _NCX_H_
 #define _NCX_H_
@@ -33,7 +32,13 @@
 #include <errno.h>
 #include <sys/types.h> /* off_t */
 #include <ncdispatch.h>
-#define longlong long long
+
+#ifndef longlong
+ #define longlong long long
+#endif
+#ifndef ulonglong
+#define ulonglong unsigned long long
+#endif
 
 #if defined(_CRAY) && !defined(_CRAYIEEE) && !defined(__crayx1)
 #define CRAYFLOAT 1 /* CRAY Floating point */
@@ -68,6 +73,13 @@
 #endif
 #define X_SIZEOF_FLOAT		4
 #define X_SIZEOF_DOUBLE		8
+
+/* additional data types in CDF-5 */
+#define X_SIZEOF_UBYTE		1
+#define X_SIZEOF_USHORT		2
+#define X_SIZEOF_UINT		4
+#define X_SIZEOF_INT64		8
+#define X_SIZEOF_UINT64		8
 
 /*
  * For now, netcdf is limited to 32 bit sizes,
@@ -141,6 +153,22 @@
 #define ncx_len_double(nelems) \
 	((nelems) * X_SIZEOF_DOUBLE)
 
+/* Additional for CDF5 */
+#define ncx_len_ubyte(nelems) \
+	_RNDUP((nelems), X_ALIGN)
+
+#define ncx_len_ushort(nelems) \
+	(((nelems) + (nelems)%2)  * X_SIZEOF_USHORT)
+
+#define ncx_len_uint(nelems) \
+	((nelems) * X_SIZEOF_UINT)
+
+#define ncx_len_int64(nelems) \
+	((nelems) * X_SIZEOF_INT64)
+
+#define ncx_len_uint64(nelems) \
+	((nelems) * X_SIZEOF_UINT64)
+
 /* End ncx_len */
 
 #if __CHAR_UNSIGNED__
@@ -180,6 +208,8 @@ typedef signed char schar;
 		ulong
 		float
 		double
+		longlong
+		ulonglong
  *
  * Not all combinations make sense.
  * We may not implement all combinations that make sense.
@@ -232,7 +262,6 @@ ncx_put_schar_float(void *xp, const float *ip);
 extern int
 ncx_put_schar_double(void *xp, const double *ip);
 #endif
- 
 
 extern int
 ncx_get_short_schar(const void *xp, schar *ip);

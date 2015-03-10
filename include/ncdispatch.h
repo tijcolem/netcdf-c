@@ -77,11 +77,9 @@
 #endif
 
 /* Define the range of Atomic types */
-#ifdef USE_NETCDF4
-#define ATOMICTYPEMAX NC_STRING
-#else
-#define ATOMICTYPEMAX NC_DOUBLE
-#endif
+#define ATOMICTYPEMAX4 NC_STRING
+#define ATOMICTYPEMAX3 NC_DOUBLE
+#define ATOMICTYPEMAX5 NC_UINT64
 
 /* Define an alias for int to indicate an error return */
 typedef int NCerror;
@@ -246,7 +244,6 @@ int (*put_vars)(int, int, const size_t*, const size_t*, const ptrdiff_t*, const 
 
 int (*get_varm)(int, int, const size_t*, const size_t*, const ptrdiff_t*, const ptrdiff_t*, void*, nc_type);
 int (*put_varm)(int, int, const size_t*, const size_t*, const ptrdiff_t*, const ptrdiff_t*, const void*, nc_type);
-
 
 int (*inq_var_all)(int ncid, int varid, char *name, nc_type *xtypep, 
                int *ndimsp, int *dimidsp, int *nattsp, 
