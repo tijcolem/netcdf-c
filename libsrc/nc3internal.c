@@ -837,15 +837,16 @@ NC_endef(NC3_INFO *ncp,
 				return status;
 
 		}
-		else if(ncp->old != NULL && (ncp->vars.nelems > ncp->old->vars.nelems))
-		{
-			status = fill_added(ncp, ncp->old);
-			if(status != NC_NOERR)
-				return status;
-			status = fill_added_recs(ncp, ncp->old);
-			if(status != NC_NOERR)
-				return status;
-		}
+		else if(ncp->old == NULL ? 0
+                                         : (ncp->vars.nelems > ncp->old->vars.nelems))
+          {
+            status = fill_added(ncp, ncp->old);
+            if(status != NC_NOERR)
+              return status;
+            status = fill_added_recs(ncp, ncp->old);
+            if(status != NC_NOERR)
+              return status;
+          }
 	}
 
 	if(ncp->old != NULL)

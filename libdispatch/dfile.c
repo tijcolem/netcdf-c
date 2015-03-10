@@ -470,7 +470,11 @@ int
 nc__create(const char *path, int cmode, size_t initialsz,
 	   size_t *chunksizehintp, int *ncidp)
 {
-   return NC_create(path, cmode, initialsz, 0,
+   /* this API is for non-parallel access: TODO check for illegal cmode
+    * flags, such as NC_PNETCDF, NC_MPIIO, or NC_MPIPOSIX, before entering
+    * NC_create()? Note nc_create_par() also calls NC_create().
+    */
+   return NC_create(path, cmode, initialsz, 0, 
 		    chunksizehintp, 0, NULL, ncidp);
 
 }
@@ -669,7 +673,11 @@ int
 nc__open(const char *path, int mode,
 	 size_t *chunksizehintp, int *ncidp)
 {
-   return NC_open(path, mode, 0, chunksizehintp, 0,
+   /* this API is for non-parallel access: TODO check for illegal cmode
+    * flags, such as NC_PNETCDF, NC_MPIIO, or NC_MPIPOSIX, before entering
+    * NC_open()? Note nc_open_par() also calls NC_open().
+    */
+   return NC_open(path, mode, 0, chunksizehintp, 0, 
 		  NULL, ncidp);
 }
 
@@ -1813,11 +1821,8 @@ NC_open(const char *path, int cmode,
    else if(model & NC_DISPATCH_NC3) {
       cmode &= ~NC_NETCDF4; /* must be netcdf-3 (CDF-1, CDF-2, CDF-5) */
       if(version == 2) cmode |= NC_64BIT_OFFSET;
-   } else if(model & NC_DISPATCH_NC5) {
-#if 0
-It appears that pnetcdf can read NC_64_BIT_OFFSET
-      cmode &= ~(NC_NETCDF4 | NC_64BIT_OFFSET); /* must be pnetcdf */
-#else
+      else if(version == 5) cmode |= NC_64BIT_DATA;
+   } else if(model & NC_DISPATCH_NCP5) {
       cmode &= ~(NC_NETCDF4);
       cmode |= (NC_64BIT_OFFSET | NC_PNETCDF);
    }
