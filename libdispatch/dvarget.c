@@ -278,13 +278,13 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
    NC* ncp;
    int memtypelen;
    char* value = (char*)value0;
+#ifdef VARMINDEX
+#else
+   ptrdiff_t cvtmap[NC_MAX_VAR_DIMS];
+#endif
 
    status = NC_check_id (ncid, &ncp);
    if(status != NC_NOERR) return status;
-
-/*
-  if(NC_indef(ncp)) return NC_EINDEFINE;
-*/
 
    status = nc_inq_vartype(ncid, varid, &vartype);
    if(status != NC_NOERR) return status;
