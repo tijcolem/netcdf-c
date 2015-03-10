@@ -157,7 +157,11 @@ Use this in mode flags for both nc_create() and nc_open(). */
 /** Turn on MPI POSIX I/O.
 Use this in mode flags for both nc_create() and nc_open(). */
 #define NC_MPIPOSIX      0x4000 /**< \deprecated As of libhdf5 1.8.13. */
-#define NC_PNETCDF       0x8000	/**< Use parallel-netcdf library. Mode flag for nc_open(). */
+
+#define NC_64BIT_DATA    0x8000  /**< CDF-5 format: classic model but 64 bit dimensions and sizes */
+#define NC_CDF5          NC_64BIT_DATA  /**< Alias */
+
+#define NC_PNETCDF       (NC_CDF5|NC_MPIIO) /**< Use parallel-netcdf library. Mode flag combo for nc_open(). */
 
 /** Format specifier for nc_set_default_format() and returned
  *  by nc_inq_format. This returns the format as provided by
@@ -167,9 +171,16 @@ Use this in mode flags for both nc_create() and nc_open(). */
  */
 /**@{*/
 #define NC_FORMAT_CLASSIC (1)
-#define NC_FORMAT_64BIT   (2)
+/* After adding CDF5 support, this flag
+   is somewhat confusing. So, it is renamed.
+*/
+#define NC_FORMAT_64BIT_OFFSET   (2)
 #define NC_FORMAT_NETCDF4 (3)
 #define NC_FORMAT_NETCDF4_CLASSIC  (4)
+#define NC_FORMAT_64BIT_DATA    (5)
+
+/* Alias */
+#define NC_FORMAT_CDF5    NC_FORMAT_64BIT_DATA
 
 /**@}*/
 
@@ -834,7 +845,7 @@ EXTERNL int
 nc_set_fill(int ncid, int fillmode, int *old_modep);
 
 /* Set the default nc_create format to NC_FORMAT_CLASSIC,
- * NC_FORMAT_64BIT, NC_FORMAT_NETCDF4, NC_FORMAT_NETCDF4_CLASSIC. */
+ * NC_FORMAT_64BIT, NC_FORMAT_NETCDF4, etc */
 EXTERNL int
 nc_set_default_format(int format, int *old_formatp);
 
