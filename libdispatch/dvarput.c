@@ -268,8 +268,11 @@ NCDEFAULT_put_varm(
    int maxidim = 0;
    NC* ncp;
    int memtypelen;
-   ptrdiff_t cvtmap[NC_MAX_VAR_DIMS];
    const char* value = (char*)value0;
+#ifdef VARMINDEX
+#else
+   ptrdiff_t cvtmap[NC_MAX_VAR_DIMS];
+#endif
 
    status = NC_check_id (ncid, &ncp);
    if(status != NC_NOERR) return status;
@@ -290,6 +293,8 @@ NCDEFAULT_put_varm(
    if(status != NC_NOERR) return status;
 
    if(memtype == NC_NAT) {
+#ifdef VARMINDEX
+#else
       if(imapp != NULL && varndims != 0) {
 	 /*
 	  * convert map units from bytes to units of sizeof(type)
@@ -305,6 +310,7 @@ NCDEFAULT_put_varm(
 	 }
 	 imapp = cvtmap;
       }
+#endif
       memtype = vartype;
    }
 

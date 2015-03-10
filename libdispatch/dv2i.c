@@ -853,6 +853,21 @@ ncvargets(
 }
 
 
+/* make map[ndims-1] number of elements instead of bytes */
+static long*
+elementsinsteadofbytes(int ncid, int varid)
+{
+    long* imp = NULL;
+    int i, ndims, el_size;
+    nc_type type;
+    nc_inq_varndims(ncid, varid, &ndims);
+    nc_inq_vartype(ncid, varid, &type);
+    el_size = nctypelen(type);
+    imp = (long*) malloc(ndims * sizeof(long));
+    for (i=0; i<ndims; i++) imp[i] = map[i] / el_size;
+    return imp;
+}
+
 int
 ncvarputg(
     int		ncid,
@@ -865,22 +880,29 @@ ncvarputg(
 )
 {
 	if(map == NULL)
-		return ncvarputs(ncid, varid, start, count, stride, value);
-	/* else */
-	{
-	NDIMS_DECL
+	    return ncvarputs(ncid, varid, start, count, stride, value);
+	else {/*map != NULL*/
+	    NDIMS_DECL
+#ifdef VARMINDEX
+	    long *imp = elementsinsteadofbytes(ncid,varid);
+#else
+	A_DECL(imp, ptrdiff_t, ndims, map);
+	A_INIT(imp, ptrdiff_t, ndims, map);
+#endif
 	A_DECL(stp, size_t, ndims, start);
 	A_DECL(cntp, size_t, ndims, count);
 	A_DECL(strdp, ptrdiff_t, ndims, stride);
-	A_DECL(imp, ptrdiff_t, ndims, map);
 	A_INIT(stp, size_t, ndims, start);
 	A_INIT(cntp, size_t, ndims, count);
 	A_INIT(strdp, ptrdiff_t, ndims, stride);
-	A_INIT(imp, ptrdiff_t, ndims, map);
 	{
 	const int status = nc_put_varm(ncid, varid,
 			 stp, cntp, strdp, imp, value);
+#ifdef VARMINDEX
+	if(imp != NULL) free(imp)
+#else
 	A_FREE(imp);
+#endif
 	A_FREE(strdp);
 	A_FREE(cntp);
 	A_FREE(stp);
@@ -911,18 +933,26 @@ ncvargetg(
 	/* else */
 	{
 	NDIMS_DECL
+#ifdef VARMINDEX
+        long *imp = elementsinsteadofbytes(ncid,varid);
+#else
+	A_DECL(imp, ptrdiff_t, ndims, map);
+	A_INIT(imp, ptrdiff_t, ndims, map);
+#endif
 	A_DECL(stp, size_t, ndims, start);
 	A_DECL(cntp, size_t, ndims, count);
 	A_DECL(strdp, ptrdiff_t, ndims, stride);
-	A_DECL(imp, ptrdiff_t, ndims, map);
 	A_INIT(stp, size_t, ndims, start);
 	A_INIT(cntp, size_t, ndims, count);
 	A_INIT(strdp, ptrdiff_t, ndims, stride);
-	A_INIT(imp, ptrdiff_t, ndims, map);
 	{
 	const int status = nc_get_varm(ncid, varid,
 			stp, cntp, strdp, imp, value);
+#ifdef VARMINDEX
+	if(imp != NULL) free(imp)
+#else
 	A_FREE(imp);
+#endif
 	A_FREE(strdp);
 	A_FREE(cntp);
 	A_FREE(stp);

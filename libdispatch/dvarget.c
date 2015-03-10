@@ -277,15 +277,14 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
    int varndims,maxidim;
    NC* ncp;
    int memtypelen;
-   ptrdiff_t cvtmap[NC_MAX_VAR_DIMS];
    char* value = (char*)value0;
+#ifdef VARMINDEX
+#else
+   ptrdiff_t cvtmap[NC_MAX_VAR_DIMS];
+#endif
 
    status = NC_check_id (ncid, &ncp);
    if(status != NC_NOERR) return status;
-
-/*
-  if(NC_indef(ncp)) return NC_EINDEFINE;
-*/
 
    status = nc_inq_vartype(ncid, varid, &vartype);
    if(status != NC_NOERR) return status;
@@ -297,6 +296,8 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
    if(status != NC_NOERR) return status;
 
    if(memtype == NC_NAT) {
+#ifdef VARMFIX
+#else
       if(imapp != NULL && varndims != 0) {
 	 /*
 	  * convert map units from bytes to units of sizeof(type)
@@ -312,6 +313,7 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
 	 }
 	 imapp = cvtmap;
       }
+#endif
       memtype = vartype;
    }
 
@@ -424,7 +426,12 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
 	    ? stride[idim]
 	    : 1;
 
+#ifdef VARMINDEX
+	 /* Remember: in netCDF-2 imapp is byte oriented, not index oriented
+	  *           Starting from netCDF-3, imapp is index oriented */
+#else
 	 /* Remember: imapp is byte oriented, not index oriented */
+#endif
 #ifdef COMPLEX
 	 mymap[idim] = (imapp != NULL
 			? imapp[idim]
