@@ -9,7 +9,6 @@
    Based on a program to test the nasa look-alike program, so not the
    most appropropriate test. See ../nctest for a complete spec test.
  
-   $Id: t_nc.c,v 1.94 2010/05/27 21:34:13 dmh Exp $ */
 
 #define REDEF
 /* #define SYNCDEBUG */
@@ -22,7 +21,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#include <netcdf.h>
+#ifdef USE_PARALLEL
+#include <mpi.h>
+#endif
+#include "netcdf.h"
+#ifdef USE_PARALLEL
+#include "netcdf_par.h"
+#endif
 
 #define MAXSHORT	32767
 #define MAXINT		2147483647
@@ -354,6 +359,8 @@ main(int ac, char *av[])
 	const size_t initialsz = 8192;
 	size_t chunksz = 8192;
 	size_t align = 8192/32;
+
+	nc_initialize(&argc,&av);
 
 	ret = nc__create(fname,NC_NOCLOBBER, initialsz, &chunksz, &id);
 	if(ret != NC_NOERR) {

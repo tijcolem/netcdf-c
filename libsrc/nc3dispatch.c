@@ -179,6 +179,12 @@ NC3_initialize(void)
     return NC_NOERR;
 }
 
+int
+NC3_finalize(void)
+{
+    return NC_NOERR;
+}
+
 static int
 NC3_inq_var_all(int ncid, int varid, char *name, nc_type *xtypep, 
                int *ndimsp, int *dimidsp, int *nattsp, 
