@@ -1625,11 +1625,8 @@ NC_create(const char *path, int cmode, size_t initialsz,
     * (with/without netCDF-4, DAP, CDMREMOTE). */
    if(!NC_initialized)
    {
-      if ((stat = NC_initialize()))
-	 return stat;
-      /* Do local initialization */
-      nc_local_initialize();
-      nc_initialized = 1;
+      if ((stat = nc_initialize()))
+	 return stat; 
    }
 
 #ifdef USE_REFCOUNT

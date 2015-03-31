@@ -8,9 +8,8 @@
  
    Based on a program to test the nasa look-alike program, so not the
    most appropropriate test. See ../nctest for a complete spec test.
+*/
  
-   $Id: t_nc.c 2792 2014-10-27 06:02:59Z wkliao $ */
-
 #define REDEF
 /* #define SYNCDEBUG */
 
@@ -22,9 +21,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#ifdef USE_PARALLEL
 #include <mpi.h>
-#include <netcdf.h>
-#include <netcdf_par.h>
+#endif
+#include "netcdf.h"
+#ifdef USE_PARALLEL
+#include "netcdf_par.h"
+#endif
 
 #define MAXSHORT	32767
 #define MAXINT		2147483647

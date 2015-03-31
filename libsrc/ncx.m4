@@ -883,7 +883,6 @@ ncx_put_uint_uchar(void *xp, const uchar *ip)
 #if X_SIZEOF_UINT != SIZEOF_UINT
 static NCX_PUT1I(uint, uint,      1)
 #endif
-
 static NCX_PUT1I(uint, short,     0)
 static NCX_PUT1I(uint, int,       0)
 static NCX_PUT1I(uint, longlong,  0)
@@ -2621,6 +2620,28 @@ NCX_PAD_PUTN_CHAR(schar, ushort)
 NCX_PAD_PUTN_CHAR(schar, uint)
 NCX_PAD_PUTN_CHAR(schar, ulonglong)
 
+/* uchar ---------------------------------------------------------------------*/
+dnl
+dnl NCX_GETN_CHAR(uchar, schar)
+int
+ncx_getn_uchar_schar(const void **xpp, size_t nelems, schar *tp)
+{
+	NCX_GETN_Byte_Body
+}
+dnl NCX_GETN_CHAR(uchar, uchar)
+int
+ncx_getn_uchar_uchar(const void **xpp, size_t nelems, uchar *tp)
+{
+	NCX_GETN_Byte_Body
+}
+NCX_GETN_CHAR(uchar, short)
+NCX_GETN_CHAR(uchar, int)
+NCX_GETN_CHAR(uchar, float)
+NCX_GETN_CHAR(uchar, double)
+NCX_GETN_CHAR(uchar, longlong)
+NCX_GETN_CHAR(uchar, ushort)
+NCX_GETN_CHAR(uchar, uint)
+NCX_GETN_CHAR(uchar, ulonglong)
 
 /* uchar ---------------------------------------------------------------------*/
 dnl
@@ -2970,9 +2991,7 @@ NCX_PUTN(uint, uchar)
 NCX_PUTN(uint, ushort)
 NCX_PUTN(uint, ulonglong)
 
-
 /* float ---------------------------------------------------------------------*/
-
 #if X_SIZEOF_FLOAT == SIZEOF_FLOAT && !defined(NO_IEEE_FLOAT)
 /* optimized version */
 int
