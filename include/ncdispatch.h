@@ -106,38 +106,34 @@ typedef struct NC_Dispatch NC_Dispatch;
 
 extern NC_Dispatch* NCSUBSTRATE_dispatch_table;
 extern int NCDISPATCH_initialize(void);
+extern int NCDISPATCH_finalize(void);
 
 extern NC_Dispatch* NC3_dispatch_table;
 extern int NC3_initialize(void);
+extern int NC3_finalize(void);
 
 #ifdef USE_DAP
 extern NC_Dispatch* NCD2_dispatch_table;
 extern int NCD2_initialize(void);
+extern int NCD2_finalize(void);
 #endif
 
 #ifdef USE_PNETCDF
 extern NC_Dispatch* NC5_dispatch_table;
 extern int NC5_initialize(void);
+extern int NC5_finalize(void);
 #endif
 
 #ifdef USE_NETCDF4
 
 extern NC_Dispatch* NC4_dispatch_table;
 extern int NC4_initialize(void);
+extern int NC4_finalize(void);
 
 #ifdef USE_DAP
 extern NC_Dispatch* NCD4_dispatch_table;
 extern int NCD4_initialize(void);
-#endif
-
-#ifdef USE_CDMREMOTE
-extern NC_Dispatch* NCCR_dispatch_table;
-extern int NCCR_initialize(void);
-#endif
-
-#ifdef BUILD_RPC
-extern NC_Dispatch* NCRPC_dispatch_table;
-extern int NCRPC_initialize(void);
+extern int NCD4_finalize(void);
 #endif
 
 #endif /*USE_NETCDF4*/
@@ -295,12 +291,14 @@ int (*get_var_chunk_cache)(int ncid, int varid, size_t *sizep, size_t *nelemsp, 
 
 /* Following functions must be handled as non-dispatch */
 #ifdef NONDISPATCH
-void(*nc_advise)(const char*cdf_routine_name,interr,const char*fmt,...);
-void(*nc_set_log_level)(int);
+void (*nc_advise)(const char*cdf_routine_name,interr,const char*fmt,...);
+void (*nc_set_log_level)(int);
 const char* (*nc_inq_libvers)(void);
 const char* (*nc_strerror)(int);
-int(*nc_delete)(const char*path);
-int(*nc_delete_mp)(const char*path,intbasepe);
+int (*nc_delete)(const char*path);
+int (*nc_delete_mp)(const char*path,intbasepe);
+int (*nc_initialize)();
+int (*nc_finalize)();
 #endif /*NONDISPATCH*/
 
 /* Define the common fields for NC and NC_FILE_INFO_T etc */
@@ -315,9 +313,6 @@ typedef struct NCcommon {
 
 extern size_t NC_atomictypelen(nc_type xtype);
 extern char* NC_atomictypename(nc_type xtype);
-
-/* Provide an initializer */
-extern int NC_initialize(void);
 
 /* Provide a dispatch table overlay facility */
 extern int NC_dispatch_overlay(const NC_Dispatch* overlay,

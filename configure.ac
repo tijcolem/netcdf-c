@@ -1110,7 +1110,7 @@ AC_CONFIG_FILES([Makefile
                  docs/images/Makefile
                  libsrc/Makefile
                  libsrc4/Makefile
-                 libsrc5/Makefile
+                 libsrcp5/Makefile
                  nctest/Makefile
                  nc_test4/Makefile
                  nc_test/Makefile

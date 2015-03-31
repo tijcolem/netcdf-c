@@ -108,3 +108,9 @@ NC4_initialize(void)
     NC4_dispatch_table = &NC4_dispatcher;
     return NC_NOERR;
 }
+
+int
+NC4_finalize(void)
+{
+    return NC_NOERR;
+}

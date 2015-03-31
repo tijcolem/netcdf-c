@@ -20,9 +20,7 @@ int
 main(int argc, char **argv)
 {
 
-#ifdef USE_PARALLEL
-   MPI_Init(&argc, &argv);
-#endif
+   nc_initialize(&argc, &argv);
 
    printf("\n*** Testing netcdf-4 large files.\n");
    printf("**** testing with user-contributed test...\n");
@@ -101,9 +99,8 @@ main(int argc, char **argv)
    }
    SUMMARIZE_ERR;
 
-#ifdef USE_PARALLEL
-   MPI_Finalize();
-#endif   
+   nc_finalize();
+
    FINAL_RESULTS;
 }
 

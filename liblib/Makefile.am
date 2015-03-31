@@ -37,8 +37,8 @@ libnetcdf_la_LIBADD += ${top_builddir}/libdispatch/libdispatch.la	\
 
 # + pnetcdf
 if USE_PNETCDF
-AM_CPPFLAGS += -I${top_srcdir}/libsrc5
-libnetcdf_la_LIBADD += ${top_builddir}/libsrc5/libnetcdf5.la
+AM_CPPFLAGS += -I${top_srcdir}/libsrcp5
+libnetcdf_la_LIBADD += ${top_builddir}/libsrcp5/libnetcdfp5.la
 endif # USE_PNETCDF
 
 # + dap
@@ -58,13 +58,8 @@ libnetcdf_la_LIBADD += ${top_builddir}/libsrc4/libnetcdf4.la
 # Not ready for prime time yet
 # libnetcdf_la_LIBADD += ${top_builddir}/libdiskless/libdiskless.la
 
-# netcdf4+cdmremote
-if BUILD_CDMREMOTE
-libnetcdf_la_LIBADD += ${top_builddir}/libcdmr/libnccr.la
-endif # BUILD_CDMREMOTE
-
 endif #USE_NETCDF4
 
 # We need at least one source file
-libnetcdf_la_SOURCES = stub.c
+libnetcdf_la_SOURCES = nc_initialize.c
 EXTRA_DIST=CMakeLists.txt 
