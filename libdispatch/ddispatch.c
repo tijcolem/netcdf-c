@@ -9,6 +9,8 @@ extern int NCSUBSTRATE_intialize(void);
 size_t nc_sizevector0[NC_MAX_VAR_DIMS];
 size_t nc_sizevector1[NC_MAX_VAR_DIMS];
 ptrdiff_t nc_ptrdiffvector1[NC_MAX_VAR_DIMS];
+size_t NC_coord_zero[NC_MAX_VAR_DIMS];
+size_t NC_coord_one[NC_MAX_VAR_DIMS];
 
 /* Define the known protocols and their manipulations */
 static struct NCPROTOCOLLIST {
@@ -42,19 +44,34 @@ static nc_type longtype = (sizeof(long) == sizeof(int)?NC_INT:NC_INT64);
 static nc_type ulongtype = (sizeof(unsigned long) == sizeof(unsigned int)?NC_UINT:NC_UINT64);
 */
 
-/* Allow dispatch to do initialization */
+/* Allow dispatch to do initialization and finalization */
 int
 NCDISPATCH_initialize(void)
 {
     extern int NCSUBSTRATE_initialize(void);
+    int status = NC_NOERR;
     int i;
-    NCSUBSTRATE_initialize();
     for(i=0;i<NC_MAX_VAR_DIMS;i++) {
 	nc_sizevector0[i] = 0;
         nc_sizevector1[i] = 1;
         nc_ptrdiffvector1[i] = 1;
     }
-    return NC_NOERR;
+    for(i=0;i<NC_MAX_VAR_DIMS;i++) {
+	NC_coord_one[i] = 1;
+	NC_coord_zero[i] = 0;
+    }
+    status = NCSUBSTRATE_initialize();
+    return status;
+}
+
+int
+NCDISPATCH_finalize(void)
+{
+    extern int NCSUBSTRATE_finalize(void);
+    int status = NC_NOERR;
+    int i;
+    status = NCSUBSTRATE_finalize();
+    return status;
 }
 
 /* search list of servers and return first that succeeds when

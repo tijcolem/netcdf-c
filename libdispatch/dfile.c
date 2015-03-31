@@ -24,7 +24,8 @@ Research/Unidata. See COPYRIGHT file for more info.
 #endif
 #include "ncdispatch.h"
 
-static int nc_initialized = 0;
+extern int NC_initialized;
+extern int NC_finalized;
 
 /** \defgroup datasets NetCDF Files
 
@@ -62,20 +63,6 @@ interfaces, the rest of this chapter presents a detailed description
 of the interfaces for these operations.
 */
 /**@{*/
-
-size_t NC_coord_zero[NC_MAX_VAR_DIMS];
-size_t NC_coord_one[NC_MAX_VAR_DIMS];
-
-static void
-nc_local_initialize(void)
-{
-    int i;
-
-    for(i=0;i<NC_MAX_VAR_DIMS;i++) {
-	NC_coord_one[i] = 1;
-	NC_coord_zero[i] = 0;
-    }
-}
 
 static int
 NC_interpret_magic_number(char* magic, int* model, int* version, int use_parallel)
@@ -1636,13 +1623,10 @@ NC_create(const char *path, int cmode, size_t initialsz,
    /* Initialize the dispatch table. The function pointers in the
     * dispatch table will depend on how netCDF was built
     * (with/without netCDF-4, DAP, CDMREMOTE). */
-   if(!nc_initialized)
+   if(!NC_initialized)
    {
-      if ((stat = NC_initialize()))
-	 return stat;
-      /* Do local initialization */
-      nc_local_initialize();
-      nc_initialized = 1;
+      if ((stat = nc_initialize()))
+	 return stat; 
    }
 
 #ifdef USE_REFCOUNT
@@ -1790,12 +1774,9 @@ NC_open(const char *path, int cmode,
    int version = 0;
    int flags = 0;
 
-   if(!nc_initialized) {
-      stat = NC_initialize();
+   if(!NC_initialized) {
+      stat = nc_initialize();
       if(stat) return stat;
-      /* Do local initialization */
-      nc_local_initialize();
-      nc_initialized = 1;
    }
 
 #ifdef USE_REFCOUNT

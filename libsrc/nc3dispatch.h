@@ -180,7 +180,7 @@ NC3_get_vara(int ncid, int varid,
 /* End _var */
 
 extern int NC3_initialize();
-
+extern int NC3_finalize();
 
 #if defined(__cplusplus)
 }
