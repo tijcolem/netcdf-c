@@ -10,6 +10,7 @@
    most appropropriate test. See ../nctest for a complete spec test.
 */
  
+
 #define REDEF
 /* #define SYNCDEBUG */
 

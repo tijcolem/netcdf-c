@@ -2083,6 +2083,103 @@ ncx_put_int64(void             **xpp,
     return NC_NOERR;
 }
 
+/*----< ncx_get_int32() >--------------------------------------------------*/
+int
+ncx_get_int32(const void **xpp,
+              int         *ip)
+{
+    const uchar *cp = (const uchar *) *xpp;
+
+    /* cannot call swap4b(), as lp is 8-byte */
+    *ip  = (*cp++ << 24);
+    *ip |= (*cp++ << 16);
+    *ip |= (*cp++ <<  8);
+    *ip |=  *cp;
+
+    /* advance *xpp 4 bytes */
+    *xpp = (void *)((const char *)(*xpp) + 4);
+
+    return NC_NOERR;
+}
+
+/*----< ncx_get_int64() >-------------------------------------------------*/
+int
+ncx_get_int64(const void **xpp,
+              long long   *llp)
+{
+    const uchar *cp = (const uchar *) *xpp;
+
+    /* below is the same as calling swap8b(llp, *xpp) */
+    *llp  = ((long long)(*cp++) << 56);
+    *llp |= ((long long)(*cp++) << 48);
+    *llp |= ((long long)(*cp++) << 40);
+    *llp |= ((long long)(*cp++) << 32);
+    *llp |= ((long long)(*cp++) << 24);
+    *llp |= ((long long)(*cp++) << 16);
+    *llp |= ((long long)(*cp++) <<  8);
+    *llp |=  (long long)*cp;
+
+    /* advance *xpp 8 bytes */
+    *xpp = (void *)((const char *)(*xpp) + 8);
+
+    return NC_NOERR;
+}
+
+/*---< ncx_put_int32() >-----------------------------------------------------*/
+/* copy the contents of lp (a signed 32-bit integer) to xpp in Big Endian
+ * form and advance *xpp 4 bytes
+ */
+int
+ncx_put_int32(void      **xpp,
+              const int   ip)
+{
+#ifdef WORDS_BIGENDIAN
+    int *ptr = (int*) (*xpp); /* typecast to 4-byte integer */
+    *ptr = ip;
+#else
+    /* bitwise shifts below are to produce an integer in Big Endian */
+    /* cannot call swap4b(), as lp is 8-byte */
+    uchar *cp = (uchar *) *xpp;
+    *cp++ = (uchar)((ip & 0xff000000) >> 24);
+    *cp++ = (uchar)((ip & 0x00ff0000) >> 16);
+    *cp++ = (uchar)((ip & 0x0000ff00) >>  8);
+    *cp   = (uchar)( ip & 0x000000ff);
+#endif
+    /* advance *xpp 4 bytes */
+    *xpp  = (void *)((char *)(*xpp) + 4);
+
+    return NC_NOERR;
+}
+
+/*---< ncx_put_int64() >-----------------------------------------------------*/
+/* copy the contents of lp (a signed 64-bit integer) to xpp in Big Endian
+ * form and advance *xpp 8 bytes
+ */
+int
+ncx_put_int64(void             **xpp,
+              const long long    ip)
+{
+#ifdef WORDS_BIGENDIAN
+    long long *ptr = (long long*) (*xpp); /* typecast to 8-byte integer */
+    *ptr = ip;
+#else
+    uchar *cp = (uchar *) *xpp;
+    /* below is the same as calling swap8b(*xpp, &ip) */
+    *cp++ = (uchar)((ip & 0xff00000000000000ULL) >> 56);
+    *cp++ = (uchar)((ip & 0x00ff000000000000ULL) >> 48);
+    *cp++ = (uchar)((ip & 0x0000ff0000000000ULL) >> 40);
+    *cp++ = (uchar)((ip & 0x000000ff00000000ULL) >> 32);
+    *cp++ = (uchar)((ip & 0x00000000ff000000ULL) >> 24);
+    *cp++ = (uchar)((ip & 0x0000000000ff0000ULL) >> 16);
+    *cp++ = (uchar)((ip & 0x000000000000ff00ULL) >>  8);
+    *cp   = (uchar)( ip & 0x00000000000000ffULL);
+#endif
+    /* advance *xpp 8 bytes */
+    *xpp  = (void *)((char *)(*xpp) + 8);
+
+    return NC_NOERR;
+}
+
 
 /*
  * Aggregate numeric conversion functions.
@@ -2620,6 +2717,7 @@ NCX_PAD_PUTN_CHAR(schar, ushort)
 NCX_PAD_PUTN_CHAR(schar, uint)
 NCX_PAD_PUTN_CHAR(schar, ulonglong)
 
+<<<<<<< HEAD
 /* uchar ---------------------------------------------------------------------*/
 dnl
 dnl NCX_GETN_CHAR(uchar, schar)

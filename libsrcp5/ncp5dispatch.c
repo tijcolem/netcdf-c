@@ -12,7 +12,7 @@
 /* Must follow netcdf.h */
 #include <pnetcdf.h>
 
-typedef struct NCP5_INFO
+typedef struct NC5_INFO
 {
    /* pnetcdf_file will be true if the file is created/opened with the
     * parallel-netcdf library. pnetcdf_access_mode keeps track of
@@ -23,11 +23,11 @@ typedef struct NCP5_INFO
     * to find out the number of dims, because these are collective in
     * pnetcdf.) */
    int pnetcdf_access_mode;
-} NCP5_INFO;
+} NC5_INFO;
 
 /* Define accessors for the dispatchdata */
-#define NCP5_DATA(nc) ((NCP5_INFO*)(nc)->dispatchdata)
-#define NCP5_DATA_SET(nc,data) ((nc)->dispatchdata = (void*)(data))
+#define NC5_DATA(nc) ((NC5_INFO*)(nc)->dispatchdata)
+#define NC5_DATA_SET(nc,data) ((nc)->dispatchdata = (void*)(data))
 
 /* Cannot have NC_MPIPOSIX flag, ignore NC_MPIIO as PnetCDF use MPIIO */
 #define LEGAL_CREATE_FLAGS (NC_NOCLOBBER | NC_64BIT_OFFSET | NC_CLASSIC_MODEL | NC_SHARE | NC_LOCK | NC_PNETCDF)
@@ -38,13 +38,13 @@ typedef struct NCP5_INFO
 /**************************************************/
 
 static int
-NCP5_create(const char *path, int cmode,
+NC5_create(const char *path, int cmode,
 	  size_t initialsz, int basepe, size_t *chunksizehintp,
 	  int use_parallel, void* mpidata,
 	  struct NC_Dispatch* table, NC* nc)
 {
     int res, default_format;
-    NCP5_INFO* nc5;
+    NC5_INFO* nc5;
     MPI_Comm comm = MPI_COMM_WORLD;
     MPI_Info info = MPI_INFO_NULL;
 
@@ -77,12 +77,12 @@ NCP5_create(const char *path, int cmode,
     comm = ((NC_MPI_INFO *)mpidata)->comm;
     info = ((NC_MPI_INFO *)mpidata)->info;
 
-    /* Create our specific NCP5_INFO instance */
-    nc5 = (NCP5_INFO*)calloc(1,sizeof(NCP5_INFO));
+    /* Create our specific NC5_INFO instance */
+    nc5 = (NC5_INFO*)calloc(1,sizeof(NC5_INFO));
     if(nc5 == NULL) return NC_ENOMEM;
 
     /* Link nc5 and nc */
-    NCP5_DATA_SET(nc,nc5);
+    NC5_DATA_SET(nc,nc5);
 
     /* Fix up the cmode by keeping only essential flags;
        these are the flags that are the same in netcf.h and pnetcdf.h
@@ -106,13 +106,13 @@ NCP5_create(const char *path, int cmode,
 }
 
 static int
-NCP5_open(const char *path, int cmode,
+NC5_open(const char *path, int cmode,
 	    int basepe, size_t *chunksizehintp,
 	    int use_parallel, void* mpidata,
 	    struct NC_Dispatch* table, NC* nc)
 {
     int res;
-    NCP5_INFO* nc5;
+    NC5_INFO* nc5;
     MPI_Comm comm = MPI_COMM_WORLD;
     MPI_Info info = MPI_INFO_NULL;
 
@@ -145,12 +145,12 @@ NCP5_open(const char *path, int cmode,
 
     cmode &= (NC_WRITE | NC_NOCLOBBER);
 
-    /* Create our specific NCP5_INFO instance */
-    nc5 = (NCP5_INFO*)calloc(1,sizeof(NCP5_INFO));
+    /* Create our specific NC5_INFO instance */
+    nc5 = (NC5_INFO*)calloc(1,sizeof(NC5_INFO));
     if(nc5 == NULL) return NC_ENOMEM;
 
     /* Link nc5 and nc */
-    NCP5_DATA_SET(nc,nc5);
+    NC5_DATA_SET(nc,nc5);
 
     res = ncmpi_open(comm, path, cmode, info, &(nc->int_ncid));
 
@@ -164,7 +164,7 @@ NCP5_open(const char *path, int cmode,
 }
 
 static int
-NCP5_redef(int ncid)
+NC5_redef(int ncid)
 {
     NC* nc;
     int status = NC_check_id(ncid, &nc);
@@ -173,11 +173,11 @@ NCP5_redef(int ncid)
 }
 
 static int
-NCP5__enddef(int ncid, size_t h_minfree, size_t v_align, size_t v_minfree, size_t r_align)
+NC5__enddef(int ncid, size_t h_minfree, size_t v_align, size_t v_minfree, size_t r_align)
 {
     int status;
     NC* nc;
-    NCP5_INFO* nc5;
+    NC5_INFO* nc5;
     MPI_Offset mpi_h_minfree = h_minfree;
     MPI_Offset mpi_v_align   = v_align;
     MPI_Offset mpi_v_minfree = v_minfree;
@@ -187,17 +187,11 @@ NCP5__enddef(int ncid, size_t h_minfree, size_t v_align, size_t v_minfree, size_
     if(status != NC_NOERR)
 	return status;
 
-    nc5 = NCP5_DATA(nc);
+    nc5 = NC5_DATA(nc);
     assert(nc5);
 
-    /* causes implicitly defined warning; may be because of old installed pnetcdf? */
-#if 0
     status = ncmpi__enddef(nc->int_ncid, mpi_h_minfree, mpi_v_align,
                            mpi_v_minfree, mpi_r_align);
-#else
-    status = ncmpi_enddef(nc->int_ncid);
-#endif
-
     if(!status) {
 	if (nc5->pnetcdf_access_mode == NC_INDEPENDENT)
 	    status = ncmpi_begin_indep_data(nc->int_ncid);
@@ -205,8 +199,15 @@ NCP5__enddef(int ncid, size_t h_minfree, size_t v_align, size_t v_minfree, size_
     return status;
 }
 
+/* No longer needed
 static int
-NCP5_sync(int ncid)
+NC5_enddef(int ncid, size_t h_minfree, size_t v_align, size_t v_minfree, size_t r_align)
+{
+}
+*/
+o
+static int
+NC5_sync(int ncid)
 {
     NC* nc;
     int status = NC_check_id(ncid, &nc);
@@ -215,40 +216,40 @@ NCP5_sync(int ncid)
 }
 
 static int
-NCP5_abort(int ncid)
+NC5_abort(int ncid)
 {
     NC* nc;
-    NCP5_INFO* nc5;
+    NC5_INFO* nc5;
     int status = NC_check_id(ncid, &nc);
     if(status != NC_NOERR) goto done;
 
     status = ncmpi_abort(nc->int_ncid);
 
 done:
-    nc5 = NCP5_DATA(nc);
+    nc5 = NC5_DATA(nc);
     if(nc5 != NULL) free(nc5); /* reclaim allocated space */
     return status;
 }
 
 
 static int
-NCP5_close(int ncid)
+NC5_close(int ncid)
 {
     NC* nc;
-    NCP5_INFO* nc5;
+    NC5_INFO* nc5;
     int status = NC_check_id(ncid, &nc);
     if(status != NC_NOERR) goto done;
 
     status = ncmpi_close(nc->int_ncid);
 
 done:
-    nc5 = NCP5_DATA(nc);
+    nc5 = NC5_DATA(nc);
     if(nc5 != NULL) free(nc5); /* reclaim allocated space */
     return status;
 }
 
 static int
-NCP5_set_fill(int ncid, int fillmode, int *old_mode_ptr)
+NC5_set_fill(int ncid, int fillmode, int *old_mode_ptr)
 {
     NC* nc;
     int status = NC_check_id(ncid, &nc);
@@ -257,20 +258,20 @@ NCP5_set_fill(int ncid, int fillmode, int *old_mode_ptr)
 }
 
 static int
-NCP5_inq_base_pe(int ncid, int* pep)
+NC5_inq_base_pe(int ncid, int* pep)
 {
     if(pep) *pep = 0;
     return NC_NOERR;
 }
 
 static int
-NCP5_set_base_pe(int ncid, int pe)
+NC5_set_base_pe(int ncid, int pe)
 {
     return NC_NOERR;
 }
 
 static int
-NCP5_inq_format(int ncid, int* formatp)
+NC5_inq_format(int ncid, int* formatp)
 {
     NC* nc;
     int status = NC_check_id(ncid, &nc);
@@ -280,19 +281,18 @@ NCP5_inq_format(int ncid, int* formatp)
 }
 
 static int
-NCP5_inq_format_extended(int ncid, int* formatp, int *modep)
+NC5_inq_format_extended(int ncid, int* formatp, int *modep)
 {
     NC* nc;
     int status = NC_check_id(ncid, &nc);
     if(status != NC_NOERR) return status;
     if(modep) *modep = nc->mode;
-    /* Note that we do not use NC_FORMAT_CDF5 because PNETCDF has a dispatch table */
     if(formatp) *formatp = NC_FORMAT_PNETCDF;
     return NC_NOERR;
 }
 
 static int
-NCP5_inq(int ncid,
+NC5_inq(int ncid,
 	int *ndimsp,
 	int *nvarsp,
 	int *nattsp,
@@ -306,9 +306,9 @@ NCP5_inq(int ncid,
 
 
 static int
-NCP5_inq_type(int ncid, nc_type typeid, char* name, size_t* size)
+NC5_inq_type(int ncid, nc_type typeid, char* name, size_t* size)
 {
-    /* Assert mode & NC_FORMAT_CDF5 */
+    /* Assert format == NC_FORMAT_CDF5 */
     if (typeid < NC_BYTE || typeid >= NC_STRING)
            return NC_EBADTYPE;
     if(name)
@@ -319,24 +319,24 @@ NCP5_inq_type(int ncid, nc_type typeid, char* name, size_t* size)
 }
 
 static int
-NCP5_def_dim(int ncid, const char* name, size_t len, int* idp)
+NC5_def_dim(int ncid, const char* name, size_t len, int* idp)
 {
     int status;
-    NCP5_INFO* nc5;
+    NC5_INFO* nc5;
     NC* nc;
 
     status = NC_check_id(ncid, &nc);
     if(status != NC_NOERR)
 	return status;
 
-    nc5 = NCP5_DATA(nc);
+    nc5 = NC5_DATA(nc);
     assert(nc5);
 
     return ncmpi_def_dim(nc->int_ncid, name, len, idp);
 }
 
 static int
-NCP5_inq_dimid(int ncid, const char *name, int *idp)
+NC5_inq_dimid(int ncid, const char *name, int *idp)
 {
     NC* nc;
     int status = NC_check_id(ncid, &nc);
@@ -345,7 +345,7 @@ NCP5_inq_dimid(int ncid, const char *name, int *idp)
 }
 
 static int
-NCP5_inq_dim(int ncid, int dimid, char *name, size_t* lenp)
+NC5_inq_dim(int ncid, int dimid, char *name, size_t* lenp)
 {
     int status;
     NC* nc;
@@ -358,7 +358,7 @@ NCP5_inq_dim(int ncid, int dimid, char *name, size_t* lenp)
 }
 
 static int
-NCP5_inq_unlimdim(int ncid,  int *unlimdimidp)
+NC5_inq_unlimdim(int ncid,  int *unlimdimidp)
 {
     NC* nc;
     int status = NC_check_id(ncid, &nc);
@@ -367,7 +367,7 @@ NCP5_inq_unlimdim(int ncid,  int *unlimdimidp)
 }
 
 static int
-NCP5_rename_dim(int ncid, int dimid, const char* newname)
+NC5_rename_dim(int ncid, int dimid, const char* newname)
 {
     NC* nc;
     int status = NC_check_id(ncid, &nc);
@@ -376,7 +376,7 @@ NCP5_rename_dim(int ncid, int dimid, const char* newname)
 }
 
 static int
-NCP5_inq_att(int ncid, int varid, const char* name, nc_type* xtypep, size_t* lenp)
+NC5_inq_att(int ncid, int varid, const char* name, nc_type* xtypep, size_t* lenp)
 {
     NC* nc;
     MPI_Offset mpilen;
@@ -389,7 +389,7 @@ NCP5_inq_att(int ncid, int varid, const char* name, nc_type* xtypep, size_t* len
 }
 
 static int
-NCP5_inq_attid(int ncid, int varid, const char *name, int *idp)
+NC5_inq_attid(int ncid, int varid, const char *name, int *idp)
 {
     NC* nc;
     int status = NC_check_id(ncid, &nc);
@@ -398,7 +398,7 @@ NCP5_inq_attid(int ncid, int varid, const char *name, int *idp)
 }
 
 static int
-NCP5_inq_attname(int ncid, int varid, int attnum, char *name)
+NC5_inq_attname(int ncid, int varid, int attnum, char *name)
 {
     NC* nc;
     int status = NC_check_id(ncid, &nc);
@@ -408,7 +408,7 @@ NCP5_inq_attname(int ncid, int varid, int attnum, char *name)
 }
 
 static int
-NCP5_rename_att(int ncid, int varid, const char *name,
+NC5_rename_att(int ncid, int varid, const char *name,
 		const char *newname)
 {
     NC* nc;
@@ -418,7 +418,7 @@ NCP5_rename_att(int ncid, int varid, const char *name,
 }
 
 static int
-NCP5_del_att(int ncid, int varid, const char *name)
+NC5_del_att(int ncid, int varid, const char *name)
 {
     NC* nc;
     int status = NC_check_id(ncid, &nc);
@@ -427,7 +427,7 @@ NCP5_del_att(int ncid, int varid, const char *name)
 }
 
 int
-NCP5_get_att(
+NC5_get_att(
 	int ncid,
 	int varid,
 	const char *name,
@@ -441,7 +441,7 @@ NCP5_get_att(
     status = NC_check_id(ncid, &nc);
     if(status != NC_NOERR) return status;
 
-    status = NCP5_inq_att(ncid,varid,name,&xtype,NULL);
+    status = NC5_inq_att(ncid,varid,name,&xtype,NULL);
 
     if(memtype == NC_NAT) memtype = xtype;
 
@@ -475,7 +475,7 @@ NCP5_get_att(
 }
 
 int
-NCP5_put_att(
+NC5_put_att(
 	int ncid,
 	int varid,
 	const char *name,
@@ -531,16 +531,16 @@ NCP5_put_att(
 }
 
 static int
-NCP5_def_var(int ncid, const char *name, nc_type xtype,
+NC5_def_var(int ncid, const char *name, nc_type xtype,
 	    int ndims, const int *dimidsp, int *varidp)
 {
     NC* nc;
-    NCP5_INFO* nc5;
+    NC5_INFO* nc5;
     int status;
 
     status = NC_check_id(ncid, &nc);
     if(status != NC_NOERR) return status;
-    nc5 = NCP5_DATA(nc);
+    nc5 = NC5_DATA(nc);
     assert(nc5);
 
     status = ncmpi_def_var(nc->int_ncid,name,xtype,ndims,dimidsp,varidp);
@@ -548,7 +548,7 @@ NCP5_def_var(int ncid, const char *name, nc_type xtype,
 }
 
 static int
-NCP5_inq_varid(int ncid, const char *name, int *varidp)
+NC5_inq_varid(int ncid, const char *name, int *varidp)
 {
     NC* nc;
     int status = NC_check_id(ncid, &nc);
@@ -557,7 +557,7 @@ NCP5_inq_varid(int ncid, const char *name, int *varidp)
 }
 
 static int
-NCP5_rename_var(int ncid, int varid, const char *name)
+NC5_rename_var(int ncid, int varid, const char *name)
 {
     NC* nc;
     int status = NC_check_id(ncid, &nc);
@@ -566,7 +566,7 @@ NCP5_rename_var(int ncid, int varid, const char *name)
 }
 
 static int
-NCP5_get_vara(int ncid,
+NC5_get_vara(int ncid,
 		int varid,
 		const size_t* startp,
 		const size_t* countp,
@@ -574,7 +574,7 @@ NCP5_get_vara(int ncid,
 		nc_type memtype)
 {
     NC* nc;
-    NCP5_INFO* nc5;
+    NC5_INFO* nc5;
     int status;
     MPI_Offset mpi_start[NC_MAX_VAR_DIMS], mpi_count[NC_MAX_VAR_DIMS];
     int d;
@@ -583,7 +583,7 @@ NCP5_get_vara(int ncid,
     status = NC_check_id(ncid, &nc);
     if(status != NC_NOERR) return status;
 
-    nc5 = NCP5_DATA(nc);
+    nc5 = NC5_DATA(nc);
     assert(nc5);
 
     /* get variable's rank */
@@ -660,7 +660,7 @@ NCP5_get_vara(int ncid,
 }
 
 static int
-NCP5_put_vara(int ncid,
+NC5_put_vara(int ncid,
 	int varid,
 	const size_t* startp,
 	const size_t* countp,
@@ -668,7 +668,7 @@ NCP5_put_vara(int ncid,
 	nc_type memtype)
 {
     NC* nc;
-    NCP5_INFO* nc5;
+    NC5_INFO* nc5;
     int status;
     MPI_Offset mpi_start[NC_MAX_VAR_DIMS], mpi_count[NC_MAX_VAR_DIMS];
     int d;
@@ -677,7 +677,7 @@ NCP5_put_vara(int ncid,
     status = NC_check_id(ncid, &nc);
     if(status != NC_NOERR) return status;
 
-    nc5 = NCP5_DATA(nc);
+    nc5 = NC5_DATA(nc);
     assert(nc5);
 
     /* get variable's rank */
@@ -755,7 +755,7 @@ NCP5_put_vara(int ncid,
 }
 
 static int
-NCP5_get_vars(int ncid,
+NC5_get_vars(int ncid,
 		int varid,
 		const size_t* startp,
 		const size_t* countp,
@@ -764,7 +764,7 @@ NCP5_get_vars(int ncid,
 		nc_type memtype)
 {
     NC* nc;
-    NCP5_INFO* nc5;
+    NC5_INFO* nc5;
     int status;
     MPI_Offset mpi_start[NC_MAX_VAR_DIMS], mpi_count[NC_MAX_VAR_DIMS], mpi_stride[NC_MAX_VAR_DIMS];
     int d;
@@ -773,7 +773,7 @@ NCP5_get_vars(int ncid,
     status = NC_check_id(ncid, &nc);
     if(status != NC_NOERR) return status;
 
-    nc5 = NCP5_DATA(nc);
+    nc5 = NC5_DATA(nc);
     assert(nc5);
 
     /* get variable's rank */
@@ -851,7 +851,7 @@ NCP5_get_vars(int ncid,
 }
 
 static int
-NCP5_put_vars(int ncid,
+NC5_put_vars(int ncid,
 	int varid,
 	const size_t* startp,
 	const size_t* countp,
@@ -860,7 +860,7 @@ NCP5_put_vars(int ncid,
 	nc_type memtype)
 {
     NC* nc;
-    NCP5_INFO* nc5;
+    NC5_INFO* nc5;
     int status;
     MPI_Offset mpi_start[NC_MAX_VAR_DIMS], mpi_count[NC_MAX_VAR_DIMS], mpi_stride[NC_MAX_VAR_DIMS];
     int d;
@@ -869,7 +869,7 @@ NCP5_put_vars(int ncid,
     status = NC_check_id(ncid, &nc);
     if(status != NC_NOERR) return status;
 
-    nc5 = NCP5_DATA(nc);
+    nc5 = NC5_DATA(nc);
     assert(nc5);
 
     /* get variable's rank */
@@ -947,7 +947,7 @@ NCP5_put_vars(int ncid,
 }
 
 static int
-NCP5_get_varm(int ncid,
+NC5_get_varm(int ncid,
 		int varid,
 		const size_t* startp,
 		const size_t* countp,
@@ -957,7 +957,7 @@ NCP5_get_varm(int ncid,
 		nc_type memtype)
 {
     NC* nc;
-    NCP5_INFO* nc5;
+    NC5_INFO* nc5;
     int status;
     MPI_Offset mpi_start[NC_MAX_VAR_DIMS], mpi_count[NC_MAX_VAR_DIMS], mpi_stride[NC_MAX_VAR_DIMS], mpi_imap[NC_MAX_VAR_DIMS];
     int d;
@@ -966,7 +966,7 @@ NCP5_get_varm(int ncid,
     status = NC_check_id(ncid, &nc);
     if(status != NC_NOERR) return status;
 
-    nc5 = NCP5_DATA(nc);
+    nc5 = NC5_DATA(nc);
     assert(nc5);
 
     /* get variable's rank */
@@ -1045,7 +1045,7 @@ NCP5_get_varm(int ncid,
 }
 
 static int
-NCP5_put_varm(int ncid,
+NC5_put_varm(int ncid,
 	int varid,
 	const size_t* startp,
 	const size_t* countp,
@@ -1055,7 +1055,7 @@ NCP5_put_varm(int ncid,
 	nc_type memtype)
 {
     NC* nc;
-    NCP5_INFO* nc5;
+    NC5_INFO* nc5;
     int status;
     MPI_Offset mpi_start[NC_MAX_VAR_DIMS], mpi_count[NC_MAX_VAR_DIMS], mpi_stride[NC_MAX_VAR_DIMS], mpi_imap[NC_MAX_VAR_DIMS];
     int d;
@@ -1064,7 +1064,7 @@ NCP5_put_varm(int ncid,
     status = NC_check_id(ncid, &nc);
     if(status != NC_NOERR) return status;
 
-    nc5 = NCP5_DATA(nc);
+    nc5 = NC5_DATA(nc);
     assert(nc5);
 
     /* get variable's rank */
@@ -1135,15 +1135,15 @@ NCP5_put_varm(int ncid,
 	    status = ncmpi_put_varm_longlong_all(nc->int_ncid, varid, mpi_start, mpi_count, mpi_stride, mpi_imap, ip); break;
 	case NC_UINT64:
 	    status = ncmpi_put_varm_ulonglong_all(nc->int_ncid, varid, mpi_start, mpi_count, mpi_stride, mpi_imap, ip); break;
-	default:
-	    status = NC_EBADTYPE;
-	}
+ 	default:
+ 	    status = NC_EBADTYPE;
+ 	}
     }
     return status;
 }
 
 static int
-NCP5_inq_var_all(int ncid, int varid, char *name, nc_type *xtypep,
+NC5_inq_var_all(int ncid, int varid, char *name, nc_type *xtypep,
                int *ndimsp, int *dimidsp, int *nattsp,
                int *shufflep, int *deflatep, int *deflate_levelp,
                int *fletcher32p, int *contiguousp, size_t *chunksizesp,
@@ -1169,10 +1169,10 @@ NCP5_inq_var_all(int ncid, int varid, char *name, nc_type *xtypep,
 }
 
 static int
-NCP5_var_par_access(int ncid, int varid, int par_access)
+NC5_var_par_access(int ncid, int varid, int par_access)
 {
     NC *nc;
-    NCP5_INFO* nc5;
+    NC5_INFO* nc5;
     int status;
 
     if (par_access != NC_INDEPENDENT && par_access != NC_COLLECTIVE)
@@ -1181,7 +1181,7 @@ NCP5_var_par_access(int ncid, int varid, int par_access)
     status = NC_check_id(ncid, &nc);
     if(status != NC_NOERR) return status;
 
-    nc5 = NCP5_DATA(nc);
+    nc5 = NC5_DATA(nc);
     assert(nc5);
 
     if(par_access == nc5->pnetcdf_access_mode)
@@ -1196,18 +1196,18 @@ NCP5_var_par_access(int ncid, int varid, int par_access)
 #ifdef USE_NETCDF4
 
 static int
-NCP5_show_metadata(int ncid)
+NC5_show_metadata(int ncid)
 {
     return NC_NOERR;
 }
 
 static int
-NCP5_inq_unlimdims(int ncid, int *ndimsp, int *unlimdimidsp)
+NC5_inq_unlimdims(int ncid, int *ndimsp, int *unlimdimidsp)
 {
     int retval;
     int unlimid;
 
-    if((retval = NCP5_inq_unlimdim(ncid, &unlimid)))
+    if((retval = NC5_inq_unlimdim(ncid, &unlimid)))
         return retval;
     if(unlimid != -1) {
         if(ndimsp) *ndimsp = 1;
@@ -1219,7 +1219,7 @@ NCP5_inq_unlimdims(int ncid, int *ndimsp, int *unlimdimidsp)
 }
 
 static int
-NCP5_inq_type_equal(int ncid1, nc_type typeid1, int ncid2, nc_type typeid2, int* equalp)
+NC5_inq_type_equal(int ncid1, nc_type typeid1, int ncid2, nc_type typeid2, int* equalp)
 {
     /* Check input. */
     if(equalp == NULL) return NC_NOERR;
@@ -1237,7 +1237,7 @@ NCP5_inq_type_equal(int ncid1, nc_type typeid1, int ncid2, nc_type typeid2, int*
     }
 
     /* If both are atomic types, the answer is easy. */
-    if (typeid1 <= ATOMICTYPEMAX5) {
+    if (typeid1 <= ATOMICTYPEMAX) {
         if (equalp) {
             if (typeid1 == typeid2)
                 *equalp = 1;
@@ -1250,26 +1250,26 @@ NCP5_inq_type_equal(int ncid1, nc_type typeid1, int ncid2, nc_type typeid2, int*
 }
 
 static int
-NCP5_def_grp(int parent_ncid, const char *name, int *new_ncid)
+NC5_def_grp(int parent_ncid, const char *name, int *new_ncid)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_rename_grp(int ncid, const char *name)
+NC5_rename_grp(int ncid, const char *name)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_inq_ncid(int ncid, const char *name, int *grp_ncid)
+NC5_inq_ncid(int ncid, const char *name, int *grp_ncid)
 {
     if(grp_ncid) *grp_ncid = ncid;
     return NC_NOERR;
 }
 
 static int
-NCP5_inq_grps(int ncid, int *numgrps, int *ncids)
+NC5_inq_grps(int ncid, int *numgrps, int *ncids)
 {
     if(numgrps)
        *numgrps = 0;
@@ -1277,7 +1277,7 @@ NCP5_inq_grps(int ncid, int *numgrps, int *ncids)
 }
 
 static int
-NCP5_inq_grpname(int ncid, char *name)
+NC5_inq_grpname(int ncid, char *name)
 {
     if(name)
         strcpy(name, "/");
@@ -1285,7 +1285,7 @@ NCP5_inq_grpname(int ncid, char *name)
 }
 
 static int
-NCP5_inq_grpname_full(int ncid, size_t *lenp, char *full_name)
+NC5_inq_grpname_full(int ncid, size_t *lenp, char *full_name)
 {
     if(full_name)
         strcpy(full_name, "/");
@@ -1294,24 +1294,24 @@ NCP5_inq_grpname_full(int ncid, size_t *lenp, char *full_name)
 }
 
 static int
-NCP5_inq_grp_parent(int ncid, int *parent_ncid)
+NC5_inq_grp_parent(int ncid, int *parent_ncid)
 {
     return NC_ENOGRP;
 }
 
 static int
-NCP5_inq_grp_full_ncid(int ncid, const char *full_name, int *grp_ncid)
+NC5_inq_grp_full_ncid(int ncid, const char *full_name, int *grp_ncid)
 {
     return NC_ENOGRP;
 }
 
 static int
-NCP5_inq_varids(int ncid, int *nvarsp, int *varids)
+NC5_inq_varids(int ncid, int *nvarsp, int *varids)
 {
     int retval,v,nvars;
     /* This is, effectively, a netcdf-3 file, there is only one group, the root
         group, and its vars have ids 0 thru nvars - 1. */
-    if((retval = NCP5_inq(ncid, NULL, &nvars, NULL, NULL)))
+    if((retval = NC5_inq(ncid, NULL, &nvars, NULL, NULL)))
         return retval;
     if(nvarsp) *nvarsp = nvars;
     if(varids)
@@ -1321,12 +1321,12 @@ NCP5_inq_varids(int ncid, int *nvarsp, int *varids)
 }
 
 static int
-NCP5_inq_dimids(int ncid, int *ndimsp, int *dimids, int include_parents)
+NC5_inq_dimids(int ncid, int *ndimsp, int *dimids, int include_parents)
 {
     int retval,d,ndims;
     /* If this is like a netcdf-3 file, then the dimids are going to be 0
        thru ndims-1, so just provide them. */
-    if((retval = NCP5_inq(ncid, &ndims,  NULL, NULL, NULL)))
+    if((retval = NC5_inq(ncid, &ndims,  NULL, NULL, NULL)))
         return retval;
     if(ndimsp) *ndimsp = ndims;
     if(dimids)
@@ -1336,10 +1336,10 @@ NCP5_inq_dimids(int ncid, int *ndimsp, int *dimids, int include_parents)
 }
 
 static int
-NCP5_inq_typeid(int ncid, const char *name, nc_type *typeidp)
+NC5_inq_typeid(int ncid, const char *name, nc_type *typeidp)
 {
     int i;
-    for (i = 0; i <= ATOMICTYPEMAX5; i++)
+    for (i = 0; i <= ATOMICTYPEMAX; i++)
         if(!strcmp(name, NC_atomictypename(i))) {
             if(typeidp) *typeidp = i;
                 return NC_NOERR;
@@ -1348,34 +1348,34 @@ NCP5_inq_typeid(int ncid, const char *name, nc_type *typeidp)
 }
 
 static int
-NCP5_inq_typeids(int ncid, int *ntypes, int *typeids)
+NC5_inq_typeids(int ncid, int *ntypes, int *typeids)
 {
     if(ntypes) *ntypes = 0;
     return NC_NOERR;
 }
 
 static int
-NCP5_inq_user_type(int ncid, nc_type typeid, char *name, size_t *size,
+NC5_inq_user_type(int ncid, nc_type typeid, char *name, size_t *size,
 		 nc_type *base_nc_typep, size_t *nfieldsp, int *classp)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_def_compound(int ncid, size_t size, const char *name, nc_type *typeidp)
+NC5_def_compound(int ncid, size_t size, const char *name, nc_type *typeidp)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_insert_compound(int ncid, nc_type typeid, const char *name, size_t offset,
+NC5_insert_compound(int ncid, nc_type typeid, const char *name, size_t offset,
                     nc_type field_typeid)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_insert_array_compound(int ncid, nc_type typeid, const char *name,
+NC5_insert_array_compound(int ncid, nc_type typeid, const char *name,
 			 size_t offset, nc_type field_typeid,
 			 int ndims, const int *dim_sizes)
 {
@@ -1384,7 +1384,7 @@ NCP5_insert_array_compound(int ncid, nc_type typeid, const char *name,
 
 
 static int
-NCP5_inq_compound_field(int ncid, nc_type typeid, int fieldid, char *name,
+NC5_inq_compound_field(int ncid, nc_type typeid, int fieldid, char *name,
 		      size_t *offsetp, nc_type *field_typeidp, int *ndimsp,
 		      int *dim_sizesp)
 {
@@ -1392,103 +1392,103 @@ NCP5_inq_compound_field(int ncid, nc_type typeid, int fieldid, char *name,
 }
 
 static int
-NCP5_inq_compound_fieldindex(int ncid, nc_type typeid, const char *name, int *fieldidp)
+NC5_inq_compound_fieldindex(int ncid, nc_type typeid, const char *name, int *fieldidp)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_def_opaque(int ncid, size_t datum_size, const char *name, nc_type* xtypep)
+NC5_def_opaque(int ncid, size_t datum_size, const char *name, nc_type* xtypep)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_def_vlen(int ncid, const char *name, nc_type base_typeid, nc_type* xtypep)
+NC5_def_vlen(int ncid, const char *name, nc_type base_typeid, nc_type* xtypep)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_def_enum(int ncid, nc_type base_typeid, const char *name,
+NC5_def_enum(int ncid, nc_type base_typeid, const char *name,
 	    nc_type *typeidp)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_inq_enum_ident(int ncid, nc_type xtype, long long value, char *identifier)
+NC5_inq_enum_ident(int ncid, nc_type xtype, long long value, char *identifier)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_inq_enum_member(int ncid, nc_type typeid, int idx, char *identifier,
+NC5_inq_enum_member(int ncid, nc_type typeid, int idx, char *identifier,
 		   void *value)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_insert_enum(int ncid, nc_type typeid, const char *identifier,
+NC5_insert_enum(int ncid, nc_type typeid, const char *identifier,
 	       const void *value)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_put_vlen_element(int ncid, int typeid, void *vlen_element,
+NC5_put_vlen_element(int ncid, int typeid, void *vlen_element,
 		    size_t len, const void *data)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_get_vlen_element(int ncid, int typeid, const void *vlen_element,
+NC5_get_vlen_element(int ncid, int typeid, const void *vlen_element,
 		    size_t *len, void *data)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_set_var_chunk_cache(int ncid, int varid, size_t size, size_t nelems, float preemption)
+NC5_set_var_chunk_cache(int ncid, int varid, size_t size, size_t nelems, float preemption)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_get_var_chunk_cache(int ncid, int varid, size_t *sizep, size_t *nelemsp, float *preemptionp)
+NC5_get_var_chunk_cache(int ncid, int varid, size_t *sizep, size_t *nelemsp, float *preemptionp)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_def_var_deflate(int ncid, int varid, int shuffle, int deflate,
+NC5_def_var_deflate(int ncid, int varid, int shuffle, int deflate,
 		   int deflate_level)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_def_var_fletcher32(int ncid, int varid, int fletcher32)
+NC5_def_var_fletcher32(int ncid, int varid, int fletcher32)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_def_var_chunking(int ncid, int varid, int contiguous, const size_t *chunksizesp)
+NC5_def_var_chunking(int ncid, int varid, int contiguous, const size_t *chunksizesp)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_def_var_fill(int ncid, int varid, int no_fill, const void *fill_value)
+NC5_def_var_fill(int ncid, int varid, int no_fill, const void *fill_value)
 {
     return NC_ENOTNC4;
 }
 
 static int
-NCP5_def_var_endian(int ncid, int varid, int endianness)
+NC5_def_var_endian(int ncid, int varid, int endianness)
 {
     return NC_ENOTNC4;
 }
@@ -1498,109 +1498,109 @@ NCP5_def_var_endian(int ncid, int varid, int endianness)
 /**************************************************/
 /* Pnetcdf Dispatch table */
 
-NC_Dispatch NCP5_dispatcher = {
+NC_Dispatch NC5_dispatcher = {
 
-NC_DISPATCH_NCP5,
+NC_DISPATCH_NC5,
 
-NCP5_create,
-NCP5_open,
+NC5_create,
+NC5_open,
 
-NCP5_redef,
-NCP5__enddef,
-NCP5_sync,
-NCP5_abort,
-NCP5_close,
-NCP5_set_fill,
-NCP5_inq_base_pe,
-NCP5_set_base_pe,
-NCP5_inq_format,
-NCP5_inq_format_extended,
+NC5_redef,
+NC5__enddef,
+NC5_sync,
+NC5_abort,
+NC5_close,
+NC5_set_fill,
+NC5_inq_base_pe,
+NC5_set_base_pe,
+NC5_inq_format,
+NC5_inq_format_extended,
 
-NCP5_inq,
-NCP5_inq_type,
+NC5_inq,
+NC5_inq_type,
 
-NCP5_def_dim,
-NCP5_inq_dimid,
-NCP5_inq_dim,
-NCP5_inq_unlimdim,
-NCP5_rename_dim,
+NC5_def_dim,
+NC5_inq_dimid,
+NC5_inq_dim,
+NC5_inq_unlimdim,
+NC5_rename_dim,
 
-NCP5_inq_att,
-NCP5_inq_attid,
-NCP5_inq_attname,
-NCP5_rename_att,
-NCP5_del_att,
-NCP5_get_att,
-NCP5_put_att,
+NC5_inq_att,
+NC5_inq_attid,
+NC5_inq_attname,
+NC5_rename_att,
+NC5_del_att,
+NC5_get_att,
+NC5_put_att,
 
-NCP5_def_var,
-NCP5_inq_varid,
-NCP5_rename_var,
-NCP5_get_vara,
-NCP5_put_vara,
-NCP5_get_vars,
-NCP5_put_vars,
-NCP5_get_varm,
-NCP5_put_varm,
+NC5_def_var,
+NC5_inq_varid,
+NC5_rename_var,
+NC5_get_vara,
+NC5_put_vara,
+NC5_get_vars,
+NCD5_put_vars,
+NC5_get_varm,
+NC5_put_varm,
 
-NCP5_inq_var_all,
+NC5_inq_var_all,
 
-NCP5_var_par_access,
+NC5_var_par_access,
 
 #ifdef USE_NETCDF4
-NCP5_show_metadata,
-NCP5_inq_unlimdims,
+NC5_show_metadata,
+NC5_inq_unlimdims,
 
-NCP5_inq_ncid,
-NCP5_inq_grps,
-NCP5_inq_grpname,
-NCP5_inq_grpname_full,
-NCP5_inq_grp_parent,
-NCP5_inq_grp_full_ncid,
-NCP5_inq_varids,
-NCP5_inq_dimids,
-NCP5_inq_typeids,
-NCP5_inq_type_equal,
-NCP5_def_grp,
-NCP5_rename_grp,
-NCP5_inq_user_type,
-NCP5_inq_typeid,
+NC5_inq_ncid,
+NC5_inq_grps,
+NC5_inq_grpname,
+NC5_inq_grpname_full,
+NC5_inq_grp_parent,
+NC5_inq_grp_full_ncid,
+NC5_inq_varids,
+NC5_inq_dimids,
+NC5_inq_typeids,
+NC5_inq_type_equal,
+NC5_def_grp,
+NC5_rename_grp,
+NC5_inq_user_type,
+NC5_inq_typeid,
 
-NCP5_def_compound,
-NCP5_insert_compound,
-NCP5_insert_array_compound,
-NCP5_inq_compound_field,
-NCP5_inq_compound_fieldindex,
-NCP5_def_vlen,
-NCP5_put_vlen_element,
-NCP5_get_vlen_element,
-NCP5_def_enum,
-NCP5_insert_enum,
-NCP5_inq_enum_member,
-NCP5_inq_enum_ident,
-NCP5_def_opaque,
-NCP5_def_var_deflate,
-NCP5_def_var_fletcher32,
-NCP5_def_var_chunking,
-NCP5_def_var_fill,
-NCP5_def_var_endian,
-NCP5_set_var_chunk_cache,
-NCP5_get_var_chunk_cache,
+NC5_def_compound,
+NC5_insert_compound,
+NC5_insert_array_compound,
+NC5_inq_compound_field,
+NC5_inq_compound_fieldindex,
+NC5_def_vlen,
+NC5_put_vlen_element,
+NC5_get_vlen_element,
+NC5_def_enum,
+NC5_insert_enum,
+NC5_inq_enum_member,
+NC5_inq_enum_ident,
+NC5_def_opaque,
+NC5_def_var_deflate,
+NC5_def_var_fletcher32,
+NC5_def_var_chunking,
+NC5_def_var_fill,
+NC5_def_var_endian,
+NC5_set_var_chunk_cache,
+NC5_get_var_chunk_cache,
 #endif /*USE_NETCDF4*/
 
 };
 
-NC_Dispatch* NCP5_dispatch_table = NULL; /* moved here from ddispatch.c */
+NC_Dispatch* NC5_dispatch_table = NULL; /* moved here from ddispatch.c */
 
 int
-NCP5_initialize(void)
+NC5_initialize(void)
 {
-    NCP5_dispatch_table = &NCP5_dispatcher;
+    NC5_dispatch_table = &NC5_dispatcher;
     return NC_NOERR;
 }
 
 int
-NCP5_finalize(void)
+NC5_finalize(void)
 {
     return NC_NOERR;
 }
