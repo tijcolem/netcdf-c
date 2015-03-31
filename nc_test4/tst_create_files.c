@@ -19,10 +19,8 @@
 int
 main(int argc, char **argv)
 {
+    nc_initialize(argc, argv);
 
-#ifdef USE_PARALLEL
-   MPI_Init(&argc, &argv);
-#endif
     printf("\n*** Create some files for testing benchmarks.\n");
 
 #ifdef LARGE_FILE_TESTS
@@ -299,9 +297,7 @@ main(int argc, char **argv)
     }
     SUMMARIZE_ERR;
 
-#ifdef USE_PARALLEL
-   MPI_Finalize();
-#endif   
+    nc_finalize();
     FINAL_RESULTS;
 }
 

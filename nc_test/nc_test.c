@@ -1,7 +1,6 @@
 /*********************************************************************
  *   Copyright 1996-2005, UCAR/Unidata
  *   See COPYRIGHT file for copying and redistribution conditions.
- *   $Id: nc_test.c,v 1.44 2008/10/20 01:48:08 ed Exp $
  *********************************************************************/
 
 #include "tests.h"
@@ -27,6 +26,9 @@
 /* 
  * global variables (defined by function init_gvars) describing file test.nc
  */
+int numGatts;  /* number of global attributes */
+int numVars;   /* number of variables */
+int numTypes;  /* number of netCDF data types to test */
 char dim_name[NDIMS][3];
 size_t dim_len[NDIMS];
 char var_name[NVARS][2+MAX_RANK];
@@ -75,17 +77,15 @@ char scratch[] = "scratch.nc";  /* writable scratch file */
 
 /* Test everything for classic and 64-bit offsetfiles. If netcdf-4 is
  * included, that means another whole round of testing. */
-#ifdef USE_NETCDF4
-#define NUM_FORMATS (3)
-#else
-#define NUM_FORMATS (2)
-#endif
+#define NUM_FORMATS (5)
 
 int
 main(int argc, char *argv[])
 {
     int i;
     int  nfailsTotal = 0;        /* total number of failures */
+
+    nc_initialize(&argc,&argv);
 
     /* Both CRAY MPP and OSF/1 Alpha systems need this.  Some of the
      * extreme test assignments in this program trigger floating point
@@ -95,9 +95,6 @@ main(int argc, char *argv[])
 
     verbose = 0;
     max_nmpt = 8;
-
-    /* Initialize global variables defining test file */
-    init_gvars();
 
     /* If you uncomment the nc_set_log_level line, you will get a lot
      * of debugging info. If you set the number higher, you'll get
@@ -114,6 +111,10 @@ main(int argc, char *argv[])
      * output of this program. */
     for (i = 1; i <= NUM_FORMATS; i++)
     {
+       numGatts = 6;
+       numVars  = 136;
+       numTypes = 6;
+
        switch (i) 
        {
 	  case NC_FORMAT_CLASSIC:
@@ -121,22 +122,36 @@ main(int argc, char *argv[])
 	     fprintf(stderr, "\n\nSwitching to netCDF classic format.\n");
 	     strcpy(testfile, "nc_test_classic.nc");
 	     break;
-	  case NC_FORMAT_64BIT:
-	     nc_set_default_format(NC_FORMAT_64BIT, NULL);
+	  case NC_FORMAT_64BIT_OFFSET:
+	     nc_set_default_format(NC_FORMAT_64BIT_OFFSET, NULL);
 	     fprintf(stderr, "\n\nSwitching to 64-bit offset format.\n");
 	     strcpy(testfile, "nc_test_64bit.nc");
 	     break;
-#ifdef USE_NETCDF4
+	  case NC_FORMAT_CDF5:
+	     nc_set_default_format(NC_FORMAT_CDF5, NULL);
+	     fprintf(stderr, "\n\nSwitching to 64-bit data format.\n");
+	     strcpy(testfile, "nc_test_cdf5.nc");
+             numGatts = NGATTS;
+             numVars  = NVARS;
+             numTypes = NTYPES;
+	     break;
+	  case NC_FORMAT_NETCDF4_CLASSIC:
 	  case NC_FORMAT_NETCDF4: /* actually it's _CLASSIC. */
+#ifdef USE_NETCDF4
 	     nc_set_default_format(NC_FORMAT_NETCDF4_CLASSIC, NULL);
 	     strcpy(testfile, "nc_test_netcdf4.nc");
 	     fprintf(stderr, "\n\nSwitching to netCDF-4 format (with NC_CLASSIC_MODEL).\n");
 	     break;
+#else
+	     continue;
 #endif
 	  default:
 	     fprintf(stderr, "Unexpected format!\n");
 	     return 2;
        }
+
+       /* Initialize global variables defining test file */
+       init_gvars();
 
 	/* Write the test file, needed for the read-only tests below. */
        write_file(testfile);
@@ -172,6 +187,11 @@ main(int argc, char *argv[])
 	NC_TEST(nc_get_var_long);
 	NC_TEST(nc_get_var_float);
 	NC_TEST(nc_get_var_double);
+	NC_TEST(nc_get_var_ushort);
+	NC_TEST(nc_get_var_uint);
+	NC_TEST(nc_get_var_longlong);
+	NC_TEST(nc_get_var_ulonglong);
+
 	NC_TEST(nc_get_var1_text);
 	NC_TEST(nc_get_var1_uchar);
 	NC_TEST(nc_get_var1_schar);
@@ -180,7 +200,12 @@ main(int argc, char *argv[])
 	NC_TEST(nc_get_var1_long);
 	NC_TEST(nc_get_var1_float);
 	NC_TEST(nc_get_var1_double);
+	NC_TEST(nc_get_var1_ushort);
+	NC_TEST(nc_get_var1_uint);
+	NC_TEST(nc_get_var1_longlong);
+	NC_TEST(nc_get_var1_ulonglong);
 	NC_TEST(nc_get_var1);
+
 	NC_TEST(nc_get_vara_text);
 	NC_TEST(nc_get_vara_uchar);
 	NC_TEST(nc_get_vara_schar);
@@ -189,7 +214,12 @@ main(int argc, char *argv[])
 	NC_TEST(nc_get_vara_long);
 	NC_TEST(nc_get_vara_float);
 	NC_TEST(nc_get_vara_double);
+	NC_TEST(nc_get_vara_ushort);
+	NC_TEST(nc_get_vara_uint);
+	NC_TEST(nc_get_vara_longlong);
+	NC_TEST(nc_get_vara_ulonglong);
 	NC_TEST(nc_get_vara);
+
 	NC_TEST(nc_get_vars_text);
 	NC_TEST(nc_get_vars_uchar);
 	NC_TEST(nc_get_vars_schar);
@@ -198,7 +228,12 @@ main(int argc, char *argv[])
 	NC_TEST(nc_get_vars_long);
 	NC_TEST(nc_get_vars_float);
 	NC_TEST(nc_get_vars_double);
+	NC_TEST(nc_get_vars_ushort);
+	NC_TEST(nc_get_vars_uint);
+	NC_TEST(nc_get_vars_longlong);
+	NC_TEST(nc_get_vars_ulonglong);
 	NC_TEST(nc_get_vars);
+
 	NC_TEST(nc_get_varm_text);
 	NC_TEST(nc_get_varm_uchar);
 	NC_TEST(nc_get_varm_schar);
@@ -207,7 +242,12 @@ main(int argc, char *argv[])
 	NC_TEST(nc_get_varm_long);
 	NC_TEST(nc_get_varm_float);
 	NC_TEST(nc_get_varm_double);
+	NC_TEST(nc_get_varm_ushort);
+	NC_TEST(nc_get_varm_uint);
+	NC_TEST(nc_get_varm_longlong);
+	NC_TEST(nc_get_varm_ulonglong);
 	NC_TEST(nc_get_varm);
+
 	NC_TEST(nc_get_att_text);
 	NC_TEST(nc_get_att_uchar);
 	NC_TEST(nc_get_att_schar);
@@ -216,7 +256,12 @@ main(int argc, char *argv[])
 	NC_TEST(nc_get_att_long);
 	NC_TEST(nc_get_att_float);
 	NC_TEST(nc_get_att_double);
+	NC_TEST(nc_get_att_ushort);
+	NC_TEST(nc_get_att_uint);
+	NC_TEST(nc_get_att_longlong);
+	NC_TEST(nc_get_att_ulonglong);
 	NC_TEST(nc_get_att);
+
 	NC_TEST(nc_inq_att);
 	NC_TEST(nc_inq_attname);
 	NC_TEST(nc_inq_attid);
@@ -232,6 +277,7 @@ main(int argc, char *argv[])
 	NC_TEST(nc_def_dim);
 	NC_TEST(nc_rename_dim);
 	NC_TEST(nc_def_var);
+
 	NC_TEST(nc_put_var_text);
 	NC_TEST(nc_put_var_uchar);
 	NC_TEST(nc_put_var_schar);
@@ -240,6 +286,11 @@ main(int argc, char *argv[])
 	NC_TEST(nc_put_var_long);
 	NC_TEST(nc_put_var_float);
 	NC_TEST(nc_put_var_double);
+	NC_TEST(nc_put_var_ushort);
+	NC_TEST(nc_put_var_uint);
+	NC_TEST(nc_put_var_longlong);
+	NC_TEST(nc_put_var_ulonglong);
+
 	NC_TEST(nc_put_var1_text);
 	NC_TEST(nc_put_var1_uchar);
 	NC_TEST(nc_put_var1_schar);
@@ -248,7 +299,12 @@ main(int argc, char *argv[])
 	NC_TEST(nc_put_var1_long);
 	NC_TEST(nc_put_var1_float);
 	NC_TEST(nc_put_var1_double);
+	NC_TEST(nc_put_var1_ushort);
+	NC_TEST(nc_put_var1_uint);
+	NC_TEST(nc_put_var1_longlong);
+	NC_TEST(nc_put_var1_ulonglong);
 	NC_TEST(nc_put_var1);
+
 	NC_TEST(nc_put_vara_text);
 	NC_TEST(nc_put_vara_uchar);
 	NC_TEST(nc_put_vara_schar);
@@ -257,7 +313,12 @@ main(int argc, char *argv[])
 	NC_TEST(nc_put_vara_long);
 	NC_TEST(nc_put_vara_float);
 	NC_TEST(nc_put_vara_double);
+	NC_TEST(nc_put_vara_ushort);
+	NC_TEST(nc_put_vara_uint);
+	NC_TEST(nc_put_vara_longlong);
+	NC_TEST(nc_put_vara_ulonglong);
 	NC_TEST(nc_put_vara);
+
 	NC_TEST(nc_put_vars_text);
 	NC_TEST(nc_put_vars_uchar);
 	NC_TEST(nc_put_vars_schar);
@@ -266,7 +327,12 @@ main(int argc, char *argv[])
 	NC_TEST(nc_put_vars_long);
 	NC_TEST(nc_put_vars_float);
 	NC_TEST(nc_put_vars_double);
+	NC_TEST(nc_put_vars_ushort);
+	NC_TEST(nc_put_vars_uint);
+	NC_TEST(nc_put_vars_longlong);
+	NC_TEST(nc_put_vars_ulonglong);
 	NC_TEST(nc_put_vars);
+
 	NC_TEST(nc_put_varm_text);
 	NC_TEST(nc_put_varm_uchar);
 	NC_TEST(nc_put_varm_schar);
@@ -275,8 +341,14 @@ main(int argc, char *argv[])
 	NC_TEST(nc_put_varm_long);
 	NC_TEST(nc_put_varm_float);
 	NC_TEST(nc_put_varm_double);
+	NC_TEST(nc_put_varm_ushort);
+	NC_TEST(nc_put_varm_uint);
+	NC_TEST(nc_put_varm_longlong);
+	NC_TEST(nc_put_varm_ulonglong);
 	NC_TEST(nc_put_varm);
+
 	NC_TEST(nc_rename_var);
+
 	NC_TEST(nc_put_att_text);
 	NC_TEST(nc_put_att_uchar);
 	NC_TEST(nc_put_att_schar);
@@ -285,7 +357,12 @@ main(int argc, char *argv[])
 	NC_TEST(nc_put_att_long);
 	NC_TEST(nc_put_att_float);
 	NC_TEST(nc_put_att_double);
+	NC_TEST(nc_put_att_ushort);
+	NC_TEST(nc_put_att_uint);
+	NC_TEST(nc_put_att_longlong);
+	NC_TEST(nc_put_att_ulonglong);
 	NC_TEST(nc_put_att);
+
 	NC_TEST(nc_copy_att);
 	NC_TEST(nc_rename_att);
 	NC_TEST(nc_del_att);
@@ -301,6 +378,8 @@ main(int argc, char *argv[])
     }
     else
        fprintf(stderr, "*** nc_test SUCCESS!!!\n");
+
+    nc_finalize();
 
     exit(0);
     return 0;
