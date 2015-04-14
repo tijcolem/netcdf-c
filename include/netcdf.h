@@ -120,7 +120,10 @@ extern "C" {
 #define NC_NOFILL	0x100	/**< Argument to nc_set_fill() to turn off filling of data. */
 
 /* Define the ioflags bits for nc_create and nc_open.
-   currently unused: 0x0010,0x0020,0x0040,0x0080
+   currently unused:
+	0x0020
+	0x0040
+	0x0080
    and the whole upper 16 bits
 */
 
