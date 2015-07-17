@@ -14,16 +14,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <netcdf.h>
+<<<<<<< HEAD
 #ifdef USE_PARALLEL
 #include <netcdf_par.h>
 #endif
+=======
+#include <netcdf_par.h>
+>>>>>>> initial merge of the cdf5 code
 
 #define FILE_NAME "tst_misc.nc"
 
 int
 main(int argc, char **argv) 
 {
+<<<<<<< HEAD
 #ifdef USE_PNETCDF
+=======
+#ifdef TEST_PNETCDF
+>>>>>>> initial merge of the cdf5 code
    MPI_Init(&argc, &argv);
 #endif
    printf("\n*** Testing some extra stuff.\n");
@@ -47,7 +55,11 @@ main(int argc, char **argv)
 	 if (fclose(file)) ERR;
 	 
 	 /* Make sure that netCDF rejects this file politely. */
+<<<<<<< HEAD
 #ifdef USE_PNETCDF
+=======
+#ifdef TEST_PNETCDF
+>>>>>>> initial merge of the cdf5 code
         openstat = nc_open_par(FILE_NAME, NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
          openstat = nc_open(FILE_NAME, 0, &ncid);
@@ -60,7 +72,11 @@ main(int argc, char **argv)
    }
 
    SUMMARIZE_ERR;
+<<<<<<< HEAD
 #ifdef USE_PNETCDF
+=======
+#ifdef TEST_PNETCDF
+>>>>>>> initial merge of the cdf5 code
    MPI_Finalize();
 #endif
    FINAL_RESULTS;

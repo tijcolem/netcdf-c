@@ -12,9 +12,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <netcdf.h>
+<<<<<<< HEAD
 #ifdef USE_PARALLEL
 #include <netcdf_par.h>
 #endif
+=======
+#include <netcdf_par.h>
+>>>>>>> initial merge of the cdf5 code
 #include <nc_tests.h>
 
 /* The data file we will create. */
@@ -102,11 +106,19 @@ main(int argc, char **argv)
    int attvals[] = {42};
 #define ATTNUM ((sizeof attvals)/(sizeof attvals[0]))
 
+<<<<<<< HEAD
 #ifdef USE_PNETCDF
 MPI_Init(&argc, &argv);
 #endif
    printf("\n*** testing UTF-8 normalization...");
 #ifdef USE_PNETCDF
+=======
+#ifdef TEST_PNETCDF
+MPI_Init(&argc, &argv);
+#endif
+   printf("\n*** testing UTF-8 normalization...");
+#ifdef TEST_PNETCDF
+>>>>>>> initial merge of the cdf5 code
    if((res = nc_create_par(FILE7_NAME, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL,&ncid)))
 #else
    if((res = nc_create(FILE7_NAME, NC_CLOBBER, &ncid)))
@@ -149,7 +161,11 @@ MPI_Init(&argc, &argv);
        ERR;
 
    /* Check it out. */
+<<<<<<< HEAD
 #ifdef USE_PNETCDF
+=======
+#ifdef TEST_PNETCDF
+>>>>>>> initial merge of the cdf5 code
    if ((res = nc_open_par(FILE7_NAME, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD,MPI_INFO_NULL, &ncid)))
 #else
    if ((res = nc_open(FILE7_NAME, NC_NOWRITE, &ncid)))
@@ -184,7 +200,11 @@ MPI_Init(&argc, &argv);
        ERR;
 
    SUMMARIZE_ERR;
+<<<<<<< HEAD
 #ifdef USE_PNETCDF
+=======
+#ifdef TEST_PNETCDF
+>>>>>>> initial merge of the cdf5 code
    MPI_Finalize();
 #endif
    FINAL_RESULTS;

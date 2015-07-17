@@ -52,7 +52,7 @@ test_nc_get_var1_$1(void)
     int canConvert;     /* Both text or both numeric */
     $1 value;
 
-#ifdef USE_PNETCDF
+#ifdef TEST_PNETCDF
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -156,7 +156,7 @@ test_nc_get_var_$1(void)
     $1 value[MAX_NELS];
     double expect[MAX_NELS];
 
-#ifdef USE_PNETCDF
+#ifdef TEST_PNETCDF
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -275,7 +275,7 @@ test_nc_get_vara_$1(void)
     $1 value[MAX_NELS];
     double expect[MAX_NELS];
 
-#ifdef USE_PNETCDF
+#ifdef TEST_PNETCDF
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -469,7 +469,7 @@ test_nc_get_vars_$1(void)
     $1 value[MAX_NELS];
     double expect[MAX_NELS];
 
-#ifdef USE_PNETCDF
+#ifdef TEST_PNETCDF
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -667,7 +667,7 @@ test_nc_get_varm_$1(void)
     $1 value[MAX_NELS];
     double expect[MAX_NELS];
 
-#ifdef USE_PNETCDF
+#ifdef TEST_PNETCDF
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -858,7 +858,7 @@ test_nc_get_att_$1(void)
     double expect[MAX_NELS];
     int nok = 0;      /* count of valid comparisons */
 
-#ifdef USE_PNETCDF
+#ifdef TEST_PNETCDF
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);

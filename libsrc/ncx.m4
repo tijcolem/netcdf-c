@@ -2717,7 +2717,6 @@ NCX_PAD_PUTN_CHAR(schar, ushort)
 NCX_PAD_PUTN_CHAR(schar, uint)
 NCX_PAD_PUTN_CHAR(schar, ulonglong)
 
-<<<<<<< HEAD
 /* uchar ---------------------------------------------------------------------*/
 dnl
 dnl NCX_GETN_CHAR(uchar, schar)

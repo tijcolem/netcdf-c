@@ -98,7 +98,7 @@ check_vars_$1(const char *filename)
     int canConvert;     /* Both text or both numeric */
     int nok = 0;      /* count of valid comparisons */
 
-#ifdef USE_PNETCDF
+#ifdef TEST_PNETCDF
     err = nc_open_par(filename, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(filename, NC_NOWRITE, &ncid);
@@ -287,7 +287,7 @@ test_nc_put_var1_$1(void)
     int canConvert;	/* Both text or both numeric */
     $1 value = 5;	/* any value would do - only for error cases */
 
-#ifdef USE_PNETCDF
+#ifdef TEST_PNETCDF
     err = nc_create_par(scratch, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_create(scratch, NC_CLOBBER, &ncid);
@@ -393,7 +393,7 @@ test_nc_put_var_$1(void)
     int allInExtRange;	/* all values within external range? */
     $1 value[MAX_NELS];
 
-#ifdef USE_PNETCDF
+#ifdef TEST_PNETCDF
     err = nc_create_par(scratch, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_create(scratch, NC_CLOBBER, &ncid);
@@ -544,7 +544,7 @@ test_nc_put_vara_$1(void)
     int allInExtRange;	/* all values within external range? */
     $1 value[MAX_NELS];
 
-#ifdef USE_PNETCDF
+#ifdef TEST_PNETCDF
     err = nc_create_par(scratch, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_create(scratch, NC_CLOBBER, &ncid);
@@ -729,7 +729,7 @@ test_nc_put_vars_$1(void)
     int allInExtRange;	/* all values within external range? */
     $1 value[MAX_NELS];
 
-#ifdef USE_PNETCDF
+#ifdef TEST_PNETCDF
     err = nc_create_par(scratch, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_create(scratch, NC_CLOBBER, &ncid);
@@ -911,7 +911,7 @@ test_nc_put_varm_$1(void)
     int allInExtRange;	/* all values within external range? */
     $1 value[MAX_NELS];
 
-#ifdef USE_PNETCDF
+#ifdef TEST_PNETCDF
     err = nc_create_par(scratch, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_create(scratch, NC_CLOBBER, &ncid);
@@ -1080,7 +1080,7 @@ test_nc_put_att_text(void)
     int err;
     text value[MAX_NELS];
 
-#ifdef USE_PNETCDF
+#ifdef TEST_PNETCDF
     err = nc_create_par(scratch, NC_NOCLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_create(scratch, NC_NOCLOBBER, &ncid);
@@ -1150,7 +1150,7 @@ test_nc_put_att_$1(void)
     $1 value[MAX_NELS];
     int allInExtRange;  /* all values within external range? */
 
-#ifdef USE_PNETCDF
+#ifdef TEST_PNETCDF
     err = nc_create_par(scratch, NC_NOCLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_create(scratch, NC_NOCLOBBER, &ncid);

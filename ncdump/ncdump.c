@@ -261,7 +261,11 @@ kind_string_extended(int kind, int mode)
     switch (kind) {
     case NC_FORMAT_NC3:
 	if(mode & NC_CDF5)
+<<<<<<< HEAD
 	    snprintf(text,sizeof(text),"%s mode=%08x", "64-bit data",mode);
+=======
+	    snprintf(text,sizeof(text),"%s mode=%08x", "cdf5",mode);
+>>>>>>> initial merge of the cdf5 code
 	else if(mode & NC_64BIT_OFFSET)
 	    snprintf(text,sizeof(text),"%s mode=%08x", "64-bit offset",mode);
 	else
