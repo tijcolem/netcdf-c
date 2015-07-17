@@ -1,6 +1,6 @@
 #!/bin/bash
 #X="-x"
-#NB=1
+NB=1
 #DB=1
 
 if test $# != 0 ; then

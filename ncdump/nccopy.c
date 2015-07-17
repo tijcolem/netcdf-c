@@ -1647,7 +1647,7 @@ main(int argc, char**argv)
 	    option_kind = NC_FORMAT_CDF5;
 	    break;
 	case '6':		/* output format is 64-bit-offset (netCDF-3 version 2) */
-	    option_kind = NC_FORMAT_64BIT;
+	    option_kind = NC_FORMAT_64BIT_OFFSET;
 	    break;
 	case '4':		/* output format is netCDF-4 (variant of HDF5) */
 	    option_kind = NC_FORMAT_NETCDF4;

@@ -38,9 +38,9 @@
  * netcdf version 1 file.
  * The initial value of ncp->xsz.
  */
-# For classic
+/* For classic */
 #define MIN_NC3_XSZ 32
-# For cdf5
+/* For cdf5 */
 #define MIN_NC5_XSZ 48
 
 /* Forward */

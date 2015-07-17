@@ -71,10 +71,10 @@ struct Kvalues legalkinds[NKVALUES] = {
     {"1", NC_FORMAT_CLASSIC},	/* deprecated, use "-3" or "-k nc3" instead */
 
     /* NetCDF-3 64-bit offset format */
-    {"64-bit offset", NC_FORMAT_64BIT}, /* canonical format name */
-    {"nc6", NC_FORMAT_64BIT},		/* short format name */
-    {"2", NC_FORMAT_64BIT},     /* deprecated, use "-6" or "-k nc6" instead */
-    {"64-bit-offset", NC_FORMAT_64BIT}, /* aliases */
+    {"64-bit offset", NC_FORMAT_64BIT_OFFSET}, /* canonical format name */
+    {"nc6", NC_FORMAT_64BIT_OFFSET},		/* short format name */
+    {"2", NC_FORMAT_64BIT_OFFSET},     /* deprecated, use "-6" or "-k nc6" instead */
+    {"64-bit-offset", NC_FORMAT_64BIT_OFFSET}, /* aliases */
 
     /* NetCDF-4 HDF5-based format */
     {"netCDF-4", NC_FORMAT_NETCDF4}, /* canonical format name */
@@ -196,7 +196,7 @@ usage(void)
 " [-h]"
 " [-k kind ]"
 " [-l language=b|c|f77|java]"
-" [-M <name>]
+" [-M <name>]"
 " [-n]"
 " [-o outfile]"
 " [-P]"
@@ -527,7 +527,7 @@ main(
     if(k_flag == 0)
 	k_flag = 1;
 
-    usingclassic = (k_flag <= 2 || k_flag == 4 || kflag == 5)?1:0;
+    usingclassic = (k_flag <= 2 || k_flag == 4 || k_flag == 5)?1:0;
 
     /* compute cmode_modifier */
     switch (k_flag) {
