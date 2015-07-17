@@ -102,6 +102,12 @@ struct Kvalues legalkinds[NKVALUES] = {
     {"64-bit data", 5},
     {"cdf5", 5},
 
+    /* CDF-5 format */
+    {"5", 5},
+    {"64-bit-data", 5},
+    {"64-bit data", 5},
+    {"cdf5", 5},
+
     /* null terminate*/
     {NULL,0}
 };
