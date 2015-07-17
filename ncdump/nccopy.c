@@ -1518,7 +1518,6 @@ static void
 usage(void)
 {
 #define USAGE   "\
-<<<<<<< HEAD
   [-k kind] specify kind of netCDF format for output file, default same as input\n\
 	    kind strings: 'classic', '64-bit offset', 'cdf5',\n\
                           'netCDF-4', 'netCDF-4 classic model'\n\
