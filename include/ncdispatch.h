@@ -110,13 +110,10 @@ typedef struct NC_Dispatch NC_Dispatch;
 
 extern int NCDISPATCH_initialize(void);
 extern int NCDISPATCH_finalize(void);
-<<<<<<< HEAD
 
 extern NC_Dispatch* NCSUBSTRATE_dispatch_table;
 extern int NCSUBSTRATE_initialize(void);
 extern int NCSUBSTRATE_finalize(void);
-=======
->>>>>>> ckp
 
 extern NC_Dispatch* NC3_dispatch_table;
 extern int NC3_initialize(void);
@@ -129,15 +126,9 @@ extern int NCD2_finalize(void);
 #endif
 
 #ifdef USE_PNETCDF
-<<<<<<< HEAD
 extern NC_Dispatch* NCP5_dispatch_table;
 extern int NCP5_initialize(void);
 extern int NCP5_finalize(void);
-=======
-extern NC_Dispatch* NC5_dispatch_table;
-extern int NC5_initialize(void);
-extern int NC5_finalize(void);
->>>>>>> ckp
 #endif
 
 #ifdef USE_NETCDF4

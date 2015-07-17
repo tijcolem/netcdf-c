@@ -218,12 +218,6 @@ NCD2_initialize(void)
     return NC_NOERR;
 }
 
-int
-NCD2_finalize(void)
-{
-    return NC_NOERR;
-}
-
 static int
 NCD2_redef(int ncid)
 {

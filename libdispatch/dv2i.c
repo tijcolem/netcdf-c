@@ -852,7 +852,7 @@ ncvargets(
 	}
 }
 
-
+#ifdef VARMINDEX
 /* make map[ndims-1] number of elements instead of bytes */
 static long*
 elementsinsteadofbytes(int ncid, int varid)
@@ -867,6 +867,7 @@ elementsinsteadofbytes(int ncid, int varid)
     for (i=0; i<ndims; i++) imp[i] = map[i] / el_size;
     return imp;
 }
+#endif
 
 int
 ncvarputg(

@@ -60,8 +60,6 @@ return 2;                                                   \
 int
 main(int argc, char **argv)
 {
-    nc_initialize();
-
    printf("\n*** Testing netcdf-4 large files.\n");
    printf("**** testing with user-contributed test...\n");
    {

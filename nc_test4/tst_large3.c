@@ -39,8 +39,6 @@ main(int argc, char **argv)
 {
    char file_name[NC_MAX_NAME + 1];
 
-    nc_initialize();
-
     printf("\n*** Testing really large files in netCDF-4/HDF5 format, quickly.\n");
 
     printf("*** Testing create of simple, but large, file...");
