@@ -1756,9 +1756,6 @@ nc_inq_base_pe(int ncid, int *pe);
 EXTERNL int
 nctypelen(nc_type datatype);
 
-EXTERNL int nc_initialize(int* argcp, char*** argvp);
-EXTERNL int nc_finalize(void);
-
 /* Begin v2.4 backward compatiblity */
 /*
  * defining NO_NETCDF_2 to the preprocessor

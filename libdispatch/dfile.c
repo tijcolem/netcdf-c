@@ -92,7 +92,7 @@ NC_interpret_magic_number(char* magic, int* model, int* version, int use_paralle
 	 else
 	    {status = NC_ENOTNC; goto done;}
 	 if(*version == 5 && use_parallel)
-	     *model = NC_DISPATCH_NC5;
+	     *model = NC_DISPATCH_NCP5;
 	 else
   	     *model = NC_DISPATCH_NC3;
      } else
@@ -1651,7 +1651,7 @@ NC_create(const char *path, int cmode, size_t initialsz,
 	model = NC_DISPATCH_NCP5;
       else
 #endif
-      if((cmode & NC_CDF5) || (cmode & NC_NC_CLASSIC_MODEL))
+      if((cmode & NC_CDF5) || (cmode & NC_CLASSIC_MODEL))
 	model = NC_DISPATCH_NC3;
    }
 

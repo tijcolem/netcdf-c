@@ -526,8 +526,8 @@ NC4_create(const char* path, int cmode, size_t initialsz, int basepe,
 
    /* Apply default create format. */
    if (nc_get_default_format() == NC_FORMAT_CDF5)
-      cmode |= NC_64BIT_DATA;
-   else if (nc_get_default_format() == NC_FORMAT_64BIT_OFFSEWT)
+      cmode |= NC_CDF5;
+   else if (nc_get_default_format() == NC_FORMAT_64BIT_OFFSET)
       cmode |= NC_64BIT_OFFSET;
    else if (nc_get_default_format() == NC_FORMAT_NETCDF4_CLASSIC)
       cmode |= NC_CLASSIC_MODEL;

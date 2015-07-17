@@ -1,5 +1,5 @@
 /*
- *	Copyright 1996, University Corporation for Atmospheric Research
+ *	Copyright 1996, Unuiversity Corporation for Atmospheric Research
  *      See netcdf/COPYRIGHT file for copying and redistribution conditions.
  */
 
@@ -90,7 +90,7 @@ err:
  * Sense of the return is changed.
  */
 int
-nc_cktype(nc_type type, nc_type type)
+nc_cktype(int mode, nc_type type)
 {
     if (mode & NC_64BIT_OFFSET) { /* CDF-1 and CDF-2 format */
         if (type >= NC_BYTE && type <= NC_DOUBLE) return NC_NOERR;
@@ -332,12 +332,12 @@ read_numrecs(NC3_INFO *ncp)
 	const void *xp = NULL;
 	size_t new_nrecs = 0;
 	size_t  old_nrecs = NC_get_numrecs(ncp);
-	size_t nc_numrecs_extent = NC_NUMRECS3_EXTENT; /* CDF-1 and CDF-2 */
+	size_t nc_numrecs_extent = NC_NUMRECS_EXTENT3; /* CDF-1 and CDF-2 */
 
 	assert(!NC_indef(ncp));
 
 	if (fIsSet(ncp->flags, NC_64BIT_DATA))
-		nc_numrecs_extent = NC_NUMRECS5_EXTENT; /* CDF-5 */
+		nc_numrecs_extent = NC_NUMRECS_EXTENT5; /* CDF-5 */
 
 	status = ncio_get(ncp->nciop,
 		 NC_NUMRECS_OFFSET, nc_numrecs_extent, 0, (void **)&xp);/* cast away const */
@@ -388,7 +388,7 @@ write_numrecs(NC3_INFO *ncp)
 	{
 		const size_t nrecs = NC_get_numrecs(ncp);
 		if (fIsSet(ncp->flags, NC_64BIT_DATA))
-		    status = ncx_put_int64(&xp, &nrecs);
+		    status = ncx_put_int64(&xp, nrecs);
 		else
  		    status = ncx_put_size_t(&xp, &nrecs);
 	}
@@ -690,11 +690,11 @@ NC_check_vlens(NC3_INFO *ncp)
     if(ncp->vars.nelems == 0)
 	return NC_NOERR;
 
-    if (FIsSet(ncp->flags,NC_64BIT_DATA)) {
+    if (fIsSet(ncp->flags,NC_64BIT_DATA)) {
 	/* CDF5 format allows many large vars */
         return NC_NOERR;
     } 
-    if (FIsSet(ncp->flags,NC_64BIT_OFFSET) && sizeof(off_t) > 4) {
+    if (fIsSet(ncp->flags,NC_64BIT_OFFSET) && sizeof(off_t) > 4) {
 	/* CDF2 format and LFS */
 	vlen_max = X_UINT_MAX - 3; /* "- 3" handles rounded-up size */
     } else {
@@ -990,7 +990,7 @@ NC3_create(const char *path, int ioflags,
 	  ioflags |= NC_64BIT_DATA;
 
 	/* Now we can set min size */
-	if (fIsSet(ioflags, NC_64BIT_DATA)) {
+	if (fIsSet(ioflags, NC_64BIT_DATA))
 	    nc3->xsz = MIN_NC5_XSZ; /* CDF-5 has minimum 16 extra bytes */
 	else
 	    nc3->xsz = MIN_NC3_XSZ;

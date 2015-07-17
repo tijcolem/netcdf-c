@@ -717,7 +717,7 @@ unwind_name:
 
 /* How much space in the header is required for this NC_attrarray? */
 static size_t
-ncx_len_NC_attrarray(const NC_attrarray *ncap, version)
+ncx_len_NC_attrarray(const NC_attrarray *ncap, int version)
 {
 	size_t xlen = X_SIZEOF_NCTYPE;	/* type */
 	xlen += (version == 5) ? X_SIZEOF_INT64 : X_SIZEOF_SIZE_T; /* count */

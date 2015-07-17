@@ -3,7 +3,8 @@
 
 #define MAXSERVERURL 4096
 
-extern int NCSUBSTRATE_intialize(void);
+extern int NCSUBSTRATE_initialize(void);
+extern int NCSUBSTRATE_finalize(void);
 
 /* Define vectors of zeros and ones for use with various nc_get_varX function*/
 size_t nc_sizevector0[NC_MAX_VAR_DIMS];
@@ -48,7 +49,6 @@ static nc_type ulongtype = (sizeof(unsigned long) == sizeof(unsigned int)?NC_UIN
 int
 NCDISPATCH_initialize(void)
 {
-    extern int NCSUBSTRATE_initialize(void);
     int status = NC_NOERR;
     int i;
     for(i=0;i<NC_MAX_VAR_DIMS;i++) {
@@ -67,7 +67,6 @@ NCDISPATCH_initialize(void)
 int
 NCDISPATCH_finalize(void)
 {
-    extern int NCSUBSTRATE_finalize(void);
     int status = NC_NOERR;
     int i;
     status = NCSUBSTRATE_finalize();

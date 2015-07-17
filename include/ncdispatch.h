@@ -62,7 +62,7 @@
 #define NC_DISPATCH_NC4    2
 #define NC_DISPATCH_NCD    4
 #define NC_DISPATCH_NCR    8
-#define NC_DISPATCH_NC5    16
+#define NC_DISPATCH_NCP5    16
 
 
 /* Define a type for use when doing e.g. nc_get_vara_long, etc. */
@@ -366,6 +366,12 @@ extern int NC_inq_recvar(int ncid, int varid, int* nrecdims, int* is_recdim);
 
 extern size_t NC_coord_zero[NC_MAX_VAR_DIMS];
 extern size_t NC_coord_one[NC_MAX_VAR_DIMS];
+
+extern int NC_argc;
+extern char* NC_argv[];
+extern int NC_initialized;
+extern int NC_finalized;
+extern int nc_initialize();
 
 #endif /* _DISPATCH_H */
 
