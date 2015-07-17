@@ -7,6 +7,8 @@ This file contains a high-level description of this package's evolution. Release
 
 ## 4.4.0 Released TBD
 
+* Added CDM-5 support; thanks to Wei-Keng Liao.
+
 ### 4.4.0-RC2 Released 2015-07-09
 
 * Minor bug fixes and cleanup of issues reported with first release candidate.
