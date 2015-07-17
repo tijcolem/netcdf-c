@@ -1518,20 +1518,15 @@ static void
 usage(void)
 {
 #define USAGE   "\
-<<<<<<< HEAD
   [-k kind] specify kind of netCDF format for output file, default same as input\n\
-	    kind strings: 'classic', '64-bit offset',\n\
+	    kind strings: 'classic', '64-bit offset', 'cdf5',\n\
                           'netCDF-4', 'netCDF-4 classic model'\n\
   [-3]      netCDF classic output (same as -k 'classic')\n\
   [-6]      64-bit-offset output (same as -k '64-bit offset')\n\
   [-4]      netCDF-4 output (same as -k 'netCDF-4')\n\
   [-7]      netCDF-4-classic output (same as -k 'netCDF-4 classic model')\n\
+  [-5]      CDF5 output (same as -k 'cdf5)\n\
   [-d n]    set output deflation compression level, default same as input (0=none 9=max)\n\
-=======
-  [-k n]    specify kind of netCDF format for output file, default same as input\n\
-	    1=classic, 2=64-bit- offset, 3=netCDF-4, 4=netCDF-4-classic-model 5=classic-CDF-5\n\
-  [-d n]    set deflation compression level, default same as input (0=none 9=max)\n\
->>>>>>> initial merge of the cdf5 code
   [-s]      add shuffle option to deflation compression\n\
   [-c chunkspec] specify chunking for dimensions, e.g. \"dim1/N1,dim2/N2,...\"\n\
   [-u]      convert unlimited dimensions to fixed-size dimensions in output copy\n\
@@ -1647,6 +1642,9 @@ main(int argc, char**argv)
 	    break;
 	case '3':		/* output format is classic (netCDF-3) */
 	    option_kind = NC_FORMAT_CLASSIC;
+	    break;
+	case '5':		/* output format is cdf5 */
+	    option_kind = NC_FORMAT_CDF5;
 	    break;
 	case '6':		/* output format is 64-bit-offset (netCDF-3 version 2) */
 	    option_kind = NC_FORMAT_64BIT;
