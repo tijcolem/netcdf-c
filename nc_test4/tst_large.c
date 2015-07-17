@@ -8,6 +8,7 @@
 
 #include <nc_tests.h>
 #include "netcdf.h"
+#include "ncdispatch.h"
 
 #define FILE_NAME "tst_large.nc"
 #define NUMDIMS 2		/* rank of each variable in tests */
@@ -17,8 +18,9 @@
 int
 main(int argc, char **argv)
 {
-
-   nc_initialize(&argc, &argv);
+    nc_argc = argc;
+    nc_argv = argv;    
+    nc_initialize();
 
    printf("\n*** Testing netcdf-4 large files.\n");
    printf("**** testing simple fill value attribute creation...");

@@ -376,7 +376,7 @@ ncx_szof(nc_type type)
 	switch(type){
 	case NC_BYTE:
 	case NC_CHAR:
-	case NC_UCHAR:
+	case NC_UBYTE:
 		return(1);
 	case NC_SHORT :
 		return(2);

@@ -29,8 +29,11 @@ extern int NC5_initialize(void);
 extern int NC5_finalize(void);
 #endif
 
-static int NC_initialized = 0;
-static int NC_finalized = 1;
+int NC_argc = 1;
+char* NC_argv[] = {"nc_initialize",NULL};
+
+int NC_initialized = 0;
+int NC_finalized = 1;
 
 /**
 This procedure invokes all defined
@@ -42,22 +45,22 @@ It also initializes appropriate external libraries.
 */
 
 int
-nc_initialize(int* argcp, char*** argvp)
+nc_initialize()
 {
     int stat = NC_NOERR;
-    int argc = (argcp == NULL ? 0 : *argcp);
-    char** argv = (argvp == NULL ? NULL : *argvp);
+#ifdef USE_PARALLEL
+    char** argv = nc_argv;
+    int argc = nc_argc;
+#endif
 
     if(NC_initialized) return NC_NOERR;
     NC_initialized = 1;
     NC_finalized = 0;
 
-    /* Init external libraries
+    /* Init external libraries */
 #ifdef USE_PARALLEL
     {
-        if(argv == NULL)
-	    argv = {"nc_initialize",NULL};
-	MPI_finalize(1,argv);
+	MPI_finalize(argc,argv);
     }
 #endif
 
@@ -120,7 +123,7 @@ nc_finalize(void)
     /* Allow libdispatch to do finalization; also finalizes substrate */
     if((stat = NCDISPATCH_finalize())) return stat;
 
-    /* Finalize external libraries
+    /* Finalize external libraries */
 #ifdef USE_PARALLEL
     MPI_Finalize();
 #endif

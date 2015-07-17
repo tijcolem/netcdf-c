@@ -11,7 +11,7 @@
 #include <netcdf.h>
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
+#include "ncdispatch.h"
 
 /* We will create this file. */
 #define FILE_NAME "tst_floats_1D.nc"
@@ -19,7 +19,9 @@
 int
 main(int argc, char **argv)
 {
-    nc_initialize(argc, argv);
+    nc_argc = argc;
+    nc_argv = argv;    
+    nc_initialize();
 
     printf("\n*** Create some files for testing benchmarks.\n");
 
