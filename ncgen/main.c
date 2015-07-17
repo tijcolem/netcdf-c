@@ -178,6 +178,12 @@ void
 usage(void)
 {
     derror("Usage: %s"
+" [-1]"
+" [-3]"
+" [-4]"
+" [-5]"
+" [-6]"
+" [-7]"
 " [-b]"
 " [-B buffersize]"
 " [-d]"
@@ -235,7 +241,7 @@ main(
     (void) par_io_init(32, 32);
 #endif
 
-    while ((c = getopt(argc, argv, "hbcfk:3467l:no:v:xdM:D:B:P")) != EOF)
+    while ((c = getopt(argc, argv, "134567bB:cdD:fhk:l:M:noPv:x")) != EOF)
       switch(c) {
 	case 'd':
 	  debug = 1;
@@ -269,33 +275,29 @@ main(
 	case 'h':
 	  header_only = 1;
 	  break;
-    case 'l': /* specify language, instead of using -c or -f or -b */
-
-      {
-		if(l_flag != 0) {
-          fprintf(stderr,"Please specify only one language\n");
-          return 1;
-		}
-        if(!optarg) {
-          derror("%s: output language is null",
-                 progname);
-          return(1);
-        }
-        lang_name = (char*) emalloc(strlen(optarg)+1);
-		(void)strcpy(lang_name, optarg);
-		for(langs=legallanguages;langs->name != NULL;langs++) {
-          if(strcmp(lang_name,langs->name)==0) {
-			l_flag = langs->flag;
-            break;
-          }
-		}
-		if(langs->name == NULL) {
-          derror("%s: output language %s not implemented",
-                 progname, lang_name);
-          return(1);
-		}
-      }
-	  break;
+        case 'l': /* specify language, instead of using -c or -f or -b */
+	{
+	    if(l_flag != 0) {
+              fprintf(stderr,"Please specify only one language\n");
+              return 1;
+	    }
+            if(!optarg) {
+              derror("%s: output language is null", progname);
+              return(1);
+            }
+            lang_name = (char*) emalloc(strlen(optarg)+1);
+	    (void)strcpy(lang_name, optarg);
+	    for(langs=legallanguages;langs->name != NULL;langs++) {
+              if(strcmp(lang_name,langs->name)==0) {
+	  	l_flag = langs->flag;
+                break;
+              }
+	    }
+	    if(langs->name == NULL) {
+              derror("%s: output language %s not implemented",progname, lang_name);
+              return(1);
+	    }
+	}; break;
 	case 'n':		/* old version of -b, uses ".cdf" extension */
 	  if(l_flag != 0) {
 	    fprintf(stderr,"Please specify only one language\n");
@@ -320,6 +322,7 @@ main(
 		       "64-bit data" or "nc5" or "cdf-5"
 		       "netCDF-4" or "nc4"
 		       "netCDF-4 classic model" or "nc7"
+		       "netCDF-5" or "nc5" or "cdf5"
 		     Format version numbers (deprecated):
 		       1 (=> classic)
 		       2 (=> 64-bit offset)
@@ -353,10 +356,13 @@ main(
 	    k_flag = NC_FORMAT_CLASSIC;
 	    break;
 	case '6':		/* output format is 64-bit-offset (netCDF-3 version 2) */
-	    k_flag = NC_FORMAT_64BIT;
+	    k_flag = NC_FORMAT_64BIT_OFFSET;
 	    break;
 	case '4':		/* output format is netCDF-4 (variant of HDF5) */
 	    k_flag = NC_FORMAT_NETCDF4;
+	    break;
+	case '5':		/* output format is CDF5 */
+	    k_flag = NC_FORMAT_CDF5;
 	    break;
 	case '7':		/* output format is netCDF-4 (restricted to classic model)*/
 	    k_flag = NC_FORMAT_NETCDF4_CLASSIC;

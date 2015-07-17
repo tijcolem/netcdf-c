@@ -1594,8 +1594,8 @@ main(int argc, char**argv)
 	{"5", NC_FORMAT_CDF5},
 	{"64-bit-data", NC_FORMAT_CDF5},
 	{"64-bit data", NC_FORMAT_CDF5},
-	{"cdf5", NC_FORMAT_CDF5},
 	{"nc5", NC_FORMAT_CDF5},
+	{"cdf5", NC_FORMAT_CDF5},
 
 	/* null terminate*/
 	{NULL,0}

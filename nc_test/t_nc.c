@@ -21,13 +21,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
-#ifdef USE_PARALLEL
 #include <mpi.h>
-#endif
-#include "netcdf.h"
-#ifdef USE_PARALLEL
-#include "netcdf_par.h"
-#endif
+#include <netcdf.h>
+#include <netcdf_par.h>
 
 #define MAXSHORT	32767
 #define MAXINT		2147483647
