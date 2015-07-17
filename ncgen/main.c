@@ -40,7 +40,7 @@ int header_only;
 int k_flag;    /* > 0  => -k was specified on command line*/
 int format_flag;   /* _Format attribute value (same range as -k flag) */
 int format_attribute; /* 1=>format came from format attribute */
-int enhanced_flag; /* 1 => netcdf-4 constructs appear in the parse */
+int enhanced_flag; /* 1 => netcdf-4 | (some) CDF-5 constructs appear in the parse */
 int specials_flag; /* 1=> special attributes are present */
 int usingclassic;
 int cmode_modifier;
@@ -86,6 +86,12 @@ struct Kvalues legalkinds[NKVALUES] = {
     {"hdf5-nc3", 4},
     {"netCDF-4 classic model", 4},
     {"enhanced-nc3", 4},
+
+    /* CDF-5 format */
+    {"5", 5},
+    {"64-bit-data", 5},
+    {"64-bit data", 5},
+    {"cdf5", 5},
 
     /* null terminate*/
     {NULL,0}
@@ -161,7 +167,20 @@ ubasename(char *logident)
 void
 usage(void)
 {
-    derror("Usage: %s [ -b ] [ -c ] [ -f ] [ -k kind ] [ -x ] [-S struct-format] [-M <name> [ -o outfile]  [ file ... ]",
+    derror("Usage: %s"
+" [-b]"
+" [-B buffersize]"
+" [-d]"
+" [-D debuglevel]"
+" [-h]"
+" [-k kind ]"
+" [-l language=b|c|f77|java]"
+" [-M <name>]
+" [-n]"
+" [-o outfile]"
+" [-P]"
+" [-x]"
+" [file ... ]",
 	   progname);
     derror("netcdf library version %s", nc_inq_libvers());
 }
@@ -286,15 +305,17 @@ main(
         case 'k': /* for specifying variant of netCDF format to be generated
                      Possible values are:
                      1 (=> classic 32 bit)
-                     2 (=> classic 64 bit)
+                     2 (=> classic 64 bit offseta)
                      3 (=> enhanced)
                      4 (=> classic, but stored in an enhanced file format)
+                     5 (=> classic 64 bit data aka CDF-5)
                      Also provide string versions of above
                      "classic"
                      "64-bit-offset"
                      "64-bit offset"
 		     "enhanced" | "hdf5" | "netCDF-4"
                      "enhanced-nc3" | "hdf5-nc3" | "netCDF-4 classic model"
++                     "64-bit-data" | "64-bit data" | "cdf5"
 		   */
 	    {
 		struct Kvalues* kvalue;
@@ -458,6 +479,7 @@ main(
 	k_flag = 3;
 
     if(enhanced_flag && k_flag != 3) {
+    if(enhanced_flag && k_flag != 3 && k_flag != 5)
 	derror("-k or _Format conflicts with enhanced CDL input");
 	return 0;
     }
@@ -472,7 +494,7 @@ main(
     if(k_flag == 0)
 	k_flag = 1;
 
-    usingclassic = (k_flag <= 2 || k_flag == 4)?1:0;
+    usingclassic = (k_flag <= 2 || k_flag == 4 || kflag == 5)?1:0;
 
     /* compute cmode_modifier */
     switch (k_flag) {
@@ -480,6 +502,7 @@ main(
     case 2: cmode_modifier = NC_64BIT_OFFSET; break;
     case 3: cmode_modifier = NC_NETCDF4; break;
     case 4: cmode_modifier = NC_NETCDF4 | NC_CLASSIC_MODEL; break;
+    case 5: cmode_modifier = NC_CDF5; break;
     default: ASSERT(0); /* cannot happen */
     }
 
