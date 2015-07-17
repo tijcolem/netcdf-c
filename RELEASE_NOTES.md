@@ -13,6 +13,7 @@ This file contains a high-level description of this package's evolution. Release
 * Added a note to the install directions pointing out that parallel make
 cannot be used for 'make check'.
 
+* Added CDM-5 support; thanks to Wei-Keng Liao.
 
 ### 4.4.0-RC2 Released 2015-07-09
 
