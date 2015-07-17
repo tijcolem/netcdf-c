@@ -1,6 +1,7 @@
 /*********************************************************************
  *   Copyright 1996-2005, UCAR/Unidata
  *   See COPYRIGHT file for copying and redistribution conditions.
+ *   $Id: nc_test.c 2796 2014-10-28 03:40:29Z wkliao $
  *********************************************************************/
 
 int numGatts;  /* number of global attributes */
@@ -30,9 +31,6 @@ int numTypes;  /* number of netCDF data types to test */
 /* 
  * global variables (defined by function init_gvars) describing file test.nc
  */
-int numGatts;  /* number of global attributes */
-int numVars;   /* number of variables */
-int numTypes;  /* number of netCDF data types to test */
 char dim_name[NDIMS][3];
 size_t dim_len[NDIMS];
 char var_name[NVARS][2+MAX_RANK];
@@ -92,7 +90,6 @@ main(int argc, char *argv[])
 #ifdef TEST_PNETCDF
     MPI_Init(&argc, &argv);
 #endif
-
     /* Both CRAY MPP and OSF/1 Alpha systems need this.  Some of the
      * extreme test assignments in this program trigger floating point
      * exceptions on CRAY T90
@@ -128,8 +125,8 @@ main(int argc, char *argv[])
 	     fprintf(stderr, "\n\nSwitching to netCDF classic format.\n");
 	     strcpy(testfile, "nc_test_classic.nc");
 	     break;
-	  case NC_FORMAT_64BIT_OFFSET:
-	     nc_set_default_format(NC_FORMAT_64BIT_OFFSET, NULL);
+	  case NC_FORMAT_CDF2:
+	     nc_set_default_format(NC_FORMAT_CDF2, NULL);
 	     fprintf(stderr, "\n\nSwitching to 64-bit offset format.\n");
 	     strcpy(testfile, "nc_test_64bit.nc");
 	     break;
@@ -210,7 +207,6 @@ main(int argc, char *argv[])
 	NC_TEST(nc_get_var1_longlong);
 	NC_TEST(nc_get_var1_ulonglong);
 	NC_TEST(nc_get_var1);
-
 	NC_TEST(nc_get_vara_text);
 	NC_TEST(nc_get_vara_uchar);
 	NC_TEST(nc_get_vara_schar);
@@ -224,7 +220,6 @@ main(int argc, char *argv[])
 	NC_TEST(nc_get_vara_longlong);
 	NC_TEST(nc_get_vara_ulonglong);
 	NC_TEST(nc_get_vara);
-
 	NC_TEST(nc_get_vars_text);
 	NC_TEST(nc_get_vars_uchar);
 	NC_TEST(nc_get_vars_schar);
@@ -238,7 +233,6 @@ main(int argc, char *argv[])
 	NC_TEST(nc_get_vars_longlong);
 	NC_TEST(nc_get_vars_ulonglong);
 	NC_TEST(nc_get_vars);
-
 	NC_TEST(nc_get_varm_text);
 	NC_TEST(nc_get_varm_uchar);
 	NC_TEST(nc_get_varm_schar);
@@ -252,7 +246,6 @@ main(int argc, char *argv[])
 	NC_TEST(nc_get_varm_longlong);
 	NC_TEST(nc_get_varm_ulonglong);
 	NC_TEST(nc_get_varm);
-
 	NC_TEST(nc_get_att_text);
 	NC_TEST(nc_get_att_uchar);
 	NC_TEST(nc_get_att_schar);
@@ -266,7 +259,6 @@ main(int argc, char *argv[])
 	NC_TEST(nc_get_att_longlong);
 	NC_TEST(nc_get_att_ulonglong);
 	NC_TEST(nc_get_att);
-
 	NC_TEST(nc_inq_att);
 	NC_TEST(nc_inq_attname);
 	NC_TEST(nc_inq_attid);
@@ -282,7 +274,6 @@ main(int argc, char *argv[])
 	NC_TEST(nc_def_dim);
 	NC_TEST(nc_rename_dim);
 	NC_TEST(nc_def_var);
-
 	NC_TEST(nc_put_var_text);
 	NC_TEST(nc_put_var_uchar);
 	NC_TEST(nc_put_var_schar);
@@ -308,7 +299,6 @@ main(int argc, char *argv[])
 	NC_TEST(nc_put_var1_longlong);
 	NC_TEST(nc_put_var1_ulonglong);
 	NC_TEST(nc_put_var1);
-
 	NC_TEST(nc_put_vara_text);
 	NC_TEST(nc_put_vara_uchar);
 	NC_TEST(nc_put_vara_schar);
@@ -322,7 +312,6 @@ main(int argc, char *argv[])
 	NC_TEST(nc_put_vara_longlong);
 	NC_TEST(nc_put_vara_ulonglong);
 	NC_TEST(nc_put_vara);
-
 	NC_TEST(nc_put_vars_text);
 	NC_TEST(nc_put_vars_uchar);
 	NC_TEST(nc_put_vars_schar);
@@ -336,7 +325,6 @@ main(int argc, char *argv[])
 	NC_TEST(nc_put_vars_longlong);
 	NC_TEST(nc_put_vars_ulonglong);
 	NC_TEST(nc_put_vars);
-
 	NC_TEST(nc_put_varm_text);
 	NC_TEST(nc_put_varm_uchar);
 	NC_TEST(nc_put_varm_schar);
@@ -350,9 +338,7 @@ main(int argc, char *argv[])
 	NC_TEST(nc_put_varm_longlong);
 	NC_TEST(nc_put_varm_ulonglong);
 	NC_TEST(nc_put_varm);
-
 	NC_TEST(nc_rename_var);
-
 	NC_TEST(nc_put_att_text);
 	NC_TEST(nc_put_att_uchar);
 	NC_TEST(nc_put_att_schar);
@@ -360,13 +346,12 @@ main(int argc, char *argv[])
 	NC_TEST(nc_put_att_int);
 	NC_TEST(nc_put_att_long);
 	NC_TEST(nc_put_att_float);
-	NC_TEST(nc_put_att_double);
+	NC_TEST(nc_put_att_ulonglong);
 	NC_TEST(nc_put_att_ushort);
 	NC_TEST(nc_put_att_uint);
 	NC_TEST(nc_put_att_longlong);
 	NC_TEST(nc_put_att_ulonglong);
 	NC_TEST(nc_put_att);
-
 	NC_TEST(nc_copy_att);
 	NC_TEST(nc_rename_att);
 	NC_TEST(nc_del_att);
@@ -386,7 +371,6 @@ main(int argc, char *argv[])
 #ifdef TEST_PNETCDF
     MPI_Finalize();
 #endif
-
     exit(0);
     return 0;
 }

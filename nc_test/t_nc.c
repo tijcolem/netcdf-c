@@ -21,10 +21,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+<<<<<<< HEAD
 #include <netcdf.h>
 #ifdef USE_PARALLEL
 #include <netcdf_par.h>
 #endif
+=======
+#include <mpi.h>
+#include <netcdf.h>
+#include <netcdf_par.h>
+>>>>>>> initial merge of the cdf5 code
 
 #define MAXSHORT	32767
 #define MAXINT		2147483647

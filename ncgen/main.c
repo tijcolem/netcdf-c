@@ -178,15 +178,12 @@ void
 usage(void)
 {
     derror("Usage: %s"
-<<<<<<< HEAD
 " [-1]"
 " [-3]"
 " [-4]"
 " [-5]"
 " [-6]"
 " [-7]"
-=======
->>>>>>> initial merge of the cdf5 code
 " [-b]"
 " [-B buffersize]"
 " [-d]"
@@ -194,11 +191,7 @@ usage(void)
 " [-h]"
 " [-k kind ]"
 " [-l language=b|c|f77|java]"
-<<<<<<< HEAD
 " [-M <name>]"
-=======
-" [-M <name>]
->>>>>>> initial merge of the cdf5 code
 " [-n]"
 " [-o outfile]"
 " [-P]"
@@ -530,11 +523,7 @@ main(
     if(k_flag == 0)
 	k_flag = 1;
 
-<<<<<<< HEAD
     usingclassic = (k_flag <= 2 || k_flag == 4 || k_flag == 5)?1:0;
-=======
-    usingclassic = (k_flag <= 2 || k_flag == 4 || kflag == 5)?1:0;
->>>>>>> initial merge of the cdf5 code
 
     /* compute cmode_modifier */
     switch (k_flag) {
