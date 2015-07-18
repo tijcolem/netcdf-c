@@ -48,21 +48,10 @@ int
 nc_initialize()
 {
     int stat = NC_NOERR;
-#ifdef USE_PARALLEL
-    char** argv = nc_argv;
-    int argc = nc_argc;
-#endif
 
     if(NC_initialized) return NC_NOERR;
     NC_initialized = 1;
     NC_finalized = 0;
-
-    /* Init external libraries */
-#ifdef USE_PARALLEL
-    {
-	MPI_finalize(argc,argv);
-    }
-#endif
 
     /* Initialize each active protocol */
 
@@ -81,9 +70,6 @@ nc_initialize()
 #ifdef USE_NETCDF4
     if((stat = NC4_initialize())) return stat;
 #endif /* USE_NETCDF4 */
-
-    /* Allow libdispatch to do initialization; also initializes substrate*/
-    if((stat = NCDISPATCH_initialize())) return stat;
 
     return NC_NOERR;
 }
@@ -122,13 +108,7 @@ nc_finalize(void)
 
     if((stat = NC3_finalize())) return stat;
 
-    /* Allow libdispatch to do finalization; also finalizes substrate */
-    if((stat = NCDISPATCH_finalize())) return stat;
-
-    /* Finalize external libraries */
-#ifdef USE_PARALLEL
-    MPI_Finalize();
-#endif
+    if((stat = NCSUBSTRATE_finalize())) return stat;
 
     return NC_NOERR;
 }
