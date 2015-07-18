@@ -53,6 +53,10 @@ nc_initialize()
     NC_initialized = 1;
     NC_finalized = 0;
 
+
+    /* Do general initialization */
+    if((stat = NCDISPATCH_initialize())) return stat;
+
     /* Initialize each active protocol */
 
     if((stat = NCSUBSTRATE_initialize())) return stat;
@@ -109,6 +113,9 @@ nc_finalize(void)
     if((stat = NC3_finalize())) return stat;
 
     if((stat = NCSUBSTRATE_finalize())) return stat;
+
+    /* Do general finalization */
+    if((stat = NCDISPATCH_finalize())) return stat;
 
     return NC_NOERR;
 }

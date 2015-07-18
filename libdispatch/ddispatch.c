@@ -45,7 +45,7 @@ static nc_type longtype = (sizeof(long) == sizeof(int)?NC_INT:NC_INT64);
 static nc_type ulongtype = (sizeof(unsigned long) == sizeof(unsigned int)?NC_UINT:NC_UINT64);
 */
 
-/* Allow dispatch to do initialization and finalization */
+/* Allow dispatch to do general initialization and finalization */
 int
 NCDISPATCH_initialize(void)
 {
@@ -60,7 +60,6 @@ NCDISPATCH_initialize(void)
 	NC_coord_one[i] = 1;
 	NC_coord_zero[i] = 0;
     }
-    status = NCSUBSTRATE_initialize();
     return status;
 }
 
@@ -69,7 +68,6 @@ NCDISPATCH_finalize(void)
 {
     int status = NC_NOERR;
     int i;
-    status = NCSUBSTRATE_finalize();
     return status;
 }
 
