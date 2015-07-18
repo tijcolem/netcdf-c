@@ -2,7 +2,7 @@
 Functions for getting data from variables.
 
 Copyright 2011 University Corporation for Atmospheric
-Research/Unidata. See \ref copyright file for more info.
+Research/Unidata. See \ref COPYRIGHT file for more info.
 
 */
 
@@ -278,13 +278,13 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
    NC* ncp;
    int memtypelen;
    char* value = (char*)value0;
-#ifdef VARMINDEX
-#else
-   ptrdiff_t cvtmap[NC_MAX_VAR_DIMS];
-#endif
 
    status = NC_check_id (ncid, &ncp);
    if(status != NC_NOERR) return status;
+
+/*
+  if(NC_indef(ncp)) return NC_EINDEFINE;
+*/
 
    status = nc_inq_vartype(ncid, varid, &vartype);
    if(status != NC_NOERR) return status;
@@ -296,24 +296,6 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
    if(status != NC_NOERR) return status;
 
    if(memtype == NC_NAT) {
-#ifdef VARMFIX
-#else
-      if(imapp != NULL && varndims != 0) {
-	 /*
-	  * convert map units from bytes to units of sizeof(type)
-	  */
-	 size_t ii;
-	 const ptrdiff_t szof = (ptrdiff_t) nctypelen(vartype);
-	 for(ii = 0; ii < varndims; ii++) {
-	    if(imapp[ii] % szof != 0) {
-	       /*free(cvtmap);*/
-	       return NC_EINVAL;
-	    }
-	    cvtmap[ii] = imapp[ii] / szof;
-	 }
-	 imapp = cvtmap;
-      }
-#endif
       memtype = vartype;
    }
 
@@ -426,12 +408,8 @@ NCDEFAULT_get_varm(int ncid, int varid, const size_t *start,
 	    ? stride[idim]
 	    : 1;
 
-#ifdef VARMINDEX
 	 /* Remember: in netCDF-2 imapp is byte oriented, not index oriented
 	  *           Starting from netCDF-3, imapp is index oriented */
-#else
-	 /* Remember: imapp is byte oriented, not index oriented */
-#endif
 #ifdef COMPLEX
 	 mymap[idim] = (imapp != NULL
 			? imapp[idim]
