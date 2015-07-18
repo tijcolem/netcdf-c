@@ -53,7 +53,6 @@ nc_initialize()
     NC_initialized = 1;
     NC_finalized = 0;
 
-
     /* Do general initialization */
     if((stat = NCDISPATCH_initialize())) return stat;
 

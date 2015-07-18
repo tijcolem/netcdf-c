@@ -168,6 +168,7 @@ int main(int argc, char* argv[])
         printf("This test program is intended to run on ONE process\n");
     if (rank > 0) goto fn_exit;
 
+
 #ifdef DISABLE_PNETCDF_ALIGNMENT
     MPI_Info_create(&info);
     MPI_Info_set(info, "nc_header_align_size", "1");
