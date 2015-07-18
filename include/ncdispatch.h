@@ -62,8 +62,7 @@
 #define NC_DISPATCH_NC4    2
 #define NC_DISPATCH_NCD    4
 #define NC_DISPATCH_NCR    8
-#define NC_DISPATCH_NCP5    16
-
+#define NC_DISPATCH_NCP5   16
 
 /* Define a type for use when doing e.g. nc_get_vara_long, etc. */
 /* Should matche values in libsrc4/netcdf.h */
@@ -124,9 +123,9 @@ extern int NCD2_finalize(void);
 #endif
 
 #ifdef USE_PNETCDF
-extern NC_Dispatch* NC5_dispatch_table;
-extern int NC5_initialize(void);
-extern int NC5_finalize(void);
+extern NC_Dispatch* NCP5_dispatch_table;
+extern int NCP5_initialize(void);
+extern int NCP5_finalize(void);
 #endif
 
 #ifdef USE_NETCDF4
