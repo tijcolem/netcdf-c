@@ -73,9 +73,8 @@ static void* nvmalloc(off_t size) {
   type *const name = (type*) nvmalloc((ndims) * sizeof(type))
 
 
-#if 0
-  ALLOC_ONSTACK(name, type, ndims)		
-#endif
+//  ALLOC_ONSTACK(name, type, ndims)		
+
 
 # define A_FREE(name) \
 	FREE_ONSTACK(name)
@@ -853,22 +852,6 @@ ncvargets(
 	}
 }
 
-#ifdef VARMINDEX
-/* make map[ndims-1] number of elements instead of bytes */
-static long*
-elementsinsteadofbytes(int ncid, int varid)
-{
-    long* imp = NULL;
-    int i, ndims, el_size;
-    nc_type type;
-    nc_inq_varndims(ncid, varid, &ndims);
-    nc_inq_vartype(ncid, varid, &type);
-    el_size = nctypelen(type);
-    imp = (long*) malloc(ndims * sizeof(long));
-    for (i=0; i<ndims; i++) imp[i] = map[i] / el_size;
-    return imp;
-}
-#endif
 
 int
 ncvarputg(

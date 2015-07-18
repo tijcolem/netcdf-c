@@ -283,10 +283,6 @@ NCDEFAULT_put_varm(
    NC* ncp;
    int memtypelen;
    const char* value = (char*)value0;
-#ifdef VARMINDEX
-#else
-   ptrdiff_t cvtmap[NC_MAX_VAR_DIMS];
-#endif
 
    status = NC_check_id (ncid, &ncp);
    if(status != NC_NOERR) return status;
