@@ -573,7 +573,7 @@ NC3_def_var( int ncid, const char *name, nc_type type,
 	if(status != NC_NOERR)
 		return status;
 
-	status = nc_cktype(nc->mode, type);
+	status = nc3_cktype(nc->mode, type);
 	if(status != NC_NOERR)
 		return status;
 

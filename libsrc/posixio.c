@@ -1676,7 +1676,7 @@ posixio_open(const char *path,
 		return ENOMEM;
 
 #ifdef O_BINARY
-	//#if _MSC_VER
+	/*#if _MSC_VER*/
 	fSet(oflags, O_BINARY);
 #endif
 

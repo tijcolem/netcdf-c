@@ -330,7 +330,7 @@ struct NC3_INFO {
 /* Begin defined in nc.c */
 
 extern int
-nc_cktype(int mode, nc_type datatype);
+nc3_cktype(int mode, nc_type datatype);
 
 extern size_t
 ncx_howmany(nc_type type, size_t xbufsize);

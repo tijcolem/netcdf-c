@@ -25,8 +25,8 @@ extern int NCD2_finalize(void);
 #endif
 
 #ifdef USE_PNETCDF
-extern int NC5_initialize(void);
-extern int NC5_finalize(void);
+extern int NCP5_initialize(void);
+extern int NCP5_finalize(void);
 #endif
 
 int NC_argc = 1;
@@ -66,6 +66,8 @@ nc_initialize()
 
     /* Initialize each active protocol */
 
+    if((stat = NCSUBSTRATE_initialize())) return stat;
+
     if((stat = NC3_initialize())) return stat;
 
 #ifdef USE_DAP
@@ -73,7 +75,7 @@ nc_initialize()
 #endif
 
 #ifdef USE_PNETCDF
-    if((stat = NC5_initialize())) return stat;
+    if((stat = NCP5_initialize())) return stat;
 #endif
 
 #ifdef USE_NETCDF4
@@ -111,7 +113,7 @@ nc_finalize(void)
 #endif
 
 #ifdef USE_PNETCDF
-    if((stat = NC5_finalize())) return stat;
+    if((stat = NCP5_finalize())) return stat;
 #endif
 
 #ifdef USE_NETCDF4

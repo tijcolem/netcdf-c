@@ -246,7 +246,7 @@ main(
     (void) par_io_init(32, 32);
 #endif
 
-    while ((c = getopt(argc, argv, "134567bB:cdD:fhk:l:M:noPv:x")) != EOF)
+    while ((c = getopt(argc, argv, "134567bB:cdD:fhk:l:M:no:Pv:x")) != EOF)
       switch(c) {
 	case 'd':
 	  debug = 1;

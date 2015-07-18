@@ -217,7 +217,7 @@ main(int argc, char **argv)
    int formats[] = {
        NC_FORMAT_CLASSIC
        ,
-       NC_FORMAT_64BIT
+       NC_FORMAT_64BIT_OFFSET
        ,
        NC_FORMAT_CDF5
 #ifdef USE_NETCDF4

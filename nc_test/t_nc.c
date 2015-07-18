@@ -360,7 +360,7 @@ main(int argc, char *argv[])
 #ifdef TEST_PNETCDF
 	MPI_Init(&argc, &argv);
 
-        // cmode |= NC_PNETCDF |NC_64BIT_OFFSET;
+        /* cmode |= NC_PNETCDF |NC_64BIT_OFFSET; */
         cmode != NC_PNETCDF |NC_64BIT_DATA;
 	ret = nc_create_par(fname,cmode, MPI_COMM_WORLD, MPI_INFO_NULL, &id);
 #else

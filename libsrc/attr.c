@@ -2090,7 +2090,7 @@ NC3_put_att(
     if(ncap == NULL)
 	return NC_ENOTVAR;
 
-    status = nc_cktype(nc->mode, type);
+    status = nc3_cktype(nc->mode, type);
     if(status != NC_NOERR)
 	return status;
 

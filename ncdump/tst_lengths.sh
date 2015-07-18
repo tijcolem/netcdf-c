@@ -131,11 +131,6 @@ if test `wc -c < small2.nc` != 161; then
     exit 1
 fi
 
-<<<<<<< HEAD
-echo "*** testing length of one-record-variable 64-bit data file written with NOFILL"
-../ncgen/ncgen -b -5 -x ${srcdir}/small2.cdl
-if test `wc -c < small2.nc` != 161; then
-=======
 echo "*** testing length of one-record-variable 64-bit data file"
 ../ncgen/ncgen -b -5 ${srcdir}/small2.cdl
 if test `wc -c < small2.nc` != 161; then
@@ -151,7 +146,6 @@ fi
 echo "*** testing length of one-record-variable classic file written with NOFILL"
 ../ncgen/ncgen -b -x ${srcdir}/small2.cdl
 if test `wc -c < small2.nc` != 101; then
->>>>>>> e8906695de7c1b46d2b8a31238bfdb209783ecff
     exit 1
 fi
 

@@ -7,7 +7,8 @@ This file contains a high-level description of this package's evolution. Release
 
 ## 4.4.0 Released TBD
 
-* Added CDM-5 support; thanks to Wei-Keng Liao.
+* Added CDM-5 support via new mode flag called NC_64BIT_DATA (alias NC_CDF5);
+  thanks to Wei-Keng Liao.
 
 ### 4.4.0-RC2 Released 2015-07-09
 
