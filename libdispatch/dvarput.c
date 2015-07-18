@@ -131,8 +131,6 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
    int memtypelen;
    const char* value = (const char*)value0;
    size_t numrecs;
-   int nrecdims;		   /* number of record dims for a variable */
-   int is_recdim[NC_MAX_VAR_DIMS]; /* for variable's dimensions */
    size_t varshape[NC_MAX_VAR_DIMS];
    size_t mystart[NC_MAX_VAR_DIMS];
    size_t myedges[NC_MAX_VAR_DIMS];
@@ -173,10 +171,7 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
    if(status != NC_NOERR) return status;
 
    /* Get variable dimension sizes */
-   /* isrecvar = NC_is_recvar(ncid,varid,&numrecs); */
-   status = NC_inq_recvar(ncid,varid,&nrecdims,is_recdim);
-   if(status != NC_NOERR) return status;
-   isrecvar = (nrecdims > 0);
+   isrecvar = NC_is_recvar(ncid,varid,&numrecs);
    NC_getshape(ncid,varid,rank,varshape);	
 
    /* Optimize out using various checks */
@@ -196,8 +191,8 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
 	size_t dimlen;
 	mystart[i] = (start == NULL ? 0 : start[i]);
 	if(edges == NULL) {
-	   if(is_recdim[i] && isrecvar)
-  	      myedges[i] = varshape[i] - start[i];
+	   if(i == 0 && isrecvar)
+  	      myedges[i] = numrecs - start[i];
 	   else
 	      myedges[i] = varshape[i] - mystart[i];
 	} else
@@ -211,8 +206,8 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
            return NC_ESTRIDE;
   	if(mystride[i] != 1) simplestride = 0;	
         /* illegal value checks */
-	dimlen = varshape[i];
-	if(is_recdim[i]) {/*do nothing*/}
+	dimlen = (i == 0 && isrecvar ? numrecs : varshape[i]);
+	if(i == 0 && isrecvar) {/*do nothing*/}
         else {
 	  /* mystart is unsigned, will never be < 0 */
 	  if(mystart[i] > dimlen)
@@ -274,10 +269,6 @@ NCDEFAULT_put_varm(
    NC* ncp;
    int memtypelen;
    const char* value = (char*)value0;
-#ifdef VARMINDEX
-#else
-   ptrdiff_t cvtmap[NC_MAX_VAR_DIMS];
-#endif
 
    status = NC_check_id (ncid, &ncp);
    if(status != NC_NOERR) return status;
@@ -298,24 +289,6 @@ NCDEFAULT_put_varm(
    if(status != NC_NOERR) return status;
 
    if(memtype == NC_NAT) {
-#ifdef VARMINDEX
-#else
-      if(imapp != NULL && varndims != 0) {
-	 /*
-	  * convert map units from bytes to units of sizeof(type)
-	  */
-	 size_t ii;
-	 const ptrdiff_t szof = (ptrdiff_t) nctypelen(vartype);
-	 for(ii = 0; ii < varndims; ii++) {
-	    if(imapp[ii] % szof != 0) {
-	       /*free(cvtmap);*/
-	       return NC_EINVAL;
-	    }
-	    cvtmap[ii] = imapp[ii] / szof;
-	 }
-	 imapp = cvtmap;
-      }
-#endif
       memtype = vartype;
    }
 
