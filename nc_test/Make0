@@ -1,19 +1,17 @@
 # Test c output
-T=tst_cdf5format
+T=tst_diskless3
 #CMD=valgrind --leak-check=full
 #CMD=gdb --args
 
-
 CC=gcc
-
 
 CFLAGS=-g -O0 -I.. -I../include
 #LDFLAGS=../liblib/.libs/libnetcdf.a  -L/usr/local/lib -lhdf5_hl -lhdf5 -lz -lm -lcurl
 
-#LDFLAGS=-L/usr/local/lib -lhdf5_hl -lhdf5 -lz  ../liblib/.libs/libnetcdf.a -ldl -lm -lcurl
+LDFLAGS=-L/usr/local/lib -lhdf5_hl -lhdf5 -lz  ../liblib/.libs/libnetcdf.a -ldl -lm -lcurl
 
-CC=/usr/local/bin/mpicc
-LDFLAGS=-L/usr/local/lib -lhdf5_hl -lhdf5 -lz  ../liblib/.libs/libnetcdf.a -ldl -lcurl -lpnetcdf -lmpich -lm
+#CC=/usr/local/bin/mpicc
+#LDFLAGS=-L/usr/local/lib -lhdf5_hl -lhdf5 -lz  ../liblib/.libs/libnetcdf.a -ldl -lcurl -lpnetcdf -lmpich -lm
 
 #	cd .. ; ${MAKE} all
 
@@ -24,3 +22,7 @@ all::
 	export LD_LIBRARY_PATH=${LLP}; export CFLAGS; export LDFLAGS; \
 	${CC} -o t ${CFLAGS} ${T}.c ${LDFLAGS}; \
 	${CMD} ./t
+
+cpp::
+	${CC} -E ${CFLAGS} ${T}.c > ${T}.txt
+
