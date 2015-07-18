@@ -149,7 +149,9 @@ generate_array(Symbol* vsym,
 	    /* Create an odometer to get the dimension info */
             odom = newodometer(dimset,NULL,NULL);
             writer(generator,vsym,code,odom->rank,odom->start,odom->count);
-//            writer(generator,vsym,code,odom->rank,0,bbLength(charbuf));
+#if 0
+            writer(generator,vsym,code,odom->rank,0,bbLength(charbuf));
+#endif
 	    bbFree(charbuf);
 	} else { /* typecode != NC_CHAR */
             /* Case: dim 1..rank-1 are not unlimited, dim 0 might be */

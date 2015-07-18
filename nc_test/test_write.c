@@ -2140,7 +2140,7 @@ nc_get_file_version(char *path, int *version)
    if (strncmp(magic, "CDF", MAGIC_NUM_LEN-1)==0)
    {
       if (magic[MAGIC_NUM_LEN-1] == NC_FORMAT_CLASSIC || 
-	  magic[MAGIC_NUM_LEN-1] == NC_FORMAT_CDF2 ||
+	  magic[MAGIC_NUM_LEN-1] == NC_FORMAT_64BIT_OFFSET ||
 	  magic[MAGIC_NUM_LEN-1] == NC_FORMAT_CDF5)
 	 *version = magic[MAGIC_NUM_LEN-1];
       else
@@ -2177,7 +2177,7 @@ test_nc_set_default_format(void)
 	error("bad default format: status = %d", err);
 
     /* NULL old_formatp */
-    err = nc_set_default_format(NC_FORMAT_CDF2, NULL);
+    err = nc_set_default_format(NC_FORMAT_64BIT_OFFSET, NULL);
     IF (err)
 	error("null old_fortmatp: status = %d", err);
 

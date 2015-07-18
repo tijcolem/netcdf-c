@@ -24,7 +24,7 @@ TESTPROGRAMS += tst_atts tst_put_vars
 endif
 
 if USE_PNETCDF
-TESTPROGRAMS += tst_parallel2 tst_pnetcdf tst_formatx_pnetcdf
+TESTPROGRAMS += tst_parallel2 tst_pnetcdf tst_formatx_pnetcdf tst_cdf5format
 endif
 
 # These are the source files for the main workhorse test program,

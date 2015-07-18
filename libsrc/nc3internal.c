@@ -54,7 +54,7 @@ new_NC3INFO(const size_t *chunkp)
 	ncp = (NC3_INFO*)calloc(1,sizeof(NC3_INFO));
 	if(ncp == NULL) return ncp;
         ncp->chunk = chunkp != NULL ? *chunkp : NC_SIZEHINT_DEFAULT;
-	/* Note that ncp->xsz is not set yet because we do not node the file format */
+	/* Note that ncp->xsz is not set yet because we do not know the file format */
 	return ncp;
 }
 
@@ -90,12 +90,14 @@ err:
  * Sense of the return is changed.
  */
 int
-nc_cktype(int mode, nc_type type)
+nc3_cktype(int mode, nc_type type)
 {
-    if (mode & NC_64BIT_OFFSET) { /* CDF-1 and CDF-2 format */
-        if (type >= NC_BYTE && type <= NC_DOUBLE) return NC_NOERR;
-    } else if (mode & NC_64BIT_DATA) { /* CDF-5 format */
+    if (mode & NC_CDF5) { /* CDF-5 format */
         if (type >= NC_BYTE && type < NC_STRING) return NC_NOERR;
+    } else if (mode & NC_64BIT_OFFSET) { /* CDF-2 format */
+        if (type >= NC_BYTE && type <= NC_DOUBLE) return NC_NOERR;
+    } else if ((mode & NC_64BIT_OFFSET) == 0) { /* CDF-1 format */
+        if (type >= NC_BYTE && type <= NC_DOUBLE) return NC_NOERR;
     }
     return(NC_EBADTYPE);
 }

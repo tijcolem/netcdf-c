@@ -125,8 +125,8 @@ main(int argc, char *argv[])
 	     fprintf(stderr, "\n\nSwitching to netCDF classic format.\n");
 	     strcpy(testfile, "nc_test_classic.nc");
 	     break;
-	  case NC_FORMAT_CDF2:
-	     nc_set_default_format(NC_FORMAT_CDF2, NULL);
+	  case NC_FORMAT_64BIT_OFFSET:
+	     nc_set_default_format(NC_FORMAT_64BIT_OFFSET, NULL);
 	     fprintf(stderr, "\n\nSwitching to 64-bit offset format.\n");
 	     strcpy(testfile, "nc_test_64bit.nc");
 	     break;
