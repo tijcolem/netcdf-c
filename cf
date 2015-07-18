@@ -25,7 +25,8 @@ fi
 
 CFLAGS=""
 #CFLAGS="-Wall -Wno-unused-variable -Wno-unused-parameter -Wconversion ${CFLAGS}"
-CFLAGS="-Wall ${CFLAGS}"
+CFLAGS="-Wall -Wno-unused-variable -Wno-unused-parameter ${CFLAGS}"
+#CFLAGS="-Wall ${CFLAGS}"
 #CFLAGS="-Wconversion"
 
 stddir="/usr/local"
