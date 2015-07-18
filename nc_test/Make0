@@ -27,3 +27,8 @@ all::
 cpp::
 	${CC} -E ${CFLAGS} ${T}.c > ${T}.txt
 
+all::
+	echo ${LD_RUN_PATH}
+	export LD_LIBRARY_PATH=${LLP}; export CFLAGS; export LDFLAGS; \
+	gcc -o t ${CFLAGS} ${T}.c ${LDFLAGS}; \
+	${CMD} ./t

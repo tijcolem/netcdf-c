@@ -2281,10 +2281,14 @@ nc_get_file_version(char *path, int *version)
    {
       if (magic[MAGIC_NUM_LEN-1] == NC_FORMAT_CLASSIC || 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	  magic[MAGIC_NUM_LEN-1] == NC_FORMAT_64BIT_OFFSET ||
 =======
 	  magic[MAGIC_NUM_LEN-1] == NC_FORMAT_CDF2 ||
 >>>>>>> initial merge of the cdf5 code
+=======
+	  magic[MAGIC_NUM_LEN-1] == NC_FORMAT_64BIT_OFFSET ||
+>>>>>>> ckp
 	  magic[MAGIC_NUM_LEN-1] == NC_FORMAT_CDF5)
 	 *version = magic[MAGIC_NUM_LEN-1];
       else
@@ -2322,10 +2326,14 @@ test_nc_set_default_format(void)
 
     /* NULL old_formatp */
 <<<<<<< HEAD
+<<<<<<< HEAD
     err = nc_set_default_format(NC_FORMAT_64BIT_OFFSET, NULL);
 =======
     err = nc_set_default_format(NC_FORMAT_CDF2, NULL);
 >>>>>>> initial merge of the cdf5 code
+=======
+    err = nc_set_default_format(NC_FORMAT_64BIT_OFFSET, NULL);
+>>>>>>> ckp
     IF (err)
 	error("null old_fortmatp: status = %d", err);
 

@@ -75,7 +75,6 @@ write(int ncid, int parallel)
         }
     }
     if (stat=nc_enddef(ncid)) Error(stat);;
-
     for (i=0; i<NVARS; i++) {
 	if(parallel) {
             /* Note NC_INDEPENDENT is the default */
@@ -127,7 +126,6 @@ read(int ncid)
     char str[32];
     size_t start[2], count[2];
     int stat = NC_NOERR;
-
     /* read variables and check their contents */
     for (i=0; i<NVARS; i++) {
         for (j=0; j<NX; j++) buf[j] = -1;
@@ -169,7 +167,6 @@ int main(int argc, char* argv[])
     if (nprocs > 1 && rank == 0)
         printf("This test program is intended to run on ONE process\n");
     if (rank > 0) goto fn_exit;
-
 
 #ifdef DISABLE_PNETCDF_ALIGNMENT
     MPI_Info_create(&info);

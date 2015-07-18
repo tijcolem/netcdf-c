@@ -1454,10 +1454,14 @@ test_nc_get_varm(void)
         if (var_rank[i] > 0) {
             j = var_rank[i] - 1;
 <<<<<<< HEAD
+<<<<<<< HEAD
             /* imap[j] = nctypelen(var_type[i]); // in bytes */ 
 =======
             // imap[j] = nctypelen(var_type[i]); /* in bytes */
 >>>>>>> initial merge of the cdf5 code
+=======
+            /* imap[j] = nctypelen(var_type[i]); // in bytes */ 
+>>>>>>> ckp
             imap[j] = 1; /* in numbers of elements */
             for (; j > 0; j--)
                 imap[j-1] = imap[j] * var_shape[i][j];

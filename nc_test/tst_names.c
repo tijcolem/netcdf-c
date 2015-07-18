@@ -224,10 +224,14 @@ main(int argc, char **argv)
        NC_FORMAT_CLASSIC
        ,
 <<<<<<< HEAD
+<<<<<<< HEAD
        NC_FORMAT_64BIT_OFFSET
 =======
        NC_FORMAT_64BIT
 >>>>>>> initial merge of the cdf5 code
+=======
+       NC_FORMAT_64BIT_OFFSET
+>>>>>>> ckp
        ,
        NC_FORMAT_CDF5
 #ifdef USE_NETCDF4

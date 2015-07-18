@@ -73,8 +73,9 @@ static void* nvmalloc(off_t size) {
   type *const name = (type*) nvmalloc((ndims) * sizeof(type))
 
 
-//  ALLOC_ONSTACK(name, type, ndims)		
-
+#if 0
+  ALLOC_ONSTACK(name, type, ndims)		
+#endif
 
 # define A_FREE(name) \
 	FREE_ONSTACK(name)
