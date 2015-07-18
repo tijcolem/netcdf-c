@@ -31,7 +31,7 @@ main()
 #ifdef _MSC_VER
 	 /* See https://msdn.microsoft.com/en-us/library/5at7yxcs(v=vs.120).aspx
 	    for more information re: these. */
-	 //int tmpFlag = _CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_LEAK_CHECK_DF);
+	 /*int tmpFlag = _CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_LEAK_CHECK_DF);*/
 #endif
      printf(" \n");
      printf("********************\n");
@@ -44,11 +44,11 @@ main()
      }
      printf("status after open = %d\n", ncstatus);
 
-     // get the format
+     /* get the format */
      ncstatus = nc_inq_format(ncid, &format_p);
      printf("lat id = %d\n", format_p);
 
-     // get varid for latitude
+     /* get varid for latitude */
      ncstatus = nc_inq_varid(ncid,"lat",&lat_id);
      printf("status after inq lat id = %d\n", ncstatus);
      printf("lat id = %d\n", lat_id);
@@ -57,13 +57,14 @@ main()
      printf("status after inq lat var = %d\n", ncstatus);
      printf("lat type = %d\n", lat_type);
 
-     // extract the first latitude value
+     /* extract the first latitude value */
      ncstatus = nc_get_var_float(ncid, lat_id, &lat_data[0]);
      printf("status after get = %d\n", ncstatus);
      printf("my datum = %f\n", lat_data[0]);
 
-     // This code works okay in Linux and Mac
-     // Everything works okay up until here in Windows then an exception occurs
+     /* This code works okay in Linux and Mac
+        Everything works okay up until here in Windows then an exception occurs
+     */
      ncstatus = nc_close(ncid);
      printf("status after close = %d\n", ncstatus);
      printf("End of test.\n\n");

@@ -110,7 +110,9 @@ NC_check_file_type(const char *path, int flags, void *parameters,
    int diskless = ((flags & NC_DISKLESS) == NC_DISKLESS);
 
    /* Unused, throws a 'value never read' in static analysis. */
-   //int persist = ((flags & NC_WRITE) == NC_WRITE);
+#if 0
+   int persist = ((flags & NC_WRITE) == NC_WRITE);
+#endif
 
    int use_parallel = ((flags & NC_MPIIO) == NC_MPIIO);
    int inmemory = (diskless && ((flags & NC_INMEMORY) == NC_INMEMORY));
@@ -1651,7 +1653,7 @@ NC_create(const char *path, int cmode, size_t initialsz,
 	model = NC_DISPATCH_NCP5;
       else
 #endif
-      if((cmode & NC_CDF5) || (cmode & NC_CLASSIC_MODEL))
+      if((cmode & NC_CDF5)==NC_CDF5)
 	model = NC_DISPATCH_NC3;
    }
 
@@ -1685,6 +1687,10 @@ NC_create(const char *path, int cmode, size_t initialsz,
    /* Add inferred flags */
    cmode |= xcmode;
 
+   /* Clean up illegal combinations */
+   if((cmode & (NC_64BIT_OFFSET|NC_64BIT_DATA)) == (NC_64BIT_OFFSET|NC_64BIT_DATA))
+	cmode &= ~(NC_64BIT_OFFSET); /*NC_64BIT_DATA=>NC_64BIT_OFFSET*/
+
 #ifdef USE_NETCDF4
    if((cmode & NC_MPIIO && cmode & NC_MPIPOSIX))
       return  NC_EINVAL;
@@ -1710,7 +1716,7 @@ NC_create(const char *path, int cmode, size_t initialsz,
       else
 #endif
 #ifdef USE_PNETCDF
-      if(model == (NC_DISPATCH_NC5))
+      if(model == (NC_DISPATCH_NCP5))
 	dispatcher = NC5_dispatch_table;
       else
 #endif
@@ -1818,10 +1824,13 @@ NC_open(const char *path, int cmode,
    else if(model & NC_DISPATCH_NC3) {
       cmode &= ~NC_NETCDF4; /* must be netcdf-3 (CDF-1, CDF-2, CDF-5) */
       if(version == 2) cmode |= NC_64BIT_OFFSET;
-      else if(version == 5) cmode |= NC_64BIT_DATA;
+      else if(version == 5) {
+	cmode |= NC_64BIT_DATA;
+	cmode &= ~(NC_64BIT_OFFSET); /*NC_64BIT_DATA=>NC_64BIT_OFFSET*/
+     }
    } else if(model & NC_DISPATCH_NCP5) {
       cmode &= ~(NC_NETCDF4);
-      cmode |= (NC_64BIT_OFFSET | NC_PNETCDF);
+      cmode |= NC_PNETCDF;
    }
 
    if((cmode & NC_MPIIO && cmode & NC_MPIPOSIX))
@@ -1843,7 +1852,7 @@ NC_open(const char *path, int cmode,
    else
 #endif
 #if  defined(USE_PNETCDF)
-   if(model == (NC_DISPATCH_NC5))
+   if(model == (NC_DISPATCH_NCP5))
 	dispatcher = NC5_dispatch_table;
    else
 #endif

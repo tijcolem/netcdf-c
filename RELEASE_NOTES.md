@@ -10,10 +10,12 @@ This file contains a high-level description of this package's evolution. Release
 ### 4.4.0-RC3 In Progress
 
 * Addressed an issue where an interrupted read on a `POSIX` system would return an error even if errno had been properly set to `EINTR`.  This issue was initially reported by David Knaak at Cray.  More information may be found at [NCF-337](https://bugtracking.unidata.ucar.edu/browse/NCF-337).
+
 * Added a note to the install directions pointing out that parallel make
 cannot be used for 'make check'.
 
-* Added CDM-5 support; thanks to Wei-Keng Liao.
+* Added CDM-5 support via new mode flag called NC_64BIT_DATA (alias NC_CDF5);
+  thanks to Wei-Keng Liao.
 
 ### 4.4.0-RC2 Released 2015-07-09
 
