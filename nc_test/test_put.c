@@ -7,7 +7,9 @@
  *   $Id: test_put.m4 2785 2014-10-26 05:21:20Z wkliao $
  *********************************************************************/
 
-// #define TEST_PNETCDF
+#if 0
+#define TEST_PNETCDF
+#endif
 #include <mpi.h>
 
 #line 34

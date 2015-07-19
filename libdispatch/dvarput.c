@@ -122,7 +122,7 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
   /* Rebuilt put_vars code to simplify and avoid use of put_varm */
   
    int status = NC_NOERR;
-   int i,simplestride,isrecvar;
+   int i,isstride1,isrecvar;
    int rank;
    struct PUTodometer odom;
    nc_type vartype = NC_NAT;
@@ -135,8 +135,9 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
    size_t mystart[NC_MAX_VAR_DIMS];
    size_t myedges[NC_MAX_VAR_DIMS];
    ptrdiff_t mystride[NC_MAX_VAR_DIMS];
-
    const char* memptr = value;
+   int nrecdims = 0;
+   int is_recdim[NC_MAX_VAR_DIMS];
 
    status = NC_check_id (ncid, &ncp);
    if(status != NC_NOERR) return status;
@@ -172,6 +173,9 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
 
    /* Get variable dimension sizes */
    isrecvar = NC_is_recvar(ncid,varid,&numrecs);
+   status = NC_inq_recvar(ncid,varid,&nrecdims,is_recdim);
+   if(status != NC_NOERR) return status;
+   isrecvar = (nrecdims > 0);
    NC_getshape(ncid,varid,rank,varshape);	
 
    /* Optimize out using various checks */
@@ -186,13 +190,18 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
    }
 
    /* Do various checks and fixups on start/edges/stride */
-   simplestride = 1; /* assume so */
+   isstride1 = 1; /* assume so */
    for(i=0;i<rank;i++) {
 	size_t dimlen;
 	mystart[i] = (start == NULL ? 0 : start[i]);
 	if(edges == NULL) {
+#if 0
 	   if(i == 0 && isrecvar)
   	      myedges[i] = numrecs - start[i];
+#else
+	   if(is_recdim[i] && isrecvar)
+  	      myedges[i] = varshape[i] - start[i];
+#endif
 	   else
 	      myedges[i] = varshape[i] - mystart[i];
 	} else
@@ -204,10 +213,15 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
 	   /* cast needed for braindead systems with signed size_t */
            || ((unsigned long) mystride[i] >= X_INT_MAX))
            return NC_ESTRIDE;
-  	if(mystride[i] != 1) simplestride = 0;	
+  	if(mystride[i] != 1) isstride1 = 0;	
         /* illegal value checks */
+#if 0
 	dimlen = (i == 0 && isrecvar ? numrecs : varshape[i]);
 	if(i == 0 && isrecvar) {/*do nothing*/}
+#else
+	dimlen = varshape[i];
+	if(is_recdim[i]) {/*do nothing*/}
+#endif
         else {
 	  /* mystart is unsigned, will never be < 0 */
 	  if(mystart[i] > dimlen)
@@ -217,7 +231,7 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
 	    return NC_EEDGE;
        }
    }
-   if(simplestride) {
+   if(isstride1) {
       return NC_put_vara(ncid, varid, mystart, myedges, value, memtype);
    }
 

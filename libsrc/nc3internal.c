@@ -1611,21 +1611,31 @@ NC3_inq_format_extended(int ncid, int *formatp, int *modep)
 int
 NC3_inq_type(int ncid, nc_type typeid, char *name, size_t *size)
 {
+#if 0
    int atomic_size[NUM_ATOMIC_TYPES] = {NC_BYTE_LEN, NC_CHAR_LEN, NC_SHORT_LEN,
 					NC_INT_LEN, NC_FLOAT_LEN, NC_DOUBLE_LEN};
    char atomic_name[NUM_ATOMIC_TYPES][NC_MAX_NAME + 1] = {"byte", "char", "short",
 							  "int", "float", "double"};
+#endif
 
-   /* Only netCDF classic model needs to be handled. */
-   if (typeid < NC_BYTE || typeid > NC_DOUBLE)
+   NC *ncp;
+   int stat = NC_check_id(ncid, &ncp);
+   if (stat != NC_NOERR)
+	return stat;
+
+   /* Only netCDF classic model and CDF-5 need to be handled. */
+   if((ncp->mode & NC_CDF5) != 0) {
+	if (typeid < NC_BYTE || typeid > NC_STRING)
+            return NC_EBADTYPE;
+   } else if (typeid < NC_BYTE || typeid > NC_DOUBLE)
       return NC_EBADTYPE;
 
    /* Give the user the values they want. Subtract one because types
     * are numbered starting at 1, not 0. */
    if (name)
-      strcpy(name, atomic_name[typeid - 1]);
+      strcpy(name, NC_atomictypename(typeid - 1));
    if (size)
-      *size = atomic_size[typeid - 1];
+      *size = NC_atomictypelen(typeid);
 
    return NC_NOERR;
 }
