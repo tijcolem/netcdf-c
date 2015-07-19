@@ -1,5 +1,6 @@
 # Test c output
 T=tst_diskless3
+T=test_get
 #CMD=valgrind --leak-check=full
 #CMD=gdb --args
 

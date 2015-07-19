@@ -108,6 +108,9 @@ typedef struct NC_MEM_INFO {
 /*Forward*/
 typedef struct NC_Dispatch NC_Dispatch;
 
+extern int NCDISPATCH_initialize(void);
+extern int NCDISPATCH_finalize(void);
+
 extern NC_Dispatch* NCSUBSTRATE_dispatch_table;
 extern int NCSUBSTRATE_initialize(void);
 extern int NCSUBSTRATE_finalize(void);

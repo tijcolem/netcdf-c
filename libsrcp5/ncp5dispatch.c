@@ -1237,7 +1237,7 @@ NCP5_inq_type_equal(int ncid1, nc_type typeid1, int ncid2, nc_type typeid2, int*
     }
 
     /* If both are atomic types, the answer is easy. */
-    if (typeid1 <= ATOMICTYPEMAX) {
+    if (typeid1 <= ATOMICTYPEMAX5) {
         if (equalp) {
             if (typeid1 == typeid2)
                 *equalp = 1;
@@ -1339,7 +1339,7 @@ static int
 NCP5_inq_typeid(int ncid, const char *name, nc_type *typeidp)
 {
     int i;
-    for (i = 0; i <= ATOMICTYPEMAX; i++)
+    for (i = 0; i <= ATOMICTYPEMAX5; i++)
         if(!strcmp(name, NC_atomictypename(i))) {
             if(typeidp) *typeidp = i;
                 return NC_NOERR;
