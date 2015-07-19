@@ -1376,6 +1376,7 @@ NC_FORMAT_NETCDF4_CLASSIC.
 int
 nc_inq_format(int ncid, int *formatp)
 {
+   /* Do not check for ncid because it is not required for netcdf-3 */
    NC* ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
