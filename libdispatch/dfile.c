@@ -1376,6 +1376,7 @@ NC_FORMAT_NETCDF4_CLASSIC.
 int
 nc_inq_format(int ncid, int *formatp)
 {
+   /* Do not check for ncid because it is not required for netcdf-3 */
    NC* ncp;
    int stat = NC_check_id(ncid, &ncp);
    if(stat != NC_NOERR) return stat;
@@ -1547,9 +1548,27 @@ int
 nc_inq_type(int ncid, nc_type xtype, char *name, size_t *size)
 {
    NC* ncp;
-   int maxtype;
-   int format;
+   int stat;
 
+   /* Do a quick triage on xtype */
+   if(xtype <= NC_NAT) return NC_EBADTYPE;
+   /* See if the ncid is valid */
+   stat = NC_check_id(ncid, &ncp);
+   if(stat != NC_NOERR) { /* bad ncid; do what we can */
+       /* For compatibility, we need to allow inq about
+          atomic types, even if ncid is ill-defined */
+	if(xtype <= ATOMICTYPEMAX3) {
+            if(name) strncpy(name,NC_atomictypename(xtype),NC_MAX_NAME);
+            if(size) *size = NC_atomictypelen(xtype);
+            return NC_NOERR;
+	} else
+	    return NC_EBADTYPE;
+   } else { /* have good ncid */
+      return ncp->dispatch->inq_type(ncid,xtype,name,size);
+   }
+#if 0
+       int maxtype;
+       int format;
    nc_inq_format(ncid, &format);
    switch (format) {
    case NC_FORMAT_NETCDF4_CLASSIC: /*fall thru*/
@@ -1559,19 +1578,7 @@ nc_inq_type(int ncid, nc_type xtype, char *name, size_t *size)
    case NC_FORMAT_CDF5: maxtype = ATOMICTYPEMAX5; break;
    default: return NC_EINVAL;
    }
-
-   /* For compatibility, we need to allow inq about
-      atomic types, even if ncid is ill-defined */
-   if(xtype <= maxtype) {
-      if(xtype <= NC_NAT) return NC_EBADTYPE;
-      if(name) strncpy(name,NC_atomictypename(xtype),NC_MAX_NAME);
-      if(size) *size = NC_atomictypelen(xtype);
-      return NC_NOERR;
-   } else {
-      int stat = NC_check_id(ncid, &ncp);
-      if(stat != NC_NOERR) return NC_EBADTYPE; /* compatibility */
-      return ncp->dispatch->inq_type(ncid,xtype,name,size);
-   }
+#endif
 }
 /**@}*/
 
