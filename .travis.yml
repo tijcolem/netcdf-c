@@ -18,7 +18,7 @@ before_install:
 before_script:
   - mkdir build
   - cd build
-  - cmake .. -DENABLE_EXTRA_TESTS=ON -DENABLE_HDF4=ON
+  - cmake ..
 
 script:
   - make -j 4
