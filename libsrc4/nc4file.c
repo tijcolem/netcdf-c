@@ -46,9 +46,9 @@ extern int num_spaces;
 #define NAME "NAME"
 
 /* Define the illegal mode flags */
-#define ILLEGAL_OPEN_FLAGS (NC_MMAP|NC_64BIT_OFFSET)
+static const int ILLEGAL_OPEN_FLAGS = (NC_MMAP|NC_64BIT_OFFSET);
 
-#define ILLEGAL_CREATE_FLAGS (NC_NOWRITE|NC_MMAP|NC_INMEMORY|NC_64BIT_OFFSET|NC_PNETCDF)
+static const int ILLEGAL_CREATE_FLAGS = (NC_NOWRITE|NC_MMAP|NC_INMEMORY|NC_64BIT_OFFSET|NC_CDF5);
 
 /*! Struct to track information about objects in a group, for nc4_rec_read_metadata()
 
