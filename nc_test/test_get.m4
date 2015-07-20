@@ -11,7 +11,9 @@ dnl
  *********************************************************************/
 
 // #define TEST_PNETCDF
+#ifdef USE_PARALLEL
 #include <mpi.h>
+#endif
 
 undefine(`index')dnl
 dnl dnl dnl
@@ -314,10 +316,10 @@ test_nc_get_vara_$1(void)
 		edge[j] = 0;
 	    }
 	    err = nc_get_vara_$1(BAD_ID, i, start, edge, value);
-	    IF (err != NC_EBADID) 
+	    IF (err != NC_EBADID)
 		error("bad ncid: status = %d", err);
 	    err = nc_get_vara_$1(ncid, BAD_VARID, start, edge, value);
-	    IF (err != NC_ENOTVAR) 
+	    IF (err != NC_ENOTVAR)
 		error("bad var id: status = %d", err);
 	    for (j = 0; j < var_rank[i]; j++) {
 		if (var_dimid[i][j] > 0) {		/* skip record dim */
@@ -330,7 +332,7 @@ test_nc_get_vara_$1(void)
 	    }
 	    err = nc_get_vara_$1(ncid, i, start, edge, value);
 	    if (canConvert) {
-		IF (err) 
+		IF (err)
 		    error("%s", nc_strerror(err));
 	    } else {
 		IF (err != NC_ECHAR)
@@ -560,7 +562,7 @@ test_nc_get_vars_$1(void)
 			error("error in toMixedBase 1");
 		    for (d = 0; d < var_rank[i]; d++)
 			index2[d] = index[d] + index2[d] * stride[d];
-		    expect[j] = hash4(var_type[i], var_rank[i], index2, 
+		    expect[j] = hash4(var_type[i], var_rank[i], index2,
 			NCT_ITYPE($1));
 		    if (inRange3(expect[j],var_type[i],NCT_ITYPE($1))) {
 			allInIntRange = allInIntRange && expect[j] >= $1_min
@@ -793,7 +795,7 @@ test_nc_get_varm_$1(void)
                     }
                     for (j = 0; j < nels; j++) {
                         if (inRange3(expect[j],var_type[i],NCT_ITYPE($1))
-                                && expect[j] >= $1_min 
+                                && expect[j] >= $1_min
 				&& expect[j] <= $1_max) {
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_ITYPE($1))){
                                 error("value read not that expected");
@@ -862,20 +864,20 @@ test_nc_get_att_$1(void)
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
 #endif
-    IF (err) 
+    IF (err)
 	error("nc_open: %s", nc_strerror(err));
 
     for (i = -1; i < numVars; i++) {
         for (j = 0; j < NATTS(i); j++) {
 	    canConvert = (ATT_TYPE(i,j) == NC_CHAR) == (NCT_ITYPE($1) == NCT_TEXT);
 	    err = nc_get_att_$1(BAD_ID, i, ATT_NAME(i,j), value);
-	    IF (err != NC_EBADID) 
+	    IF (err != NC_EBADID)
 		error("bad ncid: status = %d", err);
 	    err = nc_get_att_$1(ncid, BAD_VARID, ATT_NAME(i,j), value);
-	    IF (err != NC_ENOTVAR) 
+	    IF (err != NC_ENOTVAR)
 		error("bad var id: status = %d", err);
 	    err = nc_get_att_$1(ncid, i, "noSuch", value);
-	    IF (err != NC_ENOTATT) 
+	    IF (err != NC_ENOTATT)
 		error("Bad attribute name: status = %d", err);
 	    allInExtRange = allInIntRange = 1;
             for (k = 0; k < ATT_LEN(i,j); k++) {
@@ -945,4 +947,3 @@ TEST_NC_GET_ATT(ushort)
 TEST_NC_GET_ATT(uint)
 TEST_NC_GET_ATT(longlong)
 TEST_NC_GET_ATT(ulonglong)
-

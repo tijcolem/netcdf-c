@@ -13,9 +13,12 @@
 #include <float.h>
 #define NO_NETCDF_2 1
 #include "netcdf.h"
+
+#ifdef USE_PARALLEL
 #include "netcdf_par.h"
+#endif
+
 #include "error.h"
-#include <mpi.h>
 
 #if defined(_CRAY) && !defined(_CRAYIEEE) && !defined(__crayx1)
 #define CRAYFLOAT 1 /* CRAY Floating point */
@@ -49,7 +52,7 @@
 #define X_DOUBLE_MAX    1.79769313486230e+308
 #else
 /* scalb(1. - scalb(.5 , -52), 1024) */
-#define X_DOUBLE_MAX	1.7976931348623157e+308 
+#define X_DOUBLE_MAX	1.7976931348623157e+308
 #endif
 #define X_DOUBLE_MIN	(-X_DOUBLE_MAX)
 

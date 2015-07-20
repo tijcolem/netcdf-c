@@ -11,7 +11,9 @@ dnl
  *********************************************************************/
 
 // #define TEST_PNETCDF
+#ifdef USE_PARALLEL
 #include <mpi.h>
+#endif
 
 undefine(`index')dnl
 dnl dnl dnl
@@ -74,7 +76,7 @@ dnl CHECK_VARS(TYPE)
 dnl
 define(`CHECK_VARS',dnl
 `dnl
-/* 
+/*
  *  check all vars in file which are (text/numeric) compatible with TYPE
  */
 static
@@ -181,7 +183,7 @@ dnl CHECK_ATTS(TYPE)         numeric only
 dnl
 define(`CHECK_ATTS',dnl
 `dnl
-/* 
+/*
  *  check all attributes in file which are (text/numeric) compatible with TYPE
  *  ignore any attributes containing values outside range of TYPE
  */
@@ -249,7 +251,7 @@ check_atts_$1(int  ncid)
                         }
                     }
                 }
-            }                                               
+            }
         }
     }
 
@@ -306,10 +308,10 @@ test_nc_put_var1_$1(void)
         for (j = 0; j < var_rank[i]; j++)
             index[j] = 0;
         err = nc_put_var1_$1(BAD_ID, i, index, &value);
-        IF (err != NC_EBADID) 
+        IF (err != NC_EBADID)
 	    error("bad ncid: status = %d", err);
         err = nc_put_var1_$1(ncid, BAD_VARID, index, &value);
-        IF (err != NC_ENOTVAR) 
+        IF (err != NC_ENOTVAR)
 	    error("bad var id: status = %d", err);
         for (j = 0; j < var_rank[i]; j++) {
 	    if (var_dimid[i][j] > 0) {		/* skip record dim */
@@ -322,7 +324,7 @@ test_nc_put_var1_$1(void)
         }
         for (j = 0; j < var_nels[i]; j++) {
             err = toMixedBase(j, var_rank[i], var_shape[i], index);
-            IF (err) 
+            IF (err)
 		error("error in toMixedBase 1");
             value = hash_$1( var_type[i], var_rank[i], index, NCT_ITYPE($1));
 	    if (var_rank[i] == 0 && i%2 == 0)
@@ -349,7 +351,7 @@ test_nc_put_var1_$1(void)
     }
 
     err = nc_close(ncid);
-    IF (err) 
+    IF (err)
 	error("nc_close: %s", nc_strerror(err));
 
     check_vars_$1(scratch);
@@ -412,10 +414,10 @@ test_nc_put_var_$1(void)
         assert(var_rank[i] <= MAX_RANK);
         assert(var_nels[i] <= MAX_NELS);
         err = nc_put_var_$1(BAD_ID, i, value);
-        IF (err != NC_EBADID) 
+        IF (err != NC_EBADID)
 	    error("bad ncid: status = %d", err);
         err = nc_put_var_$1(ncid, BAD_VARID, value);
-        IF (err != NC_ENOTVAR) 
+        IF (err != NC_ENOTVAR)
 	    error("bad var id: status = %d", err);
 
 	nels = 1;
@@ -424,16 +426,16 @@ test_nc_put_var_$1(void)
 	}
 	for (allInExtRange = 1, j = 0; j < nels; j++) {
 	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-	    IF (err) 
+	    IF (err)
 		error("error in toMixedBase 1");
 	    value[j]= hash_$1(var_type[i], var_rank[i], index, NCT_ITYPE($1));
-	    allInExtRange = allInExtRange 
+	    allInExtRange = allInExtRange
 		&& inRange3(value[j], var_type[i], NCT_ITYPE($1));
 	}
         err = nc_put_var_$1(ncid, i, value);
 	if (canConvert) {
 	    if (allInExtRange) {
-		IF (err) 
+		IF (err)
 		    error("%s", nc_strerror(err));
 	    } else {
 		IF (err != NC_ERANGE && var_dimid[i][0] != RECDIM)
@@ -464,7 +466,7 @@ test_nc_put_var_$1(void)
 	    assert(var_rank[i] <= MAX_RANK);
 	    assert(var_nels[i] <= MAX_NELS);
 	    err = nc_put_var_$1(BAD_ID, i, value);
-	    IF (err != NC_EBADID) 
+	    IF (err != NC_EBADID)
 	        error("bad ncid: status = %d", err);
 	    nels = 1;
 	    for (j = 0; j < var_rank[i]; j++) {
@@ -472,16 +474,16 @@ test_nc_put_var_$1(void)
 	    }
 	    for (allInExtRange = 1, j = 0; j < nels; j++) {
 		err = toMixedBase(j, var_rank[i], var_shape[i], index);
-		IF (err) 
+		IF (err)
 		    error("error in toMixedBase 1");
 		value[j]= hash_$1(var_type[i], var_rank[i], index, NCT_ITYPE($1));
-		allInExtRange = allInExtRange 
+		allInExtRange = allInExtRange
 		    && inRange3(value[j], var_type[i], NCT_ITYPE($1));
 	    }
 	    err = nc_put_var_$1(ncid, i, value);
 	    if (canConvert) {
 		if (allInExtRange) {
-		    IF (err) 
+		    IF (err)
 			error("%s", nc_strerror(err));
 		} else {
 		    IF (err != NC_ERANGE)
@@ -495,7 +497,7 @@ test_nc_put_var_$1(void)
     }
 
     err = nc_close(ncid);
-    IF (err) 
+    IF (err)
 	error("nc_close: %s", nc_strerror(err));
 
     check_vars_$1(scratch);
@@ -568,10 +570,10 @@ test_nc_put_vara_$1(void)
             edge[j] = 1;
 	}
         err = nc_put_vara_$1(BAD_ID, i, start, edge, value);
-        IF (err != NC_EBADID) 
+        IF (err != NC_EBADID)
 	    error("bad ncid: status = %d", err);
         err = nc_put_vara_$1(ncid, BAD_VARID, start, edge, value);
-        IF (err != NC_ENOTVAR) 
+        IF (err != NC_ENOTVAR)
 	    error("bad var id: status = %d", err);
         for (j = 0; j < var_rank[i]; j++) {
 	    if (var_dimid[i][j] > 0) {		/* skip record dim */
@@ -592,10 +594,10 @@ test_nc_put_vara_$1(void)
             edge[j] = 0;
 	}
         err = nc_put_vara_$1(BAD_ID, i, start, edge, value);
-        IF (err != NC_EBADID) 
+        IF (err != NC_EBADID)
 	    error("bad ncid: status = %d", err);
         err = nc_put_vara_$1(ncid, BAD_VARID, start, edge, value);
-        IF (err != NC_ENOTVAR) 
+        IF (err != NC_ENOTVAR)
 	    error("bad var id: status = %d", err);
         for (j = 0; j < var_rank[i]; j++) {
 	    if (var_dimid[i][j] > 0) {		/* skip record dim */
@@ -613,7 +615,7 @@ test_nc_put_vara_$1(void)
 
 	err = nc_put_vara_$1(ncid, i, start, edge, value);
 	if (canConvert) {
-	    IF (err) 
+	    IF (err)
 		error("%s", nc_strerror(err));
 	} else {
 	    IF (err != NC_ECHAR)
@@ -646,12 +648,12 @@ test_nc_put_vara_$1(void)
 	    }
             for (allInExtRange = 1, j = 0; j < nels; j++) {
 		err = toMixedBase(j, var_rank[i], edge, index);
-		IF (err) 
+		IF (err)
 		    error("error in toMixedBase 1");
-		for (d = 0; d < var_rank[i]; d++) 
+		for (d = 0; d < var_rank[i]; d++)
 		    index[d] += start[d];
 		value[j]= hash_$1(var_type[i], var_rank[i], index, NCT_ITYPE($1));
-		allInExtRange = allInExtRange 
+		allInExtRange = allInExtRange
 		    && inRange3(value[j], var_type[i], NCT_ITYPE($1));
 	    }
 	    if (var_rank[i] == 0 && i%2 == 0)
@@ -660,7 +662,7 @@ test_nc_put_vara_$1(void)
 		err = nc_put_vara_$1(ncid, i, start, edge, value);
 	    if (canConvert) {
 		if (allInExtRange) {
-		    IF (err) 
+		    IF (err)
 			error("%s", nc_strerror(err));
 		} else {
 		    IF (err != NC_ERANGE)
@@ -674,7 +676,7 @@ test_nc_put_vara_$1(void)
     }
 
     err = nc_close(ncid);
-    IF (err) 
+    IF (err)
 	error("nc_close: %s", nc_strerror(err));
 
     check_vars_$1(scratch);
@@ -753,10 +755,10 @@ test_nc_put_vars_$1(void)
 	    stride[j] = 1;
 	}
 	err = nc_put_vars_$1(BAD_ID, i, start, edge, stride, value);
-	IF (err != NC_EBADID) 
+	IF (err != NC_EBADID)
 	    error("bad ncid: status = %d", err);
 	err = nc_put_vars_$1(ncid, BAD_VARID, start, edge, stride, value);
-	IF (err != NC_ENOTVAR) 
+	IF (err != NC_ENOTVAR)
 	    error("bad var id: status = %d", err);
 	for (j = 0; j < var_rank[i]; j++) {
 	    if (var_dimid[i][j] > 0) {		/* skip record dim */
@@ -829,9 +831,9 @@ test_nc_put_vars_$1(void)
 			error("error in toMixedBase");
 		    for (d = 0; d < var_rank[i]; d++)
 			index2[d] = index[d] + index2[d] * stride[d];
-		    value[j] = hash_$1(var_type[i], var_rank[i], index2, 
+		    value[j] = hash_$1(var_type[i], var_rank[i], index2,
 			NCT_ITYPE($1));
-		    allInExtRange = allInExtRange 
+		    allInExtRange = allInExtRange
 			&& inRange3(value[j], var_type[i], NCT_ITYPE($1));
 		}
 		if (var_rank[i] == 0 && i%2 == 0)
@@ -840,7 +842,7 @@ test_nc_put_vars_$1(void)
 		    err = nc_put_vars_$1(ncid, i, index, count, stride, value);
 		if (canConvert) {
 		    if (allInExtRange) {
-			IF (err) 
+			IF (err)
 			    error("%s", nc_strerror(err));
 		    } else {
 			IF (err != NC_ERANGE)
@@ -855,7 +857,7 @@ test_nc_put_vars_$1(void)
     }
 
     err = nc_close(ncid);
-    IF (err) 
+    IF (err)
 	error("nc_close: %s", nc_strerror(err));
 
     check_vars_$1(scratch);
@@ -936,10 +938,10 @@ test_nc_put_varm_$1(void)
 	    imap[j] = 1;
 	}
 	err = nc_put_varm_$1(BAD_ID, i, start, edge, stride, imap, value);
-	IF (err != NC_EBADID) 
+	IF (err != NC_EBADID)
 	    error("bad ncid: status = %d", err);
 	err = nc_put_varm_$1(ncid, BAD_VARID, start, edge, stride, imap, value);
-	IF (err != NC_ENOTVAR) 
+	IF (err != NC_ENOTVAR)
 	    error("bad var id: status = %d", err);
 	for (j = 0; j < var_rank[i]; j++) {
 	    if (var_dimid[i][j] > 0) {		/* skip record dim */
@@ -1044,7 +1046,7 @@ test_nc_put_varm_$1(void)
     }
 
     err = nc_close(ncid);
-    IF (err) 
+    IF (err)
 	error("nc_close: %s", nc_strerror(err));
 
     check_vars_$1(scratch);
@@ -1094,7 +1096,7 @@ test_nc_put_att_text(void)
     {
 	const char *const tval = "value for bad name";
 	const size_t tval_len = strlen(tval);
-	
+
 	err = nc_put_att_text(ncid, 0, "", tval_len, tval);
 	IF (err != NC_EBADNAME)
 	   error("should be NC_EBADNAME: status = %d", err);
@@ -1103,18 +1105,18 @@ test_nc_put_att_text(void)
         for (j = 0; j < NATTS(i); j++) {
             if (ATT_TYPE(i,j) == NC_CHAR) {
 		assert(ATT_LEN(i,j) <= MAX_NELS);
-		err = nc_put_att_text(BAD_ID, i, ATT_NAME(i,j), ATT_LEN(i,j), 
+		err = nc_put_att_text(BAD_ID, i, ATT_NAME(i,j), ATT_LEN(i,j),
 		    value);
 		IF (err != NC_EBADID)
 		    error("bad ncid: status = %d", err);
-		err = nc_put_att_text(ncid, BAD_VARID, ATT_NAME(i,j), 
+		err = nc_put_att_text(ncid, BAD_VARID, ATT_NAME(i,j),
 		    ATT_LEN(i,j), value);
 		IF (err != NC_ENOTVAR)
 		    error("bad var id: status = %d", err);
 		for (k = 0; k < ATT_LEN(i,j); k++) {
 		    value[k] = hash(ATT_TYPE(i,j), -1, &k);
 		}
-		err = nc_put_att_text(ncid, i, ATT_NAME(i,j), 
+		err = nc_put_att_text(ncid, i, ATT_NAME(i,j),
 		    ATT_LEN(i,j), value);
 		IF (err) {
 		    error("%s", nc_strerror(err));
@@ -1165,15 +1167,15 @@ test_nc_put_att_$1(void)
         for (j = 0; j < NATTS(i); j++) {
             if (!(ATT_TYPE(i,j) == NC_CHAR)) {
 		assert(ATT_LEN(i,j) <= MAX_NELS);
-		err = nc_put_att_$1(BAD_ID, i, ATT_NAME(i,j), ATT_TYPE(i,j), 
+		err = nc_put_att_$1(BAD_ID, i, ATT_NAME(i,j), ATT_TYPE(i,j),
 		    ATT_LEN(i,j), value);
 		IF (err != NC_EBADID)
 		    error("bad ncid: status = %d", err);
-		err = nc_put_att_$1(ncid, BAD_VARID, ATT_NAME(i,j), 
+		err = nc_put_att_$1(ncid, BAD_VARID, ATT_NAME(i,j),
 		    ATT_TYPE(i,j), ATT_LEN(i,j), value);
 		IF (err != NC_ENOTVAR)
 		    error("bad var id: status = %d", err);
-		err = nc_put_att_$1(ncid, i, ATT_NAME(i,j), BAD_TYPE, 
+		err = nc_put_att_$1(ncid, i, ATT_NAME(i,j), BAD_TYPE,
 		    ATT_LEN(i,j), value);
 		IF (err != NC_EBADTYPE)
 		    error("bad type: status = %d", err);
@@ -1217,4 +1219,3 @@ TEST_NC_PUT_ATT(ushort)
 TEST_NC_PUT_ATT(uint)
 TEST_NC_PUT_ATT(longlong)
 TEST_NC_PUT_ATT(ulonglong)
-
