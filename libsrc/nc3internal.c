@@ -1633,7 +1633,7 @@ NC3_inq_type(int ncid, nc_type typeid, char *name, size_t *size)
    /* Give the user the values they want. Subtract one because types
     * are numbered starting at 1, not 0. */
    if (name)
-      strcpy(name, NC_atomictypename(typeid - 1));
+      strcpy(name, NC_atomictypename(typeid));
    if (size)
       *size = NC_atomictypelen(typeid);
 

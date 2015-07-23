@@ -13,7 +13,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <netcdf.h>
+#ifdef USE_PARALLEL
 #include <netcdf_par.h>
+#endif
 #include <nc_tests.h>
 
 /* The data file we will create. */
@@ -232,7 +234,7 @@ main(int argc, char **argv)
        "classic", "64-bit offset", "64-bit data", "netCDF-4/HDF5", "netCDF-4 classic model"
    };
 
-#ifdef TEST_PNETCDF
+#ifdef USE_PNETCDF
    MPI_Init(&argc, &argv);
 #endif
 
@@ -241,7 +243,7 @@ main(int argc, char **argv)
    {
        printf("*** switching to netCDF %s format...", format_names[j]);
        nc_set_default_format(formats[j], NULL);
-#ifdef TEST_PNETCDF
+#ifdef USE_PNETCDF
        if((res = nc_create_par(testfile, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid)))
 #else
        if((res = nc_create(testfile, NC_CLOBBER, &ncid)))
@@ -293,7 +295,7 @@ main(int argc, char **argv)
 	   ERROR
        
        /* Check it out, make sure all objects with good names were defined OK */
-#ifdef TEST_PNETCDF
+#ifdef USE_PNETCDF
        if ((res = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid)))
 #else
        if ((res = nc_open(testfile, NC_NOWRITE, &ncid)))
@@ -326,7 +328,7 @@ main(int argc, char **argv)
    }
    FINAL_RESULTS;
 
-#ifdef TEST_PNETCDF
+#ifdef USE_PNETCDF
    MPI_Finalize();
 #endif
    return 0;
