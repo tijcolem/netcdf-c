@@ -10,7 +10,7 @@ fi
 HDF5=1
 DAP=1
 #HDF4=1
-PNETCDF=1
+#PNETCDF=1
 
 #PAR=1
 
@@ -24,8 +24,8 @@ fi
 #M64=1
 
 CFLAGS=""
-#CFLAGS="-Wall -Wno-unused-variable -Wno-unused-parameter -Wconversion ${CFLAGS}"
-CFLAGS="-Wall -Wno-unused-variable -Wno-unused-parameter ${CFLAGS}"
+#CFLAGS="-Wall -Wno-unused-but-set-variable -Wno-unused-variable -Wno-unused-parameter -Wconversion ${CFLAGS}"
+CFLAGS="-Wall -Wno-unused-but-set-variable -Wno-unused-variable -Wno-unused-parameter ${CFLAGS}"
 #CFLAGS="-Wall ${CFLAGS}"
 #CFLAGS="-Wconversion"
 
