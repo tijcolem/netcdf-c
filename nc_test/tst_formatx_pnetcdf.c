@@ -54,8 +54,8 @@ int main(int argc, char* argv[])
     if (nc_enddef(ncid)) ERR;
 
     if(nc_inq_format_extended(ncid,&format,&cmode)) ERR;
-    if((cmode & 0x8000) == 0) {
-	printf("***FAIL: mode was %08x ; expected %08x\n",cmode,0);
+    if((cmode & 0x0020) == 0) {
+	printf("***FAIL: mode was %08x ; expected %08x\n",cmode,0x20);
 	ecode = 1;
 	ERR;
     }

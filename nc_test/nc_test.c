@@ -87,7 +87,7 @@ main(int argc, char *argv[])
     int i;
     int  nfailsTotal = 0;        /* total number of failures */
 
-#ifdef TEST_PNETCDF
+#ifdef USE_PNETCDF
     MPI_Init(&argc, &argv);
 #endif
     /* Both CRAY MPP and OSF/1 Alpha systems need this.  Some of the
@@ -368,7 +368,7 @@ main(int argc, char *argv[])
     else
        fprintf(stderr, "*** nc_test SUCCESS!!!\n");
 
-#ifdef TEST_PNETCDF
+#ifdef USE_PNETCDF
     MPI_Finalize();
 #endif
     exit(0);

@@ -860,7 +860,7 @@ write_file(char *filename)
     int  ncid;			/* netCDF id */
     int  err;		/* status */
 
-#ifdef TEST_PNETCDF
+#ifdef USE_PNETCDF
     err = nc_create_par(filename, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_create(filename, NC_CLOBBER, &ncid);
@@ -1061,7 +1061,7 @@ check_file(char *filename)
     int  ncid;		/* netCDF id */
     int  err;		/* status */
 
-#ifdef TEST_PNETCDF
+#ifdef USE_PNETCDF
     err = nc_open_par(filename, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(filename, NC_NOWRITE, &ncid);
