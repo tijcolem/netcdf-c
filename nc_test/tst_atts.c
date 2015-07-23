@@ -454,11 +454,7 @@ create_file()
     int i444_dims[RANK_i444];
 
     /* enter define mode */
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
     stat = nc_create_par(FILE_NAME, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     stat = nc_create(FILE_NAME, NC_CLOBBER, &ncid);
@@ -2350,11 +2346,7 @@ create_file()
 int
 main(int argc, char **argv)
 {
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
    MPI_Init(&argc, &argv);
 #endif
    printf("\n*** Testing netCDF attributes.\n");
@@ -2369,11 +2361,7 @@ main(int argc, char **argv)
       char char_data = 'a';
 
       /* Create a file with a var with two atts. */
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
       if (nc_create_par(FILE_NAME, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid)) ERR;
 #else
       if (nc_create(FILE_NAME, NC_NETCDF4|NC_CLASSIC_MODEL|NC_CLOBBER, &ncid)) ERR;
@@ -2413,11 +2401,7 @@ main(int argc, char **argv)
       if (nc_close(ncid)) ERR;
 
       /* Reopen the file and check it. */
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
       if (nc_open_par(FILE_NAME, NC_WRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid)) ERR;
 #else
       if (nc_open(FILE_NAME, NC_WRITE, &ncid)) ERR;
@@ -2449,11 +2433,7 @@ main(int argc, char **argv)
       if (create_file()) ERR;
 
       /* Open the file. */
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
       if (nc_open_par(FILE_NAME, NC_WRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid)) ERR;
 #else
       if (nc_open(FILE_NAME, NC_WRITE, &ncid)) ERR;
@@ -2482,11 +2462,7 @@ main(int argc, char **argv)
       if (nc_close(ncid)) ERR;
 
       /* Reopen the file and check it. */
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
       if (nc_open_par(FILE_NAME, NC_WRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid)) ERR;
 #else
       if (nc_open(FILE_NAME, NC_WRITE, &ncid)) ERR;
@@ -2506,11 +2482,7 @@ main(int argc, char **argv)
 
    }
    SUMMARIZE_ERR;
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
    MPI_Finalize();
 #endif
    FINAL_RESULTS;

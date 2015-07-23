@@ -13,13 +13,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <netcdf.h>
-<<<<<<< HEAD
 #ifdef USE_PARALLEL
 #include <netcdf_par.h>
 #endif
-=======
-#include <netcdf_par.h>
->>>>>>> initial merge of the cdf5 code
 #include <nc_tests.h>
 
 /* The data file we will create. */
@@ -223,15 +219,7 @@ main(int argc, char **argv)
    int formats[] = {
        NC_FORMAT_CLASSIC
        ,
-<<<<<<< HEAD
-<<<<<<< HEAD
        NC_FORMAT_64BIT_OFFSET
-=======
-       NC_FORMAT_64BIT
->>>>>>> initial merge of the cdf5 code
-=======
-       NC_FORMAT_64BIT_OFFSET
->>>>>>> ckp
        ,
        NC_FORMAT_CDF5
 #ifdef USE_NETCDF4
@@ -246,11 +234,7 @@ main(int argc, char **argv)
        "classic", "64-bit offset", "64-bit data", "netCDF-4/HDF5", "netCDF-4 classic model"
    };
 
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
    MPI_Init(&argc, &argv);
 #endif
 
@@ -259,11 +243,7 @@ main(int argc, char **argv)
    {
        printf("*** switching to netCDF %s format...", format_names[j]);
        nc_set_default_format(formats[j], NULL);
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
        if((res = nc_create_par(testfile, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid)))
 #else
        if((res = nc_create(testfile, NC_CLOBBER, &ncid)))
@@ -315,11 +295,7 @@ main(int argc, char **argv)
 	   ERROR
        
        /* Check it out, make sure all objects with good names were defined OK */
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
        if ((res = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid)))
 #else
        if ((res = nc_open(testfile, NC_NOWRITE, &ncid)))
@@ -352,11 +328,7 @@ main(int argc, char **argv)
    }
    FINAL_RESULTS;
 
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
    MPI_Finalize();
 #endif
    return 0;
