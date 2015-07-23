@@ -107,7 +107,7 @@ create_file(char *file_name, int fill_mode, size_t* sizehintp)
     * the same effect by providing the desired value as sizehint to
     * nc__create() instead of calling nc_create() and getting the
     * block size reported by fstat */
-#ifdef TEST_PNETCDF
+#ifdef USE_PNETCDF
    stat = nc_create_par(file_name, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
    /* PnetCDF does not support fill mode */
 #else
@@ -362,7 +362,7 @@ main(int argc, char **argv)
 				 * value between 2091953 and 2150032
 				 * triggers bug, whereas all other
 				 * values work fine. */
-#ifdef TEST_PNETCDF
+#ifdef USE_PNETCDF
     MPI_Init(&argc, &argv);
 #endif
 
@@ -401,7 +401,7 @@ main(int argc, char **argv)
        printf("*** Compare values in nofill mode and fill mode files...");
        /* compare data in two files created with nofill mode and fill
 	* mode, which should be identical if all the data were written */
-#ifdef TEST_PNETCDF
+#ifdef USE_PNETCDF
        if (nc_open_par(FILE_NAME1, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid1)) ERR;
        if (nc_open_par(FILE_NAME2, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid2)) ERR;
 #else
@@ -486,7 +486,7 @@ main(int argc, char **argv)
        SUMMARIZE_ERR;
    }
    FINAL_RESULTS;
-#ifdef TEST_PNETCDF
+#ifdef USE_PNETCDF
    MPI_Finalize();
 #endif
 }

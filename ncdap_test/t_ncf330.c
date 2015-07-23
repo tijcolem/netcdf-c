@@ -8,10 +8,10 @@
 
 #include "config.h"
 #ifdef HAVE_STDLIB_H
-#include <stdio.h>
+#include <stdlib.h>
 #endif
 #ifdef HAVE_STDIO_H
-#include <stdio.>
+#include <stdio.h>
 #endif
 #include <netcdf.h>
 

@@ -12,7 +12,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <netcdf.h>
+#ifdef USE_PARALLEL
 #include <netcdf_par.h>
+#endif
 #include <nc_tests.h>
 
 /* The data file we will create. */
@@ -100,11 +102,11 @@ main(int argc, char **argv)
    int attvals[] = {42};
 #define ATTNUM ((sizeof attvals)/(sizeof attvals[0]))
 
-#ifdef TEST_PNETCDF
+#ifdef USE_PNETCDF
 MPI_Init(&argc, &argv);
 #endif
    printf("\n*** testing UTF-8 normalization...");
-#ifdef TEST_PNETCDF
+#ifdef USE_PNETCDF
    if((res = nc_create_par(FILE7_NAME, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL,&ncid)))
 #else
    if((res = nc_create(FILE7_NAME, NC_CLOBBER, &ncid)))
@@ -147,7 +149,7 @@ MPI_Init(&argc, &argv);
        ERR;
 
    /* Check it out. */
-#ifdef TEST_PNETCDF
+#ifdef USE_PNETCDF
    if ((res = nc_open_par(FILE7_NAME, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD,MPI_INFO_NULL, &ncid)))
 #else
    if ((res = nc_open(FILE7_NAME, NC_NOWRITE, &ncid)))
@@ -182,7 +184,7 @@ MPI_Init(&argc, &argv);
        ERR;
 
    SUMMARIZE_ERR;
-#ifdef TEST_PNETCDF
+#ifdef USE_PNETCDF
    MPI_Finalize();
 #endif
    FINAL_RESULTS;
