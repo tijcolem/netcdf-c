@@ -13,15 +13,10 @@
 #include <float.h>
 #define NO_NETCDF_2 1
 #include "netcdf.h"
-<<<<<<< HEAD
 #ifdef USE_PARALLEL
 #include "netcdf_par.h"
 #endif
-=======
-#include "netcdf_par.h"
->>>>>>> initial merge of the cdf5 code
 #include "error.h"
-#include <mpi.h>
 
 #if defined(_CRAY) && !defined(_CRAYIEEE) && !defined(__crayx1)
 #define CRAYFLOAT 1 /* CRAY Floating point */

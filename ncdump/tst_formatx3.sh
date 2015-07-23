@@ -34,15 +34,7 @@ echo "Test extended format output for a 64-bit CDF-5 classic file"
 rm -f tmp
 ../ncgen/ncgen -k5 -b -o ./test.nc $srcdir/ref_tst_small.cdl
 ./ncdump -K test.nc >tmp
-<<<<<<< HEAD
-<<<<<<< HEAD
 if ! fgrep '64-bit data mode=00000020' <tmp ; then
-=======
-if ! fgrep '64-bit data mode=00000010' <tmp ; then
->>>>>>> initial merge of the cdf5 code
-=======
-if ! fgrep '64-bit data mode=00008000' <tmp ; then
->>>>>>> ckp
 echo "*** Fail: extended format for a 64-bit CDF-5 classic file"
 ECODE=1
 fi
