@@ -134,7 +134,9 @@ extern "C" {
 
 #define NC_DISKLESS      0x0008  /**< Use diskless file. Mode flag for nc_open() or nc_create(). */
 #define NC_MMAP          0x0010  /**< Use diskless file with mmap. Mode flag for nc_open() or nc_create(). */
-#define NC_INMEMORY      0x0020  /**< Read from memory. Mode flag for nc_open() or nc_create(). */
+
+#define NC_64BIT_DATA    0x0020  /**< CDF-5 format: classic model but 64 bit dimensions and sizes */
+#define NC_CDF5          NC_64BIT_DATA  /**< Alias */
 
 #define NC_CLASSIC_MODEL 0x0100 /**< Enforce classic model on netCDF-4. Mode flag for nc_create(). */
 #define NC_64BIT_OFFSET  0x0200  /**< Use large (64-bit) file offsets. Mode flag for nc_create(). */
@@ -158,8 +160,7 @@ Use this in mode flags for both nc_create() and nc_open(). */
 Use this in mode flags for both nc_create() and nc_open(). */
 #define NC_MPIPOSIX      0x4000 /**< \deprecated As of libhdf5 1.8.13. */
 
-#define NC_64BIT_DATA    0x8000  /**< CDF-5 format: classic model but 64 bit dimensions and sizes */
-#define NC_CDF5          NC_64BIT_DATA  /**< Alias */
+#define NC_INMEMORY      0x8000  /**< Read from memory. Mode flag for nc_open() or nc_create(). */
 
 #define NC_PNETCDF       (NC_CDF5|NC_MPIIO) /**< Use parallel-netcdf library. Mode flag combo for nc_open(). */
 

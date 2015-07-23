@@ -6,6 +6,13 @@
  * See https://bugtracking.unidata.ucar.edu/browse/NCF-330
  */
 
+#include "config.h"
+#ifdef HAVE_STDLIB_H
+#include <stdio.h>
+#endif
+#ifdef HAVE_STDIO_H
+#include <stdio.>
+#endif
 #include <netcdf.h>
 
 #ifdef _MSC_VER
