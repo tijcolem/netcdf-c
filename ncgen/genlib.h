@@ -156,6 +156,7 @@ extern void jflush(void);
 
 
 /* from: main.c */
+extern int k_flag;    /* -k value from command line*/
 extern int format_flag;   /* _Format attribute value (same range as -k flag) */
 extern int format_attribute; /* 1 if format came from _FORMAT attribute */
 extern int enhanced_flag; /* 1 => netcdf-4 constructs appear in the parse */
