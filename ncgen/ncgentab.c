@@ -3256,19 +3256,19 @@ makespecial(int tag, Symbol* vsym, Symbol* tsym, void* data, int isconst)
             }
             attr = makeattribute(install("_FillValue"),vsym,tsym,list,ATTRVAR);
         } else switch (tag) {
-            // These will be output as attributes later
-          case _STORAGE_FLAG:
-            if(!sdata)
-              derror("_Storage: illegal NULL value");
-            else if(strcmp(sdata,"contiguous") == 0)
-              special->_Storage = NC_CONTIGUOUS;
-            else if(strcmp(sdata,"chunked") == 0)
-              special->_Storage = NC_CHUNKED;
-            else
-              derror("_Storage: illegal value: %s",sdata);
-            special->flags |= _STORAGE_FLAG;
-            break;
-            case _FLETCHER32_FLAG:
+	    /* These will be output as attributes later */
+            case _STORAGE_FLAG:
+              if(!sdata)
+                derror("_Storage: illegal NULL value");
+              else if(strcmp(sdata,"contiguous") == 0)
+                special->_Storage = NC_CONTIGUOUS;
+              else if(strcmp(sdata,"chunked") == 0)
+                special->_Storage = NC_CHUNKED;
+              else
+                derror("_Storage: illegal value: %s",sdata);
+              special->flags |= _STORAGE_FLAG;
+              break;
+          case _FLETCHER32_FLAG:
                 special->_Fletcher32 = tf;
                 special->flags |= _FLETCHER32_FLAG;
                 break;
@@ -3282,7 +3282,7 @@ makespecial(int tag, Symbol* vsym, Symbol* tsym, void* data, int isconst)
                 break;
             case _ENDIAN_FLAG:
               if(!sdata)
-                derror("_Endianness: NULL value.");
+                derror("_Endianness: illegal NULL value");
               else if(strcmp(sdata,"little") == 0)
                 special->_Endianness = 1;
               else if(strcmp(sdata,"big") == 0)
