@@ -2,6 +2,10 @@
 # This shell script runs the ncgen tests.
 # $Id: run_tests.sh,v 1.10 2010/04/04 22:06:03 dmh Exp $
 
+if test "x$srcdir" = x ; then
+srcdir="."
+fi
+
 echo "*** Testing ncgen."
 set -e
 echo "*** creating classic file c0.nc from c0.cdl..."
