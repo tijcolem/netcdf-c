@@ -362,7 +362,7 @@ main(int argc, char *argv[])
 	MPI_Init(&argc, &argv);
 
         /* cmode |= NC_PNETCDF |NC_64BIT_OFFSET; */
-        cmode != NC_PNETCDF |NC_64BIT_DATA;
+        cmode |= (NC_PNETCDF | NC_64BIT_DATA);
 	ret = nc_create_par(fname,cmode, MPI_COMM_WORLD, MPI_INFO_NULL, &id);
 #else
 	ret = nc__create(fname,cmode, initialsz, &chunksz, &id);
@@ -475,7 +475,8 @@ main(int argc, char *argv[])
         omode = NC_NOWRITE;
 #ifdef USE_PNETCDF
         omode = NC_NOWRITE | NC_PNETCDF;
-#elifdef USE_PARALLEL
+	ret = nc_open_par(fname,omode, MPI_COMM_WORLD, MPI_INFO_NULL, &id);
+#elif defined USE_PARALLEL
 	ret = nc_open_par(fname,omode, MPI_COMM_WORLD, MPI_INFO_NULL, &id);
 #else
 	ret = nc__open(fname,omode, &chunksz, &id);
