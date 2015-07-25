@@ -1262,18 +1262,18 @@ NC3_close(int ncid)
 	 * what it should be (due to previous use of NOFILL mode),
 	 * pad it to correct size, as reported by NC_calcsize().
 	 */
-	if (status == ENOERR) {
+	if (status == NC_NOERR) {
 	    off_t filesize; 	/* current size of open file */
 	    off_t calcsize;	/* calculated file size, from header */
 	    status = ncio_filesize(nc3->nciop, &filesize);
-	    if(status != ENOERR)
+	    if(status != NC_NOERR)
 		return status;
 	    status = NC_calcsize(nc3, &calcsize);
 	    if(status != NC_NOERR)
 		return status;
 	    if(filesize < calcsize && !NC_readonly(nc3)) {
 		status = ncio_pad_length(nc3->nciop, calcsize);
-		if(status != ENOERR)
+		if(status != NC_NOERR)
 		    return status;
 	    }
 	}
