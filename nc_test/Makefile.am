@@ -20,6 +20,11 @@ TESTPROGRAMS = t_nc tst_small nc_test tst_swap4b tst_misc tst_norm \
 	tst_names tst_nofill tst_nofill2 tst_nofill3 tst_atts3 \
 	tst_meta tst_swap4b
 
+if ! USE_PNETCDF
+# Pnetcdf currently does not support utf-8 names
+TESTPROGRAMS += tst_norm
+endif
+
 if USE_NETCDF4
 TESTPROGRAMS += tst_atts tst_put_vars
 endif

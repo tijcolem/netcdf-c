@@ -2388,9 +2388,15 @@ main(int argc, char **argv)
       {
 	  static const int var_FillValue_atts[] = {42, -99} ;
 	  float var_FillValue_att = -99 ;
+	  int res = 0;
 	  /* This should return error, because attribute has too many values */
-	  if (nc_put_att_int(ncid, varid, "_FillValue", NC_INT, 2, var_FillValue_atts) 
+#if 1
+	  res=nc_put_att_int(ncid, varid, "_FillValue", NC_INT, 2, var_FillValue_atts);
+	  if(res != NC_EINVAL) ERR;
+#else
+	  if ((res=nc_put_att_int(ncid, varid, "_FillValue", NC_INT, 2, var_FillValue_atts))
 	      != NC_EINVAL) ERR;
+#endif
 	  /* This also should return error, because types don't match */
 	  if (nc_put_att_float(ncid, varid, "_FillValue", NC_FLOAT, 1, &var_FillValue_att) 
 	      != NC_EBADTYPE) ERR;
