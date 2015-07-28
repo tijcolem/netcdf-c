@@ -201,13 +201,6 @@ AC_ARG_ENABLE([fortran], [AS_HELP_STRING([--enable-remote-fortran-bootstrap],
 test "x$enable_remote_fortran_bootstrap" = xyes || enable_remote_fortran_bootstrap=no
 AC_MSG_RESULT([$enable_remote_fortran_bootstrap])
 
-# Does the user want to turn on PNETCDF read ability?
-AC_MSG_CHECKING([whether parallel I/O for classic and 64-bit offset files using parallel-netcdf is to be enabled])
-AC_ARG_ENABLE([pnetcdf], [AS_HELP_STRING([--enable-pnetcdf],
-              [build with parallel I/O for classic and 64-bit offset files using parallel-netcdf])])
-test "x$enable_pnetcdf" = xyes || enable_pnetcdf=no
-AC_MSG_RESULT($enable_pnetcdf)
-
 # Does the user want to run extra example tests
 AC_MSG_CHECKING([whether extra example tests should be run])
 AC_ARG_ENABLE([extra-example-tests],
@@ -886,14 +879,13 @@ if test "x$enable_netcdf_4" = xyes; then
       AC_DEFINE([USE_PARALLEL_MPIO], [1], [if true, compile in parallel netCDF-4 based on MPI/IO])
    fi
 
-   # If parallel is in use, enable it in the C code. Also add some stuff to netcdf.h.
+   # If parallel is available in hdf5, enable it in the C code. Also add some stuff to netcdf.h.
    enable_parallel=no
    if test "x$ac_cv_func_H5Pget_fapl_mpio" = xyes -o "x$ac_cv_func_H5Pget_fapl_mpiposix" = xyes; then
       enable_parallel=yes
       AC_DEFINE([USE_PARALLEL], [1], [if true, parallel netCDF-4 is in use])
    fi
-
-   AC_MSG_CHECKING([whether parallel I/O features are to be included])
+   AC_MSG_CHECKING([whether parallel io is enabled in hdf5])
    AC_MSG_RESULT([$enable_parallel])
 
    # The user must have built HDF5 with the ZLIB library.
@@ -913,8 +905,6 @@ if test "x$enable_netcdf_4" = xyes; then
       AC_DEFINE([HDF5_HAS_H5FREE], [1], [if true, H5free_memory() will be used to free hdf5-allocated memory in nc4file.])
    fi
 
-
-
    # If the user wants hdf4 built in, check it out.
    if test "x$enable_hdf4" = xyes; then
       AC_CHECK_HEADERS([mfhdf.h], [], [nc_mfhdf_h_missing=yes])
@@ -930,11 +920,61 @@ if test "x$enable_netcdf_4" = xyes; then
    fi
 fi
 
+# Now check if parallel io should be suppressed for netcdf-4 even if possible
+# Should we suppress parallel io for netcdf-4?
+AC_MSG_CHECKING([whether parallel I/O is enabled for netcdf-4])
+AC_ARG_ENABLE([parallel4], [AS_HELP_STRING([--disable-parallel4],
+                [disable parallel I/O for netcdf-4, even if possible])])
+test "x$enable_parallel4" = xno || enable_parallel4=yes
+AC_MSG_RESULT($enable_parallel4)
+
+if test "x$enable_parallel" = xno; then
+  # hdf5 does not support parallel io
+  enable_parallel4=no
+AC_MSG_CHECKING([parallel io disabled for netcdf-4 because hdf5 does not support])
+AC_MSG_RESULT([zzz])
+fi
+
+if test "x$enable_parallel4" = xyes; then
+  # Provide more precise parallel control
+  AC_DEFINE([USE_PARALLEL4], [1], [if true, parallel netcdf-4 is in use])
+else
+  # this may be overridden by pnetcdf checking
+  enable_parallel=no
+fi
+
+# We have already tested for parallel io in netcdf4
+# Now do it for netcdf-3
+# Does the user want parallel I/O for classic and 64-bit offset files using parallel-netcdf (pnetcdf)?
+AC_MSG_CHECKING([whether parallel I/O for classic files is to be enabled])
+AC_ARG_ENABLE([pnetcdf], [AS_HELP_STRING([--enable-pnetcdf],
+              [build with parallel I/O for classic files])])
+test "x$enable_pnetcdf" = xyes || enable_pnetcdf=no
+AC_MSG_RESULT($enable_pnetcdf)
+
+# See if the pnetcdf lib is available
+# to use for classic parallel I/O?
+if test "x$enable_pnetcdf" = xyes; then
+  pnetcdf_conflict=no
+  AC_CHECK_LIB([pnetcdf], [ncmpi_create], [],[pnetcdf_conflict=yes])
+fi
+if test "x$pnetcdf_conflict" = xyes ; then
+  AC_MSG_ERROR([Cannot link to pnetcdf library, --enable-pnetcdf disabled.])
+  enable_pnetcdf=no
+else
+  enable_parallel=yes
+  AC_DEFINE([USE_PNETCDF], [1], [if true, parallel netCDF is used])
+fi
+
+# If enable_parallel is in use, enable it in the C code. Also add some stuff to netcdf.h.
+if test "x$enable_parallel" = xyes; then
+  AC_DEFINE([USE_PARALLEL], [1], [if true, pnetcdf or parallel netcdf-4 is in use])
+fi
+
 # Check for downloading/building fortran via postinstall script.
 if test "x$enable_remote_fortran_bootstrap" = xyes; then
    AC_DEFINE([BUILD_FORTRAN], 1, [If true, will attempt to download and build netcdf-fortran.])
 fi
-
 
 # No logging for netcdf-3.
 if test "x$enable_netcdf_4" = xno; then
@@ -942,18 +982,6 @@ if test "x$enable_netcdf_4" = xno; then
 fi
 if test "x$enable_logging" = xyes; then
    AC_DEFINE([LOGGING], 1, [If true, turn on logging.])
-fi
-
-# Using pnetcdf for classic parallel I/O?
-if test "x$enable_pnetcdf" = xyes; then
-  AC_CHECK_LIB([pnetcdf], [ncmpi_create], [],
-  [AC_MSG_ERROR([Cannot link to pnetcdf library, yet --enable-pnetcdf was used.])])
-  AC_DEFINE([USE_PNETCDF], [1], [if true, parallel netCDF is used])
-
-  # pnetcdf => parallel
-  # If parallel is in use, enable it in the C code. Also add some stuff to netcdf.h.
-  enable_parallel=yes
-  AC_DEFINE([USE_PARALLEL], [1], [if true, pnetcdf or parallel netcdf-4 is in use])
 fi
 
 
@@ -1096,6 +1124,7 @@ AC_SUBST(HAS_PNETCDF,[$enable_pnetcdf])
 AC_SUBST(HAS_HDF5,[$enable_netcdf_4])
 AC_SUBST(HAS_SZLIB,[$nc_has_szlib])
 AC_SUBST(HAS_PARALLEL,[$enable_parallel])
+AC_SUBST(HAS_PARALLEL4,[$enable_parallel4])
 AC_SUBST(HAS_DISKLESS,[$enable_diskless])
 AC_SUBST(HAS_MMAP,[$enable_mmap])
 AC_SUBST(HAS_JNA,[$enable_jna])
@@ -1179,7 +1208,7 @@ AC_CONFIG_FILES([Makefile
                  docs/images/Makefile
                  libsrc/Makefile
                  libsrc4/Makefile
-                 libsrcp5/Makefile
+                 libsrcp/Makefile
                  nctest/Makefile
                  nc_test4/Makefile
                  nc_test/Makefile

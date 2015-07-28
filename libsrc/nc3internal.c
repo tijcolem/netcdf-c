@@ -1591,7 +1591,7 @@ NC3_inq_format_extended(int ncid, int *formatp, int *modep)
 	status = NC_check_id(ncid, &nc);
 	if(status != NC_NOERR)
 		return status;
-        if(formatp) *formatp = NC_FORMAT_NC3;
+        if(formatp) *formatp = NC_FORMATX_NC3;
 	if(modep) *modep = nc->mode;
 	return NC_NOERR;
 }

@@ -80,7 +80,7 @@ static int NC3_get_var_chunk_cache(int,int,size_t*,size_t*,float*);
 
 static NC_Dispatch NC3_dispatcher = {
 
-NC_DISPATCH_NC3,
+NC_FORMATX_NC3,
 
 NC3_create,
 NC3_open,

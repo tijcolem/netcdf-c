@@ -400,7 +400,7 @@ NC_lookupattr(int ncid,
 	if(attrpp != NULL)
 		*attrpp = *tmp;
 
-	return ENOERR;
+	return NC_NOERR;
 }
 
 /* Public */
@@ -2137,7 +2137,7 @@ NC3_put_att(
                  * N.B.: potentially overrides NC_ERANGE
                  * set by ncx_pad_putn_I$1
                  */
-                if(lstatus != ENOERR) return lstatus;
+                if(lstatus != NC_NOERR) return lstatus;
             }
 
             return status;

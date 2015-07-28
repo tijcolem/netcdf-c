@@ -131,13 +131,13 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
    int memtypelen;
    const char* value = (const char*)value0;
    size_t numrecs;
+   int nrecdims;                /* number of record dims for a variable */
+   int is_recdim[NC_MAX_VAR_DIMS]; /* for variable's dimensions */
    size_t varshape[NC_MAX_VAR_DIMS];
    size_t mystart[NC_MAX_VAR_DIMS];
    size_t myedges[NC_MAX_VAR_DIMS];
    ptrdiff_t mystride[NC_MAX_VAR_DIMS];
    const char* memptr = value;
-   int nrecdims = 0;
-   int is_recdim[NC_MAX_VAR_DIMS];
 
    status = NC_check_id (ncid, &ncp);
    if(status != NC_NOERR) return status;
@@ -172,7 +172,9 @@ NCDEFAULT_put_vars(int ncid, int varid, const size_t * start,
    if(status != NC_NOERR) return status;
 
    /* Get variable dimension sizes */
+#if 0
    isrecvar = NC_is_recvar(ncid,varid,&numrecs);
+#endif
    status = NC_inq_recvar(ncid,varid,&nrecdims,is_recdim);
    if(status != NC_NOERR) return status;
    isrecvar = (nrecdims > 0);

@@ -15,7 +15,11 @@ This file contains a high-level description of this package's evolution. Release
 cannot be used for 'make check'.
 
 * Added CDM-5 support via new mode flag called NC_64BIT_DATA (alias NC_CDF5);
-  thanks to Wei-Keng Liao.
+  thanks to Wei-Keng Liao. This cascaded into a number of other changes.
+  1. Renamed libsrcp5 -> libsrcp because pnetcdf can do parallel io for
+     CDF-1, CDF-2 and CDF-5, not just CDF-5.
+  2. Given #1, then the NC_PNETCDF mode flag becomes a subset of NC_MPIIO,
+      so made NC_PNETCDF an alias for NC_MPII.
 
 ### 4.4.0-RC2 Released 2015-07-09
 

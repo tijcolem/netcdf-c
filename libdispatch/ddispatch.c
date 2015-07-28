@@ -17,17 +17,13 @@ size_t NC_coord_one[NC_MAX_VAR_DIMS];
 static struct NCPROTOCOLLIST {
     char* protocol;
     char* substitute;
-    int   modelflags;
+    int   model;
 } ncprotolist[] = {
     {"http",NULL,0},
     {"https",NULL,0},
-    {"file",NULL,NC_DISPATCH_NCD},
-    {"dods","http",NC_DISPATCH_NCD},
-    {"dodss","https",NC_DISPATCH_NCD},
-    {"cdmr","http",NC_DISPATCH_NCR|NC_DISPATCH_NC4},
-    {"cdmrs","https",NC_DISPATCH_NCR|NC_DISPATCH_NC4},
-    {"cdmremote","http",NC_DISPATCH_NCR|NC_DISPATCH_NC4},
-    {"cdmremotes","https",NC_DISPATCH_NCR|NC_DISPATCH_NC4},
+    {"file",NULL,NC_FORMATX_DAP2},
+    {"dods","http",NC_FORMATX_DAP2},
+    {"dodss","https",NC_FORMATX_DAP2},
     {NULL,NULL,0} /* Terminate search */
 };
 
@@ -145,7 +141,7 @@ NC_testurl(const char* path)
 }
 
 /*
-Return the OR of some of the NC_DISPATCH flags
+Return an NC_FORMATX_... value.
 Assumes that the path is known to be a url
 */
 
@@ -156,39 +152,12 @@ NC_urlmodel(const char* path)
     NCURI* tmpurl = NULL;
     struct NCPROTOCOLLIST* protolist;
 
+    model = NC_FORMATX_DAP2;
+#if 0
     if(!ncuriparse(path,&tmpurl)) goto done;
-
-    /* Look at any prefixed parameters */
-    if(ncurilookup(tmpurl,"netcdf4",NULL)
-       || ncurilookup(tmpurl,"netcdf-4",NULL)) {
-	model = (NC_DISPATCH_NC4|NC_DISPATCH_NCD);
-    } else if(ncurilookup(tmpurl,"netcdf3",NULL)
-              || ncurilookup(tmpurl,"netcdf-3",NULL)) {
-	model = (NC_DISPATCH_NC3|NC_DISPATCH_NCD);
-    } else if(ncurilookup(tmpurl,"cdmremote",NULL)
-	      || ncurilookup(tmpurl,"cdmr",NULL)) {
-	model = (NC_DISPATCH_NCR|NC_DISPATCH_NC4);
-    }
-
-    if(model == 0) {
-        for(protolist=ncprotolist;protolist->protocol;protolist++) {
-	    if(strcmp(tmpurl->protocol,protolist->protocol) == 0) {
-    	        model |= protolist->modelflags;
-    	        if(protolist->substitute) {
-		    free(tmpurl->protocol);
-    		    tmpurl->protocol = strdup(protolist->substitute);
-    	        }
-    	        break;
-	    }
-	}
-    }
-
-    /* Force NC_DISPATCH_NC3 if necessary */
-    if((model & NC_DISPATCH_NC4) == 0)
-	model |= (NC_DISPATCH_NC3 | NC_DISPATCH_NCD);
-
-done:
     ncurifree(tmpurl);
+#endif 
+
     return model;
 }
 
