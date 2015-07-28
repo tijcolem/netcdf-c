@@ -880,6 +880,7 @@ ncvarputg(
 		for (i=0; i<ndims; i++) imp[i] = map[i] / el_size;
 	}
 
+	{
 	A_DECL(stp, size_t, ndims, start);
 	A_DECL(cntp, size_t, ndims, count);
 	A_DECL(strdp, ptrdiff_t, ndims, stride);
@@ -900,6 +901,7 @@ ncvarputg(
 	}
 	}
 	return 0;
+	}
 	}
 }
 
@@ -931,6 +933,7 @@ ncvargetg(
 		for (i=0; i<ndims; i++) imp[i] = map[i] / el_size;
 	}
 
+	{
 	A_DECL(stp, size_t, ndims, start);
 	A_DECL(cntp, size_t, ndims, count);
 	A_DECL(strdp, ptrdiff_t, ndims, stride);
@@ -951,6 +954,7 @@ ncvargetg(
 	}
 	}
 	return 0;
+	}
 	}
 }
 

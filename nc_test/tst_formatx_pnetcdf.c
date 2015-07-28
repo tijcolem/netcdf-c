@@ -59,8 +59,8 @@ int main(int argc, char* argv[])
 	ecode = 1;
 	ERR;
     }
-    if(format != NC_FORMAT_PNETCDF) {
-	printf("***FAIL: format was %d ; expected %d\n",format,NC_FORMAT_PNETCDF);
+    if(format != NC_FORMATX_PNETCDF) {
+	printf("***FAIL: format was %d ; expected %d\n",format,NC_FORMATX_PNETCDF);
 	ecode = 1;
 	ERR;
     }

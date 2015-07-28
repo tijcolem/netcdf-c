@@ -162,7 +162,7 @@ Use this in mode flags for both nc_create() and nc_open(). */
 
 #define NC_INMEMORY      0x8000  /**< Read from memory. Mode flag for nc_open() or nc_create(). */
 
-#define NC_PNETCDF       (NC_CDF5|NC_MPIIO) /**< Use parallel-netcdf library. Mode flag combo for nc_open(). */
+#define NC_PNETCDF       (NC_MPIIO) /**< Use parallel-netcdf library; alias for NC_MPIIO. */
 
 /** Format specifier for nc_set_default_format() and returned
  *  by nc_inq_format. This returns the format as provided by
@@ -204,13 +204,14 @@ Use this in mode flags for both nc_create() and nc_open(). */
  * Note that CDF-5 returns NC_FORMAT_NC3, but sets the mode flag properly.
  */
 /**@{*/
-#define NC_FORMAT_NC3       (1)
-#define NC_FORMAT_NC_HDF5   (2) /* netCDF-4 subset of HDF5 */
-#define NC_FORMAT_NC_HDF4   (3) /* netCDF-4 subset of HDF4 */
-#define NC_FORMAT_PNETCDF   (4)
-#define NC_FORMAT_DAP2      (5)
-#define NC_FORMAT_DAP4      (6)
-#define NC_FORMAT_UNDEFINED (0)
+#define NC_FORMATX_NC3       (1)
+#define NC_FORMATX_NC_HDF5   (2) /* netCDF-4 subset of HDF5 */
+#define NC_FORMATX_NC4       NC_FORMATX_NC_HDF5 /* alias */
+#define NC_FORMATX_NC_HDF4   (3) /* netCDF-4 subset of HDF4 */
+#define NC_FORMATX_PNETCDF   (4)
+#define NC_FORMATX_DAP2      (5)
+#define NC_FORMATX_DAP4      (6)
+#define NC_FORMATX_UNDEFINED (0)
 /**@}*/
 
 /** Let nc__create() or nc__open() figure out a suitable buffer size. */

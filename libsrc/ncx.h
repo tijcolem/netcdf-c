@@ -286,7 +286,8 @@ ncx_put_int32(void **xpp, const int ip);
 extern int
 ncx_put_int64(void **xpp, const long long ip);
 
-
+extern int ncx_get_int_int(const void *xp, int *ip);
+extern int ncx_put_int_int(void *xp, const int *ip);
 
 /*
  * Aggregate numeric conversion functions.

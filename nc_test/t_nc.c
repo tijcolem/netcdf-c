@@ -358,11 +358,11 @@ main(int argc, char *argv[])
 	size_t chunksz = 8192;
 	size_t align = 8192/32;
 
-#ifdef USE_PARALLEL
+#ifdef USE_PNETCDF
 	MPI_Init(&argc, &argv);
 
-        /* cmode |= NC_PNETCDF |NC_64BIT_OFFSET; */
-        cmode |= (NC_PNETCDF | NC_64BIT_DATA);
+        cmode |= (NC_PNETCDF);
+	cmode |= (NC_64BIT_DATA);
 	ret = nc_create_par(fname,cmode, MPI_COMM_WORLD, MPI_INFO_NULL, &id);
 #else
 	ret = nc__create(fname,cmode, initialsz, &chunksz, &id);

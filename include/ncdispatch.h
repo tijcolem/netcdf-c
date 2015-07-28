@@ -58,11 +58,11 @@
 /**************************************************/
 /* Define the known classes of dispatchers */
 /* Flags may be or'd => powers of 2*/
+#if 0
 #define NC_DISPATCH_NC3    1
 #define NC_DISPATCH_NC4    2
-#define NC_DISPATCH_NCD    4
-#define NC_DISPATCH_NCR    8
-#define NC_DISPATCH_NCP5   16
+#define NC_DISPATCH_NCP   16
+#endif
 
 /* Define a type for use when doing e.g. nc_get_vara_long, etc. */
 /* Should matche values in libsrc4/netcdf.h */
@@ -126,9 +126,9 @@ extern int NCD2_finalize(void);
 #endif
 
 #ifdef USE_PNETCDF
-extern NC_Dispatch* NCP5_dispatch_table;
-extern int NCP5_initialize(void);
-extern int NCP5_finalize(void);
+extern NC_Dispatch* NCP_dispatch_table;
+extern int NCP_initialize(void);
+extern int NCP_finalize(void);
 #endif
 
 #ifdef USE_NETCDF4
@@ -190,7 +190,7 @@ struct NCHDR;
 
 struct NC_Dispatch {
 
-int model; /* one of the NC_DISPATCH #'s above */
+int model; /* one of the NC_FORMATX #'s */
 
 int (*create)(const char *path, int cmode,
 	  size_t initialsz, int basepe, size_t *chunksizehintp, 

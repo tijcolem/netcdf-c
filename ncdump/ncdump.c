@@ -259,38 +259,30 @@ kind_string_extended(int kind, int mode)
 {
     static char text[1024];
     switch (kind) {
-    case NC_FORMAT_NC3:
+    case NC_FORMATX_NC3:
 	if(mode & NC_CDF5)
-<<<<<<< HEAD
-<<<<<<< HEAD
 	    snprintf(text,sizeof(text),"%s mode=%08x", "64-bit data",mode);
-=======
-	    snprintf(text,sizeof(text),"%s mode=%08x", "cdf5",mode);
->>>>>>> initial merge of the cdf5 code
-=======
-	    snprintf(text,sizeof(text),"%s mode=%08x", "64-bit data",mode);
->>>>>>> ckp
 	else if(mode & NC_64BIT_OFFSET)
 	    snprintf(text,sizeof(text),"%s mode=%08x", "64-bit offset",mode);
 	else
 	    snprintf(text,sizeof(text),"%s mode=%08x", "classic",mode);
 	break;
-    case NC_FORMAT_NC_HDF5:
+    case NC_FORMATX_NC_HDF5:
 	snprintf(text,sizeof(text),"%s mode=%08x", "HDF5",mode);
 	break;
     case NC_FORMAT_NC_HDF4:
 	snprintf(text,sizeof(text),"%s mode=%08x", "HDF4",mode);
 	break;
-    case NC_FORMAT_PNETCDF:
+    case NC_FORMATX_PNETCDF:
 	snprintf(text,sizeof(text),"%s mode=%08x", "PNETCDF",mode);
 	break;
-    case NC_FORMAT_DAP2:
+    case NC_FORMATX_DAP2:
 	snprintf(text,sizeof(text),"%s mode=%08x", "DAP2",mode);
 	break;
-    case NC_FORMAT_DAP4:
+    case NC_FORMATX_DAP4:
 	snprintf(text,sizeof(text),"%s mode=%08x", "DAP4",mode);
 	break;
-    case NC_FORMAT_UNDEFINED:
+    case NC_FORMATX_UNDEFINED:
 	snprintf(text,sizeof(text),"%s mode=%08x", "unknown",mode);
 	break;
     default:

@@ -93,7 +93,6 @@ if test `wc -c < small.nc` != 104; then
     exit 1
 fi
 
-<<<<<<< HEAD
 echo "*** testing length of 64-bit data file"
 ../ncgen/ncgen -b -5 ${srcdir}/small.cdl
 if test `wc -c < small.nc` != 104; then
@@ -101,30 +100,18 @@ if test `wc -c < small.nc` != 104; then
 fi
 echo "*** testing length of 64-bit data file written with NOFILL"
 ../ncgen/ncgen -b -5 -x ${srcdir}/small.cdl
-=======
-echo "*** testing length of 64-bit data file written with NOFILL"
-../ncgen/ncgen -b -k64-bit-data -x ${srcdir}/small.cdl
->>>>>>> initial merge of the cdf5 code
 if test `wc -c < small.nc` != 104; then
     exit 1
 fi
 
 echo "*** testing length of rewritten 64-bit data file"
-<<<<<<< HEAD
 ../ncgen/ncgen -b -5 ${srcdir}/small.cdl && ./rewrite-scalar small.nc t
-=======
-../ncgen/ncgen -b -k64-bit-data ${srcdir}/small.cdl && ./rewrite-scalar small.nc t
->>>>>>> initial merge of the cdf5 code
 if test `wc -c < small.nc` != 104; then
     exit 1
 fi
 
 echo "*** testing length of rewritten 64-bit data file written with NOFILL"
-<<<<<<< HEAD
 ../ncgen/ncgen -b -5 -x ${srcdir}/small.cdl && ./rewrite-scalar small.nc t
-=======
-../ncgen/ncgen -b -k64-bit-data -x ${srcdir}/small.cdl && ./rewrite-scalar small.nc t
->>>>>>> initial merge of the cdf5 code
 if test `wc -c < small.nc` != 104; then
     exit 1
 fi
@@ -139,10 +126,6 @@ echo "*** testing length of one-record-variable classic file"
 #fi
 
 echo "*** testing length of one-record-variable 64-bit data file"
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> ckp
 ../ncgen/ncgen -b -5 ${srcdir}/small2.cdl
 if test `wc -c < small2.nc` != 161; then
     exit 1
@@ -150,46 +133,30 @@ fi
 
 echo "*** testing length of one-record-variable 64-bit data file"
 ../ncgen/ncgen -b -5 ${srcdir}/small2.cdl
-<<<<<<< HEAD
-=======
-../ncgen/ncgen -b -k64-bit-data ${srcdir}/small2.cdl
->>>>>>> initial merge of the cdf5 code
-=======
->>>>>>> ckp
 if test `wc -c < small2.nc` != 161; then
     exit 1
 fi
 
 echo "*** testing length of one-record-variable 64-bit data file written with NOFILL"
-<<<<<<< HEAD
 ../ncgen/ncgen -b -5 -x ${srcdir}/small2.cdl
-=======
-../ncgen/ncgen -b -k64-bit-data -x ${srcdir}/small2.cdl
->>>>>>> initial merge of the cdf5 code
 if test `wc -c < small2.nc` != 161; then
     exit 1
 fi
 
-<<<<<<< HEAD
 echo "*** testing length of one-record-variable classic file written with NOFILL"
 ../ncgen/ncgen -b -x ${srcdir}/small2.cdl
 if test `wc -c < small2.nc` != 101; then
     exit 1
 fi
 
-=======
->>>>>>> initial merge of the cdf5 code
 echo "*** testing length of one-record-variable classic file written with NOFILL"
 ../ncgen/ncgen -b -x ${srcdir}/small2.cdl
-<<<<<<< HEAD
-=======
 if test `wc -c < small2.nc` != 101; then
     exit 1
 fi
 
 echo "*** testing length of one-record-variable classic file written with NOFILL"
 ../ncgen/ncgen -b -x ${srcdir}/small2.cdl
->>>>>>> ckp
 #if test `wc -c < small2.nc` != 101; then
 #    exit 1
 #fi

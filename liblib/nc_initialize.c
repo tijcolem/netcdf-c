@@ -25,8 +25,8 @@ extern int NCD2_finalize(void);
 #endif
 
 #ifdef USE_PNETCDF
-extern int NCP5_initialize(void);
-extern int NCP5_finalize(void);
+extern int NCP_initialize(void);
+extern int NCP_finalize(void);
 #endif
 
 int NC_argc = 1;
@@ -67,7 +67,7 @@ nc_initialize()
 #endif
 
 #ifdef USE_PNETCDF
-    if((stat = NCP5_initialize())) return stat;
+    if((stat = NCP_initialize())) return stat;
 #endif
 
 #ifdef USE_NETCDF4
@@ -102,7 +102,7 @@ nc_finalize(void)
 #endif
 
 #ifdef USE_PNETCDF
-    if((stat = NCP5_finalize())) return stat;
+    if((stat = NCP_finalize())) return stat;
 #endif
 
 #ifdef USE_NETCDF4
