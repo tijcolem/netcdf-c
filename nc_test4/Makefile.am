@@ -71,9 +71,9 @@ tst_ar5 tst_h_files3 tst_mem                                            \
 run_get_knmi_files.sh tst_knmi
 
 # This will run a parallel I/O benchmark for parallel builds.
-if TEST_PARALLEL
+if TEST_PARALLEL4
 TESTS += run_par_bm_test.sh
-endif # TEST_PARALLEL
+endif # TEST_PARALLEL4
 
 benchmarks: check
 	./run_bm_radar_2D.sh
@@ -106,7 +106,7 @@ endif # USE_VALGRIND_TESTS
 
 # This are extra tests that will only be run if netcdf-4 is configured
 # with --enable-parallel-tests.
-if TEST_PARALLEL
+if TEST_PARALLEL4
 check_PROGRAMS += tst_mpi_parallel tst_parallel tst_parallel3	\
 tst_parallel4 tst_nc4perf
 TESTS += run_par_test.sh
