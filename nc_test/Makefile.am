@@ -16,13 +16,8 @@ tst_diskless4.cdl tst_diskless4.nc tst_formatx.nc nc_test_cdf5.nc \
 unlim.nc
 
 # These are the tests which are always run.
-TESTPROGRAMS = t_nc tst_small nc_test tst_misc tst_names	\
+TESTPROGRAMS = t_nc tst_small nc_test tst_misc tst_names tst_norm \
 tst_nofill tst_nofill2 tst_nofill3 tst_atts3 tst_meta
-
-if ! USE_PNETCDF
-# Pnetcdf currently does not support utf-8 names
-TESTPROGRAMS += tst_norm
-endif
 
 if USE_NETCDF4
 TESTPROGRAMS += tst_atts tst_put_vars
