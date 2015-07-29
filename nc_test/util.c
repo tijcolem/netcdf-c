@@ -971,9 +971,11 @@ check_vars(int  ncid)
 			error("nc_get_var1_double: %s", nc_strerror(err));
 		    } else {
 			IF (!equal(value,expect,var_type[i], NCT_DOUBLE)) {
-	error("Var %s value read % 12.5e not that expected % 12.7e ",
-		var_name[i], value, expect);
-		print_n_size_t(var_rank[i], index);
+			    value = 0;
+	  		    err = nc_get_var1_double(ncid, i, index, &value);		
+			    error("Var %s value read % 12.5e not that expected % 12.7e ",
+					var_name[i], value, expect);
+			    print_n_size_t(var_rank[i], index);
 			} else {
 #if 0
 			print("\nOk %s ", var_name[i]);

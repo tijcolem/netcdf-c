@@ -1014,7 +1014,7 @@ fi
 # Automake conditionals need to be called, whether the answer is yes
 # or no.
 AM_CONDITIONAL(BUILD_PARALLEL, [test x$enable_parallel = xyes])
-AM_CONDITIONAL(TEST_PARALLEL, [test "x$enable_parallel" = xyes -a "x$enable_parallel_tests" = xyes])
+AM_CONDITIONAL(TEST_PARALLEL4, [test "x$enable_parallel4" = xyes -a "x$enable_parallel_tests" = xyes])
 AM_CONDITIONAL(BUILD_DAP, [test "x$enable_dap" = xyes])
 AM_CONDITIONAL(USE_DAP, [test "x$enable_dap" = xyes]) # Alias
 AM_CONDITIONAL(ENABLE_DAP_REMOTE_TESTS, [test "x$enable_dap_remote_tests" = xyes])
@@ -1190,6 +1190,7 @@ AX_SET_META([NC_HAS_MMAP],[$enable_mmap],[yes])
 AX_SET_META([NC_HAS_JNA],[$enable_jna],[yes])
 AX_SET_META([NC_HAS_PNETCDF],[$enable_pnetcdf],[yes])
 AX_SET_META([NC_HAS_PARALLEL],[$enable_parallel],[yes])
+AX_SET_META([NC_HAS_PARALLEL4],[$enable_parallel4],[yes])
 
 #####
 # End netcdf_meta.h definitions.
