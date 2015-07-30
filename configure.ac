@@ -880,13 +880,12 @@ if test "x$enable_netcdf_4" = xyes; then
    fi
 
    # If parallel is available in hdf5, enable it in the C code. Also add some stuff to netcdf.h.
-   enable_parallel=no
+   hdf5_parallel=no
    if test "x$ac_cv_func_H5Pget_fapl_mpio" = xyes -o "x$ac_cv_func_H5Pget_fapl_mpiposix" = xyes; then
-      enable_parallel=yes
-      AC_DEFINE([USE_PARALLEL], [1], [if true, parallel netCDF-4 is in use])
+      hdf5_parallel=yes
    fi
    AC_MSG_CHECKING([whether parallel io is enabled in hdf5])
-   AC_MSG_RESULT([$enable_parallel])
+   AC_MSG_RESULT([$hdf5_parallel])
 
    # The user must have built HDF5 with the ZLIB library.
    if test "x$ac_cv_func_H5Pset_deflate" = xyes; then
@@ -920,7 +919,12 @@ if test "x$enable_netcdf_4" = xyes; then
    fi
 fi
 
-# Now check if parallel io should be suppressed for netcdf-4 even if possible
+# There are several cases for parallelism:
+# 1. pnetcdf enabled => we want to parallelism for CDF-1,CDF-2,and CDF-5
+# 2. hdf5 has mpio enabled
+#    a. do not want to use it for netcdf4
+#    b. do want to use it for netcdf4
+
 # Should we suppress parallel io for netcdf-4?
 AC_MSG_CHECKING([whether parallel I/O is enabled for netcdf-4])
 AC_ARG_ENABLE([parallel4], [AS_HELP_STRING([--disable-parallel4],
@@ -928,19 +932,10 @@ AC_ARG_ENABLE([parallel4], [AS_HELP_STRING([--disable-parallel4],
 test "x$enable_parallel4" = xno || enable_parallel4=yes
 AC_MSG_RESULT($enable_parallel4)
 
-if test "x$enable_parallel" = xno; then
-  # hdf5 does not support parallel io
+if test "x$hdf5_parallel" = xno; then
+  # hdf5 does not support parallel io, so disable parallel4
   enable_parallel4=no
-AC_MSG_CHECKING([parallel io disabled for netcdf-4 because hdf5 does not support])
-AC_MSG_RESULT([zzz])
-fi
-
-if test "x$enable_parallel4" = xyes; then
-  # Provide more precise parallel control
-  AC_DEFINE([USE_PARALLEL4], [1], [if true, parallel netcdf-4 is in use])
-else
-  # this may be overridden by pnetcdf checking
-  enable_parallel=no
+  AC_MSG_WARN([Parallel io disabled for netcdf-4 because hdf5 does not support])
 fi
 
 # We have already tested for parallel io in netcdf4
@@ -959,10 +954,29 @@ if test "x$enable_pnetcdf" = xyes; then
   AC_CHECK_LIB([pnetcdf], [ncmpi_create], [],[pnetcdf_conflict=yes])
 fi
 if test "x$pnetcdf_conflict" = xyes ; then
-  AC_MSG_ERROR([Cannot link to pnetcdf library, --enable-pnetcdf disabled.])
+  AC_MSG_WARN([Cannot link to pnetcdf library, --enable-pnetcdf disabled.])
   enable_pnetcdf=no
+fi
+
+# Now, set enable_parallel if either pnetcdf or parallel4 is set
+if test "x$enable_pnetcdf" = xyes -o "x$enable_parallel4" = xyes; then
+enable_parallel=yes
 else
-  enable_parallel=yes
+enable_parallel=no
+fi
+
+if test "x$hdf5_parallel" = xyes; then
+  # Provide more precise parallel control
+  AC_DEFINE([HDF5_PARALLEL], [1], [if true, hdf5 has parallelism enabled])
+fi
+
+# Set config flags
+if test "x$enable_parallel4" = xyes; then
+  # Provide more precise parallel control
+  AC_DEFINE([USE_PARALLEL4], [1], [if true, parallel netcdf-4 is in use])
+fi
+
+if test "x$enable_pnetcdf" = xyes; then
   AC_DEFINE([USE_PNETCDF], [1], [if true, parallel netCDF is used])
 fi
 
@@ -1033,8 +1047,6 @@ AM_CONDITIONAL(USE_RENAMEV3, [test x$enable_netcdf_4 = xyes -o x$enable_dap = xy
 AM_CONDITIONAL(BUILD_FORTRAN, [test x$enable_remote_fortran_bootstrap = xyes])
 AM_CONDITIONAL(USE_PNETCDF, [test x$enable_pnetcdf = xyes])
 AM_CONDITIONAL(USE_DISPATCH, [test x$enable_dispatch = xyes])
-AM_CONDITIONAL(BUILD_CDMREMOTE, [test "x$enable_cdmremote" = xyes]) # Alias
-AM_CONDITIONAL(BUILD_RPC, [test "x$enable_rpc" = xyes])
 AM_CONDITIONAL(BUILD_DISKLESS, [test x$enable_diskless = xyes])
 AM_CONDITIONAL(BUILD_MMAP, [test x$enable_mmap = xyes])
 AM_CONDITIONAL(BUILD_DOCS, [test x$enable_doxygen = xyes])
