@@ -7,7 +7,7 @@
 */
 
 #include "ncdispatch.h"
-#include <nc_logging.h>
+#include "nc_logging.h"
 
 #ifdef USE_NETCDF4
 /* Compare two netcdf types for equality. Must have the ncids as well,

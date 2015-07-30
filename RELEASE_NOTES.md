@@ -21,6 +21,11 @@ cannot be used for 'make check'.
   2. Given #1, then the NC_PNETCDF mode flag becomes a subset of NC_MPIIO,
       so made NC_PNETCDF an alias for NC_MPII.
 
+* Modified configure.ac to provide more detailed information about
+  what kind of parallelism to use. Specifically, allow for the possibility
+  that even if hdf5 supports parallelism, netcdf-4 will not use it.
+  This is controlled by a new --disable-parallel4 ./configure option.
+
 ### 4.4.0-RC2 Released 2015-07-09
 
 * Minor bug fixes and cleanup of issues reported with first release candidate.

@@ -14,6 +14,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#ifdef HDF5_PARALLEL
+#include <mpi.h>
+#endif
 #ifdef USE_PARALLEL
 #include "netcdf_par.h"
 #endif
@@ -83,12 +86,12 @@
 /* Define an alias for int to indicate an error return */
 typedef int NCerror;
 
-#ifndef USE_PARALLEL
+#ifndef HDF5_PARALLEL
 typedef int MPI_Comm;
 typedef int MPI_Info;
 #define MPI_COMM_WORLD 0
 #define MPI_INFO_NULL 0
-#endif /* USE_PARALLEL */
+#endif /* HDF5_PARALLEL */
 
 /* Define a struct to hold the MPI info so it can be passed down the
  * call stack. This is used internally by the netCDF library. It
