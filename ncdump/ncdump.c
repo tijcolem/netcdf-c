@@ -270,7 +270,7 @@ kind_string_extended(int kind, int mode)
     case NC_FORMATX_NC_HDF5:
 	snprintf(text,sizeof(text),"%s mode=%08x", "HDF5",mode);
 	break;
-    case NC_FORMAT_NC_HDF4:
+    case NC_FORMATX_NC_HDF4:
 	snprintf(text,sizeof(text),"%s mode=%08x", "HDF4",mode);
 	break;
     case NC_FORMATX_PNETCDF:

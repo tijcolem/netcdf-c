@@ -6,6 +6,10 @@
 #ifndef _NCX_H_
 #define _NCX_H_
 
+#include "config.h"
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
 #include "ncdispatch.h"
 #include "ncio.h"
 #include "fbits.h"

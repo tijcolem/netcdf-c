@@ -185,22 +185,15 @@ swapn2b(void *dst, const void *src, size_t nn)
 }
 
 # ifndef vax
-void
+static void
 swap4b(void *dst, const void *src)
 {
-    unsigned int *op = dst;
+    char *op = dst;
     const char *ip = src;
-    unsigned int tempIn;
-    unsigned int tempOut;
-
-    tempIn = *(unsigned int *)(ip+0);
-    tempOut =
-    ( tempIn << 24) |
-    ((tempIn & 0x0000ff00) << 8) |
-    ((tempIn & 0x00ff0000) >> 8) |
-    ( tempIn >> 24);
-
-    *(float *)op = *(float *)(&tempOut);
+    op[0] = ip[3];
+    op[1] = ip[2];
+    op[2] = ip[1];
+    op[3] = ip[0];
 }
 # endif /* !vax */
 
@@ -2201,7 +2194,8 @@ define(`NCX_GETN',dnl
 int
 ncx_getn_$1_$2(const void **xpp, size_t nelems, $2 *tp)
 {
-`#'if _SX && Xsizeof($1) == Isizeof($1)
+#if _SX && \
+           Xsizeof($1) == Isizeof($1)
 
  /* basic algorithm is:
   *   - ensure sane alignment of input data
@@ -2417,7 +2411,8 @@ define(`NCX_PUTN',dnl
 int
 ncx_putn_$1_$2(void **xpp, size_t nelems, const $2 *tp)
 {
-`#'if _SX && Xsizeof($1) == Isizeof($1)
+#if _SX && \
+           Xsizeof($1) == Isizeof($1)
 
  /* basic algorithm is:
   *   - ensure sane alignment of output data
@@ -3366,119 +3361,3 @@ ncx_pad_putn_void(void **xpp, size_t nelems, const void *tp)
 {
 NCX_PAD_PUTN_Byte_Body
 }
-
-/**************************************************/
-int ncx_get_int64(const void **xpp, long long *llp) {return NC_ENOTNC;}
-int ncx_put_int64(void **xpp, const long long llp) {return NC_ENOTNC;}
-int ncx_get_longlong(const void **xpp, long long *llp) {return NC_ENOTNC;}
-int ncx_getn_double_ushort(const void **xpp, size_t nelems, ushort* tp) {return NC_ENOTNC;}
-int ncx_getn_float_ushort(const void **xpp, size_t nelems, ushort* tp) {return NC_ENOTNC;}
-int ncx_getn_int_ushort(const void **xpp, size_t nelems, ushort* tp) {return NC_ENOTNC;}
-int ncx_getn_longlong_double(const void **xpp, size_t nelems, double* tp) {return NC_ENOTNC;}
-int ncx_getn_longlong_float(const void **xpp, size_t nelems, float* tp) {return NC_ENOTNC;}
-int ncx_getn_longlong_int(const void **xpp, size_t nelems, int* tp) {return NC_ENOTNC;}
-int ncx_getn_longlong_longlong(const void **xpp, size_t nelems, longlong* tp) {return NC_ENOTNC;}
-int ncx_getn_longlong_schar(const void **xpp, size_t nelems, schar* tp) {return NC_ENOTNC;}
-int ncx_getn_longlong_short(const void **xpp, size_t nelems, short* tp) {return NC_ENOTNC;}
-int ncx_getn_longlong_uchar(const void **xpp, size_t nelems, uchar* tp) {return NC_ENOTNC;}
-int ncx_getn_longlong_uint(const void **xpp, size_t nelems, uint* tp) {return NC_ENOTNC;}
-int ncx_getn_longlong_ulonglong(const void **xpp, size_t nelems, ulonglong* tp) {return NC_ENOTNC;}
-int ncx_getn_longlong_ushort(const void **xpp, size_t nelems, ushort* tp) {return NC_ENOTNC;}
-int ncx_getn_uint_double(const void **xpp, size_t nelems, double* tp) {return NC_ENOTNC;}
-int ncx_getn_uint_float(const void **xpp, size_t nelems, float* tp) {return NC_ENOTNC;}
-int ncx_getn_uint_int(const void **xpp, size_t nelems, int* tp) {return NC_ENOTNC;}
-int ncx_getn_uint_longlong(const void **xpp, size_t nelems, longlong* tp) {return NC_ENOTNC;}
-int ncx_getn_uint_schar(const void **xpp, size_t nelems, schar* tp) {return NC_ENOTNC;}
-int ncx_getn_uint_short(const void **xpp, size_t nelems, short* tp) {return NC_ENOTNC;}
-int ncx_getn_uint_uchar(const void **xpp, size_t nelems, uchar* tp) {return NC_ENOTNC;}
-int ncx_getn_uint_uint(const void **xpp, size_t nelems, uint* tp) {return NC_ENOTNC;}
-int ncx_getn_uint_ulonglong(const void **xpp, size_t nelems, ulonglong* tp) {return NC_ENOTNC;}
-int ncx_getn_uint_ushort(const void **xpp, size_t nelems, ushort* tp) {return NC_ENOTNC;}
-int ncx_getn_ulonglong_double(const void **xpp, size_t nelems, double* tp) {return NC_ENOTNC;}
-int ncx_getn_ulonglong_float(const void **xpp, size_t nelems, float* tp) {return NC_ENOTNC;}
-int ncx_getn_ulonglong_int(const void **xpp, size_t nelems, int* tp) {return NC_ENOTNC;}
-int ncx_getn_ulonglong_longlong(const void **xpp, size_t nelems, longlong* tp) {return NC_ENOTNC;}
-int ncx_getn_ulonglong_schar(const void **xpp, size_t nelems, schar* tp) {return NC_ENOTNC;}
-int ncx_getn_ulonglong_short(const void **xpp, size_t nelems, short* tp) {return NC_ENOTNC;}
-int ncx_getn_ulonglong_uchar(const void **xpp, size_t nelems, uchar* tp) {return NC_ENOTNC;}
-int ncx_getn_ulonglong_uint(const void **xpp, size_t nelems, uint* tp) {return NC_ENOTNC;}
-int ncx_getn_ulonglong_ulonglong(const void **xpp, size_t nelems, ulonglong* tp) {return NC_ENOTNC;}
-int ncx_getn_ulonglong_ushort(const void **xpp, size_t nelems, ushort* tp) {return NC_ENOTNC;}
-int ncx_getn_ushort_double(const void **xpp, size_t nelems, double* tp) {return NC_ENOTNC;}
-int ncx_getn_ushort_float(const void **xpp, size_t nelems, float* tp) {return NC_ENOTNC;}
-int ncx_getn_ushort_int(const void **xpp, size_t nelems, int* tp) {return NC_ENOTNC;}
-int ncx_getn_ushort_longlong(const void **xpp, size_t nelems, longlong* tp) {return NC_ENOTNC;}
-int ncx_getn_ushort_schar(const void **xpp, size_t nelems, schar* tp) {return NC_ENOTNC;}
-int ncx_getn_ushort_short(const void **xpp, size_t nelems, short* tp) {return NC_ENOTNC;}
-int ncx_getn_ushort_uchar(const void **xpp, size_t nelems, uchar* tp) {return NC_ENOTNC;}
-int ncx_getn_ushort_uint(const void **xpp, size_t nelems, uint* tp) {return NC_ENOTNC;}
-int ncx_getn_ushort_ulonglong(const void **xpp, size_t nelems, ulonglong* tp) {return NC_ENOTNC;}
-int ncx_getn_ushort_ushort(const void **xpp, size_t nelems, ushort* tp) {return NC_ENOTNC;}
-int ncx_pad_getn_schar_ushort(const void **xpp, size_t nelems, ushort* tp) {return NC_ENOTNC;}
-int ncx_pad_getn_short_ushort(const void **xpp, size_t nelems, ushort* tp) {return NC_ENOTNC;}
-int ncx_pad_getn_uchar_double(const void **xpp, size_t nelems, double* tp) {return NC_ENOTNC;}
-int ncx_pad_getn_uchar_float(const void **xpp, size_t nelems, float* tp) {return NC_ENOTNC;}
-int ncx_pad_getn_uchar_int(const void **xpp, size_t nelems, int* tp) {return NC_ENOTNC;}
-int ncx_pad_getn_uchar_longlong(const void **xpp, size_t nelems, longlong* tp) {return NC_ENOTNC;}
-int ncx_pad_getn_uchar_schar(const void **xpp, size_t nelems, schar* tp) {return NC_ENOTNC;}
-int ncx_pad_getn_uchar_short(const void **xpp, size_t nelems, short* tp) {return NC_ENOTNC;}
-int ncx_pad_getn_uchar_uchar(const void **xpp, size_t nelems, uchar* tp) {return NC_ENOTNC;}
-int ncx_pad_getn_uchar_uint(const void **xpp, size_t nelems, uint* tp) {return NC_ENOTNC;}
-int ncx_pad_getn_uchar_ulonglong(const void **xpp, size_t nelems, ulonglong* tp) {return NC_ENOTNC;}
-int ncx_pad_getn_uchar_ushort(const void **xpp, size_t nelems, ushort* tp) {return NC_ENOTNC;}
-int ncx_pad_putn_schar_ushort(void **xpp, size_t nelems, const ushort* tp) {return NC_ENOTNC;}
-int ncx_pad_putn_short_ushort(void **xpp, size_t nelems, const ushort* tp) {return NC_ENOTNC;}
-int ncx_pad_putn_uchar_double(void **xpp, size_t nelems, const double* tp) {return NC_ENOTNC;}
-int ncx_pad_putn_uchar_float(void **xpp, size_t nelems, const float* tp) {return NC_ENOTNC;}
-int ncx_pad_putn_uchar_int(void **xpp, size_t nelems, const int* tp) {return NC_ENOTNC;}
-int ncx_pad_putn_uchar_longlong(void **xpp, size_t nelems, const longlong* tp) {return NC_ENOTNC;}
-int ncx_pad_putn_uchar_schar(void **xpp, size_t nelems, const schar* tp) {return NC_ENOTNC;}
-int ncx_pad_putn_uchar_short(void **xpp, size_t nelems, const short* tp) {return NC_ENOTNC;}
-int ncx_pad_putn_uchar_uchar(void **xpp, size_t nelems, const uchar* tp) {return NC_ENOTNC;}
-int ncx_pad_putn_uchar_uint(void **xpp, size_t nelems, const uint* tp) {return NC_ENOTNC;}
-int ncx_pad_putn_uchar_ulonglong(void **xpp, size_t nelems, const ulonglong* tp) {return NC_ENOTNC;}
-int ncx_pad_putn_uchar_ushort(void **xpp, size_t nelems, const ushort* tp) {return NC_ENOTNC;}
-int ncx_put_longlong(void **xpp, size_t nelems, const long long* tp) {return NC_ENOTNC;}
-int ncx_putn_double_ushort(void **xpp, size_t nelems, const ushort* tp) {return NC_ENOTNC;}
-int ncx_putn_float_ushort(void **xpp, size_t nelems, const ushort* tp) {return NC_ENOTNC;}
-int ncx_putn_int_ushort(void **xpp, size_t nelems, const ushort* tp) {return NC_ENOTNC;}
-int ncx_putn_longlong_double(void **xpp, size_t nelems, const double* tp) {return NC_ENOTNC;}
-int ncx_putn_longlong_float(void **xpp, size_t nelems, const float* tp) {return NC_ENOTNC;}
-int ncx_putn_longlong_int(void **xpp, size_t nelems, const int* tp) {return NC_ENOTNC;}
-int ncx_putn_longlong_longlong(void **xpp, size_t nelems, const longlong* tp) {return NC_ENOTNC;}
-int ncx_putn_longlong_schar(void **xpp, size_t nelems, const schar* tp) {return NC_ENOTNC;}
-int ncx_putn_longlong_short(void **xpp, size_t nelems, const short* tp) {return NC_ENOTNC;}
-int ncx_putn_longlong_uchar(void **xpp, size_t nelems, const uchar* tp) {return NC_ENOTNC;}
-int ncx_putn_longlong_uint(void **xpp, size_t nelems, const uint* tp) {return NC_ENOTNC;}
-int ncx_putn_longlong_ulonglong(void **xpp, size_t nelems, const ulonglong* tp) {return NC_ENOTNC;}
-int ncx_putn_longlong_ushort(void **xpp, size_t nelems, const ushort* tp) {return NC_ENOTNC;}
-int ncx_putn_uint_double(void **xpp, size_t nelems, const double* tp) {return NC_ENOTNC;}
-int ncx_putn_uint_float(void **xpp, size_t nelems, const float* tp) {return NC_ENOTNC;}
-int ncx_putn_uint_int(void **xpp, size_t nelems, const int* tp) {return NC_ENOTNC;}
-int ncx_putn_uint_longlong(void **xpp, size_t nelems, const longlong* tp) {return NC_ENOTNC;}
-int ncx_putn_uint_schar(void **xpp, size_t nelems, const schar* tp) {return NC_ENOTNC;}
-int ncx_putn_uint_short(void **xpp, size_t nelems, const short* tp) {return NC_ENOTNC;}
-int ncx_putn_uint_uchar(void **xpp, size_t nelems, const uchar* tp) {return NC_ENOTNC;}
-int ncx_putn_uint_uint(void **xpp, size_t nelems, const uint* tp) {return NC_ENOTNC;}
-int ncx_putn_uint_ulonglong(void **xpp, size_t nelems, const ulonglong* tp) {return NC_ENOTNC;}
-int ncx_putn_uint_ushort(void **xpp, size_t nelems, const ushort* tp) {return NC_ENOTNC;}
-int ncx_putn_ulonglong_double(void **xpp, size_t nelems, const double* tp) {return NC_ENOTNC;}
-int ncx_putn_ulonglong_float(void **xpp, size_t nelems, const float* tp) {return NC_ENOTNC;}
-int ncx_putn_ulonglong_int(void **xpp, size_t nelems, const int* tp) {return NC_ENOTNC;}
-int ncx_putn_ulonglong_longlong(void **xpp, size_t nelems, const longlong* tp) {return NC_ENOTNC;}
-int ncx_putn_ulonglong_schar(void **xpp, size_t nelems, const schar* tp) {return NC_ENOTNC;}
-int ncx_putn_ulonglong_short(void **xpp, size_t nelems, const short* tp) {return NC_ENOTNC;}
-int ncx_putn_ulonglong_uchar(void **xpp, size_t nelems, const uchar* tp) {return NC_ENOTNC;}
-int ncx_putn_ulonglong_uint(void **xpp, size_t nelems, const uint* tp) {return NC_ENOTNC;}
-int ncx_putn_ulonglong_ulonglong(void **xpp, size_t nelems, const ulonglong* tp) {return NC_ENOTNC;}
-int ncx_putn_ulonglong_ushort(void **xpp, size_t nelems, const ushort* tp) {return NC_ENOTNC;}
-int ncx_putn_ushort_double(void **xpp, size_t nelems, const double* tp) {return NC_ENOTNC;}
-int ncx_putn_ushort_float(void **xpp, size_t nelems, const float* tp) {return NC_ENOTNC;}
-int ncx_putn_ushort_int(void **xpp, size_t nelems, const int* tp) {return NC_ENOTNC;}
-int ncx_putn_ushort_longlong(void **xpp, size_t nelems, const longlong* tp) {return NC_ENOTNC;}
-int ncx_putn_ushort_schar(void **xpp, size_t nelems, const schar* tp) {return NC_ENOTNC;}
-int ncx_putn_ushort_short(void **xpp, size_t nelems, const short* tp) {return NC_ENOTNC;}
-int ncx_putn_ushort_uchar(void **xpp, size_t nelems, const uchar* tp) {return NC_ENOTNC;}
-int ncx_putn_ushort_uint(void **xpp, size_t nelems, const uint* tp) {return NC_ENOTNC;}
-int ncx_putn_ushort_ulonglong(void **xpp, size_t nelems, const ulonglong* tp) {return NC_ENOTNC;}
-int ncx_putn_ushort_ushort(void **xpp, size_t nelems, const ushort* tp) {return NC_ENOTNC;}
