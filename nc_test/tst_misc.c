@@ -9,13 +9,13 @@
   $Id: tst_misc.c,v 1.6 2010/05/05 22:15:36 dmh Exp $
 */
 
-#include <config.h>
-#include <nc_tests.h>
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <netcdf.h>
+#include "netcdf.h"
+#include "nc_tests.h"
 #ifdef USE_PARALLEL
-#include <netcdf_par.h>
+#include "netcdf_par.h"
 #endif
 
 #define FILE_NAME "tst_misc.nc"
