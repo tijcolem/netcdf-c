@@ -22,7 +22,6 @@
 #include <string.h>
 #include <assert.h>
 #include <netcdf.h>
-#include <netcdf.h>
 #ifdef USE_PARALLEL
 #include <netcdf_par.h>
 #endif

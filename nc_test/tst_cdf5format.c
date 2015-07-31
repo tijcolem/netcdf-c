@@ -75,6 +75,10 @@ write(int ncid, int parallel)
         }
     }
     if (stat=nc_enddef(ncid)) Error(stat);;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 896fe992ff193edcd1a7f2ad592d144a91de3de5
     for (i=0; i<NVARS; i++) {
 	if(parallel) {
             /* Note NC_INDEPENDENT is the default */
@@ -126,6 +130,10 @@ read(int ncid)
     char str[32];
     size_t start[2], count[2];
     int stat = NC_NOERR;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 896fe992ff193edcd1a7f2ad592d144a91de3de5
     /* read variables and check their contents */
     for (i=0; i<NVARS; i++) {
         for (j=0; j<NX; j++) buf[j] = -1;

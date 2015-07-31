@@ -1567,10 +1567,10 @@ main(int argc, char**argv)
 	{"1", NC_FORMAT_CLASSIC}, /* deprecated, use "-3" or "-k nc3" instead */
 	
 	/* NetCDF-3 64-bit offset format */
-	{"64-bit offset", NC_FORMAT_64BIT}, /* canonical format name */
-	{"nc6", NC_FORMAT_64BIT},	    /* short format name */
-	{"2", NC_FORMAT_64BIT},	/* deprecated, use "-6" or "-k nc6" instead */
-	{"64-bit-offset", NC_FORMAT_64BIT}, /* deprecated alias */
+	{"64-bit offset", NC_FORMAT_64BIT_OFFSET}, /* canonical format name */
+	{"nc6", NC_FORMAT_64BIT_OFFSET},	    /* short format name */
+	{"2", NC_FORMAT_64BIT_OFFSET},	/* deprecated, use "-6" or "-k nc6" instead */
+	{"64-bit-offset", NC_FORMAT_64BIT_OFFSET}, /* deprecated alias */
 	
 	/* NetCDF-4 HDF5-based format */
 	{"netCDF-4", NC_FORMAT_NETCDF4}, /* canonical format name */
@@ -1594,13 +1594,8 @@ main(int argc, char**argv)
 	{"5", NC_FORMAT_CDF5},
 	{"64-bit-data", NC_FORMAT_CDF5},
 	{"64-bit data", NC_FORMAT_CDF5},
-<<<<<<< HEAD
 	{"nc5", NC_FORMAT_CDF5},
 	{"cdf5", NC_FORMAT_CDF5},
-=======
-	{"cdf5", NC_FORMAT_CDF5},
-	{"nc5", NC_FORMAT_CDF5},
->>>>>>> initial merge of the cdf5 code
 
 	/* null terminate*/
 	{NULL,0}

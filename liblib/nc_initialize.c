@@ -53,6 +53,10 @@ nc_initialize()
     NC_initialized = 1;
     NC_finalized = 0;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 896fe992ff193edcd1a7f2ad592d144a91de3de5
     /* Do general initialization */
     if((stat = NCDISPATCH_initialize())) return stat;
 

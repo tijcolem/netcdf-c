@@ -106,6 +106,7 @@ main(int argc, char **argv)
 MPI_Init(&argc, &argv);
 #endif
    printf("\n*** testing UTF-8 normalization...");
+#ifdef TEST_PNETCDF
    if((res = nc_create_par(FILE7_NAME, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL,&ncid)))
 #else
    if((res = nc_create(FILE7_NAME, NC_CLOBBER, &ncid)))

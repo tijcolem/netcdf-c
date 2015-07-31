@@ -92,15 +92,7 @@ test_nc_open(void)
     int ncid2;
     
     /* Try to open a nonexistent file */
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par("tooth-fairy.nc", NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open("tooth-fairy.nc", NC_NOWRITE, &ncid);/* should fail */
@@ -119,15 +111,7 @@ test_nc_open(void)
     /* 	error("nc_open of non-netCDF file: status = %d", err); */
 
     /* Open a netCDF file in read-only mode, check that write fails */
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -138,15 +122,7 @@ test_nc_open(void)
     IF (err != NC_EPERM)
 	error("nc_redef of read-only file should fail");
     /* Opened OK, see if can open again and get a different netCDF ID */
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid2);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid2);
@@ -159,15 +135,7 @@ test_nc_open(void)
     IF (ncid2 == ncid)
 	error("netCDF IDs for first and second nc_open calls should differ");
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_create_par(scratch, NC_NOCLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid2);
 #else
     err = nc_create(scratch, NC_NOCLOBBER, &ncid2);
@@ -176,15 +144,7 @@ test_nc_open(void)
        error("nc_create: %s", nc_strerror(err));
     else 
        (void) nc_close(ncid2);
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(scratch, NC_WRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid2);
 #else
     err = nc_open(scratch, NC_WRITE, &ncid2);
@@ -213,15 +173,7 @@ void
 test_nc_close(void)
 {
     int ncid, err;
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -244,15 +196,7 @@ test_nc_close(void)
 	error("nc_close with bad netCDF ID returned wrong error (%d)", err);
 
     /* Close in data mode */
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -263,15 +207,7 @@ test_nc_close(void)
     IF (err)
 	error("nc_close in data mode failed: %s", nc_strerror(err));
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_create_par(scratch, NC_NOCLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_create(scratch, NC_NOCLOBBER, &ncid);
@@ -305,15 +241,7 @@ test_nc_inq(void)
     int ngatts;			/* number of global attributes */
     int recdim;			/* id of unlimited dimension */
     int err;
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -364,15 +292,7 @@ test_nc_inq(void)
     {		/* tests using netCDF scratch file */
 	int ncid2;		/* for scratch netCDF dataset */
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
         err = nc_create_par(scratch, NC_NOCLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid2);
 #else
         err = nc_create(scratch, NC_NOCLOBBER, &ncid2);
@@ -468,15 +388,7 @@ test_nc_inq_natts(void)
     err = nc_inq_natts(BAD_ID, &ngatts);
     IF (err != NC_EBADID)
 	error("bad ncid: status = %d", err);
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -504,15 +416,7 @@ test_nc_inq_ndims(void)
     err = nc_inq_ndims(BAD_ID, &ndims);
     IF (err != NC_EBADID)
 	error("bad ncid: status = %d", err);
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -540,15 +444,7 @@ test_nc_inq_nvars(void)
     err = nc_inq_nvars(BAD_ID, &nvars);
     IF (err != NC_EBADID)
 	error("bad ncid: status = %d", err);
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -576,15 +472,7 @@ test_nc_inq_unlimdim(void)
     err = nc_inq_unlimdim(BAD_ID, &unlimdim);
     IF (err != NC_EBADID)
 	error("bad ncid: status = %d", err);
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -610,15 +498,7 @@ test_nc_inq_dimid(void)
     int i;
     int err;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -653,15 +533,7 @@ test_nc_inq_dim(void)
     char name[NC_MAX_NAME];
     size_t length;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -710,15 +582,7 @@ test_nc_inq_dimlen(void)
     int err;
     size_t length;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -752,15 +616,7 @@ test_nc_inq_dimname(void)
     int err;
     char name[NC_MAX_NAME];
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -794,15 +650,7 @@ test_nc_inq_varid(void)
     int i;
     int err;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -843,15 +691,7 @@ test_nc_inq_var(void)
     int dimids[MAX_RANK];
     int natts;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -921,15 +761,7 @@ test_nc_inq_vardimid(void)
     int err;
     int dimids[MAX_RANK];
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -963,15 +795,7 @@ test_nc_inq_varname(void)
     int err;
     char name[NC_MAX_NAME];
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -1005,15 +829,7 @@ test_nc_inq_varnatts(void)
     int err;
     int natts;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -1047,15 +863,7 @@ test_nc_inq_varndims(void)
     int err;
     int ndims;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -1089,15 +897,7 @@ test_nc_inq_vartype(void)
     int err;
     nc_type datatype;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -1139,15 +939,7 @@ test_nc_get_var1(void)
     double buf[1];		/* (void *) buffer */
     double value;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -1226,15 +1018,7 @@ test_nc_get_vara(void)
     double expect;
     double got;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -1365,15 +1149,7 @@ test_nc_get_vars(void)
     double expect;
     double got;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -1544,15 +1320,7 @@ test_nc_get_varm(void)
     double expect;
     double got;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -1569,15 +1337,7 @@ test_nc_get_varm(void)
         }
         if (var_rank[i] > 0) {
             j = var_rank[i] - 1;
-<<<<<<< HEAD
-<<<<<<< HEAD
-            /* imap[j] = nctypelen(var_type[i]); // in bytes */ 
-=======
-            // imap[j] = nctypelen(var_type[i]); /* in bytes */
->>>>>>> initial merge of the cdf5 code
-=======
-            /* imap[j] = nctypelen(var_type[i]); // in bytes */ 
->>>>>>> ckp
+            /* imap[j] = nctypelen(var_type[i]); in bytes */
             imap[j] = 1; /* in numbers of elements */
             for (; j > 0; j--)
                 imap[j-1] = imap[j] * var_shape[i][j];
@@ -1704,15 +1464,7 @@ test_nc_get_att(void)
     double got;
     int nok = 0;      /* count of valid comparisons */
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -1781,15 +1533,7 @@ test_nc_inq_att(void)
     nc_type t;
     size_t n;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -1835,15 +1579,7 @@ test_nc_inq_attlen(void)
     int err;
     size_t len;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -1887,15 +1623,7 @@ test_nc_inq_atttype(void)
     int err;
     nc_type datatype;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -1939,15 +1667,7 @@ test_nc_inq_attname(void)
     int err;
     char name[NC_MAX_NAME];
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
@@ -1994,15 +1714,7 @@ test_nc_inq_attid(void)
     int err;
     int attnum;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#ifdef USE_PNETCDF
-=======
 #ifdef TEST_PNETCDF
->>>>>>> initial merge of the cdf5 code
-=======
-#ifdef USE_PNETCDF
->>>>>>> 1. more condition refs to mpi.h
     err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
 #else
     err = nc_open(testfile, NC_NOWRITE, &ncid);
