@@ -15,19130 +15,18554 @@
 
 #include "tests.h"
 
+#line 120
+
+void
+#line 121
+test_nc_get_var1_text(void)
+#line 121
+{
+#line 121
+    int ncid;
+#line 121
+    int i;
+#line 121
+    int j;
+#line 121
+    int err;
+#line 121
+    int nok = 0;      /* count of valid comparisons */
+#line 121
+    size_t index[MAX_RANK];
+#line 121
+    double expect;
+#line 121
+    int canConvert;     /* Both text or both numeric */
+#line 121
+    text value;
+#line 121
+
+#line 121
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 121
+    IF (err)
+#line 121
+	error("nc_open: %s", nc_strerror(err));
+#line 121
+    for (i = 0; i < numVars; i++) {
+#line 121
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_TEXT == NCT_TEXT);
+#line 121
+	for (j = 0; j < var_rank[i]; j++)
+#line 121
+	    index[j] = 0;
+#line 121
+        err = nc_get_var1_text(BAD_ID, i, index, &value);
+#line 121
+        IF (err != NC_EBADID)
+#line 121
+	    error("bad ncid: status = %d", err);
+#line 121
+        err = nc_get_var1_text(ncid, BAD_VARID, index, &value);
+#line 121
+        IF (err != NC_ENOTVAR)
+#line 121
+	    error("bad var id: status = %d", err);
+#line 121
+	for (j = 0; j < var_rank[i]; j++) {
+#line 121
+	    index[j] = var_shape[i][j];
+#line 121
+	    err = nc_get_var1_text(ncid, i, index, &value);
+#line 121
+	    if(!canConvert) {
+#line 121
+		IF(err != NC_ECHAR)
+#line 121
+			error("conversion: status = %d", err);
+#line 121
+	    } else IF (err != NC_EINVALCOORDS)
+#line 121
+		error("bad index: status = %d", err);
+#line 121
+	    index[j] = 0;
+#line 121
+	}
+#line 121
+	for (j = 0; j < var_nels[i]; j++) {
+#line 121
+	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
+#line 121
+	    IF (err)
+#line 121
+		error("error in toMixedBase 1");
+#line 121
+	    expect = hash4( var_type[i], var_rank[i], index, NCT_TEXT );
+#line 121
+	    if (var_rank[i] == 0 && i%2 )
+#line 121
+		err = nc_get_var1_text(ncid, i, NULL, &value);
+#line 121
+	    else
+#line 121
+		err = nc_get_var1_text(ncid, i, index, &value);
+#line 121
+            if (canConvert) {
+#line 121
+		if (inRange3(expect,var_type[i], NCT_TEXT)) {
+#line 121
+		    if (expect >= text_min && expect <= text_max) {
+#line 121
+			IF (err) {
+#line 121
+			    error("%s", nc_strerror(err));
+#line 121
+			} else {
+#line 121
+			    IF (!equal(value,expect,var_type[i],NCT_TEXT)) {
+#line 121
+				error("expected: %G, got: %G", expect,
+#line 121
+				    (double) value);
+#line 121
+			    } else {
+#line 121
+				nok++;
+#line 121
+			    }
+#line 121
+			}
+#line 121
+		    } else {
+#line 121
+			IF (err != NC_ERANGE)
+#line 121
+			    error("Range error: status = %d", err);
+#line 121
+		    }
+#line 121
+                } else {
+#line 121
+                    IF (err != 0 && err != NC_ERANGE)
+#line 121
+                        error("OK or Range error: status = %d", err);
+#line 121
+		}
+#line 121
+	    } else {
+#line 121
+		IF (err != NC_ECHAR)
+#line 121
+		    error("wrong type: status = %d", err);
+#line 121
+	    }
+#line 121
+	}
+#line 121
+    }
+#line 121
+    err = nc_close(ncid);
+#line 121
+    IF (err)
+#line 121
+	error("nc_close: %s", nc_strerror(err));
+#line 121
+    print_nok(nok);
+#line 121
+}
+#line 121
+
+void
+#line 122
+test_nc_get_var1_uchar(void)
+#line 122
+{
+#line 122
+    int ncid;
+#line 122
+    int i;
+#line 122
+    int j;
+#line 122
+    int err;
+#line 122
+    int nok = 0;      /* count of valid comparisons */
+#line 122
+    size_t index[MAX_RANK];
+#line 122
+    double expect;
+#line 122
+    int canConvert;     /* Both text or both numeric */
+#line 122
+    uchar value;
+#line 122
+
+#line 122
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 122
+    IF (err)
+#line 122
+	error("nc_open: %s", nc_strerror(err));
+#line 122
+    for (i = 0; i < numVars; i++) {
+#line 122
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_UCHAR == NCT_TEXT);
+#line 122
+	for (j = 0; j < var_rank[i]; j++)
+#line 122
+	    index[j] = 0;
+#line 122
+        err = nc_get_var1_uchar(BAD_ID, i, index, &value);
+#line 122
+        IF (err != NC_EBADID)
+#line 122
+	    error("bad ncid: status = %d", err);
+#line 122
+        err = nc_get_var1_uchar(ncid, BAD_VARID, index, &value);
+#line 122
+        IF (err != NC_ENOTVAR)
+#line 122
+	    error("bad var id: status = %d", err);
+#line 122
+	for (j = 0; j < var_rank[i]; j++) {
+#line 122
+	    index[j] = var_shape[i][j];
+#line 122
+	    err = nc_get_var1_uchar(ncid, i, index, &value);
+#line 122
+	    if(!canConvert) {
+#line 122
+		IF(err != NC_ECHAR)
+#line 122
+			error("conversion: status = %d", err);
+#line 122
+	    } else IF (err != NC_EINVALCOORDS)
+#line 122
+		error("bad index: status = %d", err);
+#line 122
+	    index[j] = 0;
+#line 122
+	}
+#line 122
+	for (j = 0; j < var_nels[i]; j++) {
+#line 122
+	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
+#line 122
+	    IF (err)
+#line 122
+		error("error in toMixedBase 1");
+#line 122
+	    expect = hash4( var_type[i], var_rank[i], index, NCT_UCHAR );
+#line 122
+	    if (var_rank[i] == 0 && i%2 )
+#line 122
+		err = nc_get_var1_uchar(ncid, i, NULL, &value);
+#line 122
+	    else
+#line 122
+		err = nc_get_var1_uchar(ncid, i, index, &value);
+#line 122
+            if (canConvert) {
+#line 122
+		if (inRange3(expect,var_type[i], NCT_UCHAR)) {
+#line 122
+		    if (expect >= uchar_min && expect <= uchar_max) {
+#line 122
+			IF (err) {
+#line 122
+			    error("%s", nc_strerror(err));
+#line 122
+			} else {
+#line 122
+			    IF (!equal(value,expect,var_type[i],NCT_UCHAR)) {
+#line 122
+				error("expected: %G, got: %G", expect,
+#line 122
+				    (double) value);
+#line 122
+			    } else {
+#line 122
+				nok++;
+#line 122
+			    }
+#line 122
+			}
+#line 122
+		    } else {
+#line 122
+			IF (err != NC_ERANGE)
+#line 122
+			    error("Range error: status = %d", err);
+#line 122
+		    }
+#line 122
+                } else {
+#line 122
+                    IF (err != 0 && err != NC_ERANGE)
+#line 122
+                        error("OK or Range error: status = %d", err);
+#line 122
+		}
+#line 122
+	    } else {
+#line 122
+		IF (err != NC_ECHAR)
+#line 122
+		    error("wrong type: status = %d", err);
+#line 122
+	    }
+#line 122
+	}
+#line 122
+    }
+#line 122
+    err = nc_close(ncid);
+#line 122
+    IF (err)
+#line 122
+	error("nc_close: %s", nc_strerror(err));
+#line 122
+    print_nok(nok);
+#line 122
+}
+#line 122
+
+void
+#line 123
+test_nc_get_var1_schar(void)
+#line 123
+{
+#line 123
+    int ncid;
+#line 123
+    int i;
+#line 123
+    int j;
+#line 123
+    int err;
+#line 123
+    int nok = 0;      /* count of valid comparisons */
+#line 123
+    size_t index[MAX_RANK];
+#line 123
+    double expect;
+#line 123
+    int canConvert;     /* Both text or both numeric */
+#line 123
+    schar value;
+#line 123
+
+#line 123
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 123
+    IF (err)
+#line 123
+	error("nc_open: %s", nc_strerror(err));
+#line 123
+    for (i = 0; i < numVars; i++) {
+#line 123
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_SCHAR == NCT_TEXT);
+#line 123
+	for (j = 0; j < var_rank[i]; j++)
+#line 123
+	    index[j] = 0;
+#line 123
+        err = nc_get_var1_schar(BAD_ID, i, index, &value);
+#line 123
+        IF (err != NC_EBADID)
+#line 123
+	    error("bad ncid: status = %d", err);
+#line 123
+        err = nc_get_var1_schar(ncid, BAD_VARID, index, &value);
+#line 123
+        IF (err != NC_ENOTVAR)
+#line 123
+	    error("bad var id: status = %d", err);
+#line 123
+	for (j = 0; j < var_rank[i]; j++) {
+#line 123
+	    index[j] = var_shape[i][j];
+#line 123
+	    err = nc_get_var1_schar(ncid, i, index, &value);
+#line 123
+	    if(!canConvert) {
+#line 123
+		IF(err != NC_ECHAR)
+#line 123
+			error("conversion: status = %d", err);
+#line 123
+	    } else IF (err != NC_EINVALCOORDS)
+#line 123
+		error("bad index: status = %d", err);
+#line 123
+	    index[j] = 0;
+#line 123
+	}
+#line 123
+	for (j = 0; j < var_nels[i]; j++) {
+#line 123
+	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
+#line 123
+	    IF (err)
+#line 123
+		error("error in toMixedBase 1");
+#line 123
+	    expect = hash4( var_type[i], var_rank[i], index, NCT_SCHAR );
+#line 123
+	    if (var_rank[i] == 0 && i%2 )
+#line 123
+		err = nc_get_var1_schar(ncid, i, NULL, &value);
+#line 123
+	    else
+#line 123
+		err = nc_get_var1_schar(ncid, i, index, &value);
+#line 123
+            if (canConvert) {
+#line 123
+		if (inRange3(expect,var_type[i], NCT_SCHAR)) {
+#line 123
+		    if (expect >= schar_min && expect <= schar_max) {
+#line 123
+			IF (err) {
+#line 123
+			    error("%s", nc_strerror(err));
+#line 123
+			} else {
+#line 123
+			    IF (!equal(value,expect,var_type[i],NCT_SCHAR)) {
+#line 123
+				error("expected: %G, got: %G", expect,
+#line 123
+				    (double) value);
+#line 123
+			    } else {
+#line 123
+				nok++;
+#line 123
+			    }
+#line 123
+			}
+#line 123
+		    } else {
+#line 123
+			IF (err != NC_ERANGE)
+#line 123
+			    error("Range error: status = %d", err);
+#line 123
+		    }
+#line 123
+                } else {
+#line 123
+                    IF (err != 0 && err != NC_ERANGE)
+#line 123
+                        error("OK or Range error: status = %d", err);
+#line 123
+		}
+#line 123
+	    } else {
+#line 123
+		IF (err != NC_ECHAR)
+#line 123
+		    error("wrong type: status = %d", err);
+#line 123
+	    }
+#line 123
+	}
+#line 123
+    }
+#line 123
+    err = nc_close(ncid);
+#line 123
+    IF (err)
+#line 123
+	error("nc_close: %s", nc_strerror(err));
+#line 123
+    print_nok(nok);
+#line 123
+}
+#line 123
+
+void
+#line 124
+test_nc_get_var1_short(void)
+#line 124
+{
+#line 124
+    int ncid;
+#line 124
+    int i;
+#line 124
+    int j;
+#line 124
+    int err;
+#line 124
+    int nok = 0;      /* count of valid comparisons */
+#line 124
+    size_t index[MAX_RANK];
+#line 124
+    double expect;
+#line 124
+    int canConvert;     /* Both text or both numeric */
+#line 124
+    short value;
+#line 124
+
+#line 124
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 124
+    IF (err)
+#line 124
+	error("nc_open: %s", nc_strerror(err));
+#line 124
+    for (i = 0; i < numVars; i++) {
+#line 124
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_SHORT == NCT_TEXT);
+#line 124
+	for (j = 0; j < var_rank[i]; j++)
+#line 124
+	    index[j] = 0;
+#line 124
+        err = nc_get_var1_short(BAD_ID, i, index, &value);
+#line 124
+        IF (err != NC_EBADID)
+#line 124
+	    error("bad ncid: status = %d", err);
+#line 124
+        err = nc_get_var1_short(ncid, BAD_VARID, index, &value);
+#line 124
+        IF (err != NC_ENOTVAR)
+#line 124
+	    error("bad var id: status = %d", err);
+#line 124
+	for (j = 0; j < var_rank[i]; j++) {
+#line 124
+	    index[j] = var_shape[i][j];
+#line 124
+	    err = nc_get_var1_short(ncid, i, index, &value);
+#line 124
+	    if(!canConvert) {
+#line 124
+		IF(err != NC_ECHAR)
+#line 124
+			error("conversion: status = %d", err);
+#line 124
+	    } else IF (err != NC_EINVALCOORDS)
+#line 124
+		error("bad index: status = %d", err);
+#line 124
+	    index[j] = 0;
+#line 124
+	}
+#line 124
+	for (j = 0; j < var_nels[i]; j++) {
+#line 124
+	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
+#line 124
+	    IF (err)
+#line 124
+		error("error in toMixedBase 1");
+#line 124
+	    expect = hash4( var_type[i], var_rank[i], index, NCT_SHORT );
+#line 124
+	    if (var_rank[i] == 0 && i%2 )
+#line 124
+		err = nc_get_var1_short(ncid, i, NULL, &value);
+#line 124
+	    else
+#line 124
+		err = nc_get_var1_short(ncid, i, index, &value);
+#line 124
+            if (canConvert) {
+#line 124
+		if (inRange3(expect,var_type[i], NCT_SHORT)) {
+#line 124
+		    if (expect >= short_min && expect <= short_max) {
+#line 124
+			IF (err) {
+#line 124
+			    error("%s", nc_strerror(err));
+#line 124
+			} else {
+#line 124
+			    IF (!equal(value,expect,var_type[i],NCT_SHORT)) {
+#line 124
+				error("expected: %G, got: %G", expect,
+#line 124
+				    (double) value);
+#line 124
+			    } else {
+#line 124
+				nok++;
+#line 124
+			    }
+#line 124
+			}
+#line 124
+		    } else {
+#line 124
+			IF (err != NC_ERANGE)
+#line 124
+			    error("Range error: status = %d", err);
+#line 124
+		    }
+#line 124
+                } else {
+#line 124
+                    IF (err != 0 && err != NC_ERANGE)
+#line 124
+                        error("OK or Range error: status = %d", err);
+#line 124
+		}
+#line 124
+	    } else {
+#line 124
+		IF (err != NC_ECHAR)
+#line 124
+		    error("wrong type: status = %d", err);
+#line 124
+	    }
+#line 124
+	}
+#line 124
+    }
+#line 124
+    err = nc_close(ncid);
+#line 124
+    IF (err)
+#line 124
+	error("nc_close: %s", nc_strerror(err));
+#line 124
+    print_nok(nok);
+#line 124
+}
 #line 124
 
 void
 #line 125
-test_nc_get_var1_text(void)
-#line 125
-{
-#line 125
-    int ncid;
-#line 125
-    int i;
-#line 125
-    int j;
-#line 125
-    int err;
-#line 125
-    int nok = 0;      /* count of valid comparisons */
-#line 125
-    size_t index[MAX_RANK];
-#line 125
-    double expect;
-#line 125
-    int canConvert;     /* Both text or both numeric */
-#line 125
-    text value;
-#line 125
-
-#line 125
-#ifdef USE_PNETCDF
-#line 125
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 125
-#else
-#line 125
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 125
-#endif
-#line 125
-    IF (err)
-#line 125
-	error("nc_open: %s", nc_strerror(err));
-#line 125
-    for (i = 0; i < numVars; i++) {
-#line 125
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_TEXT == NCT_TEXT);
-#line 125
-	for (j = 0; j < var_rank[i]; j++)
-#line 125
-	    index[j] = 0;
-#line 125
-        err = nc_get_var1_text(BAD_ID, i, index, &value);
-#line 125
-        IF (err != NC_EBADID)
-#line 125
-	    error("bad ncid: status = %d", err);
-#line 125
-        err = nc_get_var1_text(ncid, BAD_VARID, index, &value);
-#line 125
-        IF (err != NC_ENOTVAR)
-#line 125
-	    error("bad var id: status = %d", err);
-#line 125
-	for (j = 0; j < var_rank[i]; j++) {
-#line 125
-	    index[j] = var_shape[i][j];
-#line 125
-	    err = nc_get_var1_text(ncid, i, index, &value);
-#line 125
-	    if(!canConvert) {
-#line 125
-		IF(err != NC_ECHAR)
-#line 125
-			error("conversion: status = %d", err);
-#line 125
-	    } else IF (err != NC_EINVALCOORDS)
-#line 125
-		error("bad index: status = %d", err);
-#line 125
-	    index[j] = 0;
-#line 125
-	}
-#line 125
-	for (j = 0; j < var_nels[i]; j++) {
-#line 125
-	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 125
-	    IF (err)
-#line 125
-		error("error in toMixedBase 1");
-#line 125
-	    expect = hash4( var_type[i], var_rank[i], index, NCT_TEXT );
-#line 125
-	    if (var_rank[i] == 0 && i%2 )
-#line 125
-		err = nc_get_var1_text(ncid, i, NULL, &value);
-#line 125
-	    else
-#line 125
-		err = nc_get_var1_text(ncid, i, index, &value);
-#line 125
-            if (canConvert) {
-#line 125
-		if (inRange3(expect,var_type[i], NCT_TEXT)) {
-#line 125
-		    if (expect >= text_min && expect <= text_max) {
-#line 125
-			IF (err) {
-#line 125
-			    error("%s", nc_strerror(err));
-#line 125
-			} else {
-#line 125
-			    IF (!equal(value,expect,var_type[i],NCT_TEXT)) {
-#line 125
-				error("expected: %G, got: %G", expect,
-#line 125
-				    (double) value);
-#line 125
-			    } else {
-#line 125
-				nok++;
-#line 125
-			    }
-#line 125
-			}
-#line 125
-		    } else {
-#line 125
-			IF (err != NC_ERANGE)
-#line 125
-			    error("Range error: status = %d", err);
-#line 125
-		    }
-#line 125
-                } else {
-#line 125
-                    IF (err != 0 && err != NC_ERANGE)
-#line 125
-                        error("OK or Range error: status = %d", err);
-#line 125
-		}
-#line 125
-	    } else {
-#line 125
-		IF (err != NC_ECHAR)
-#line 125
-		    error("wrong type: status = %d", err);
-#line 125
-	    }
-#line 125
-	}
-#line 125
-    }
-#line 125
-    err = nc_close(ncid);
-#line 125
-    IF (err)
-#line 125
-	error("nc_close: %s", nc_strerror(err));
-#line 125
-    print_nok(nok);
-#line 125
-}
-#line 125
-
-void
-#line 126
-test_nc_get_var1_uchar(void)
-#line 126
-{
-#line 126
-    int ncid;
-#line 126
-    int i;
-#line 126
-    int j;
-#line 126
-    int err;
-#line 126
-    int nok = 0;      /* count of valid comparisons */
-#line 126
-    size_t index[MAX_RANK];
-#line 126
-    double expect;
-#line 126
-    int canConvert;     /* Both text or both numeric */
-#line 126
-    uchar value;
-#line 126
-
-#line 126
-#ifdef USE_PNETCDF
-#line 126
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 126
-#else
-#line 126
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 126
-#endif
-#line 126
-    IF (err)
-#line 126
-	error("nc_open: %s", nc_strerror(err));
-#line 126
-    for (i = 0; i < numVars; i++) {
-#line 126
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_UCHAR == NCT_TEXT);
-#line 126
-	for (j = 0; j < var_rank[i]; j++)
-#line 126
-	    index[j] = 0;
-#line 126
-        err = nc_get_var1_uchar(BAD_ID, i, index, &value);
-#line 126
-        IF (err != NC_EBADID)
-#line 126
-	    error("bad ncid: status = %d", err);
-#line 126
-        err = nc_get_var1_uchar(ncid, BAD_VARID, index, &value);
-#line 126
-        IF (err != NC_ENOTVAR)
-#line 126
-	    error("bad var id: status = %d", err);
-#line 126
-	for (j = 0; j < var_rank[i]; j++) {
-#line 126
-	    index[j] = var_shape[i][j];
-#line 126
-	    err = nc_get_var1_uchar(ncid, i, index, &value);
-#line 126
-	    if(!canConvert) {
-#line 126
-		IF(err != NC_ECHAR)
-#line 126
-			error("conversion: status = %d", err);
-#line 126
-	    } else IF (err != NC_EINVALCOORDS)
-#line 126
-		error("bad index: status = %d", err);
-#line 126
-	    index[j] = 0;
-#line 126
-	}
-#line 126
-	for (j = 0; j < var_nels[i]; j++) {
-#line 126
-	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 126
-	    IF (err)
-#line 126
-		error("error in toMixedBase 1");
-#line 126
-	    expect = hash4( var_type[i], var_rank[i], index, NCT_UCHAR );
-#line 126
-	    if (var_rank[i] == 0 && i%2 )
-#line 126
-		err = nc_get_var1_uchar(ncid, i, NULL, &value);
-#line 126
-	    else
-#line 126
-		err = nc_get_var1_uchar(ncid, i, index, &value);
-#line 126
-            if (canConvert) {
-#line 126
-		if (inRange3(expect,var_type[i], NCT_UCHAR)) {
-#line 126
-		    if (expect >= uchar_min && expect <= uchar_max) {
-#line 126
-			IF (err) {
-#line 126
-			    error("%s", nc_strerror(err));
-#line 126
-			} else {
-#line 126
-			    IF (!equal(value,expect,var_type[i],NCT_UCHAR)) {
-#line 126
-				error("expected: %G, got: %G", expect,
-#line 126
-				    (double) value);
-#line 126
-			    } else {
-#line 126
-				nok++;
-#line 126
-			    }
-#line 126
-			}
-#line 126
-		    } else {
-#line 126
-			IF (err != NC_ERANGE)
-#line 126
-			    error("Range error: status = %d", err);
-#line 126
-		    }
-#line 126
-                } else {
-#line 126
-                    IF (err != 0 && err != NC_ERANGE)
-#line 126
-                        error("OK or Range error: status = %d", err);
-#line 126
-		}
-#line 126
-	    } else {
-#line 126
-		IF (err != NC_ECHAR)
-#line 126
-		    error("wrong type: status = %d", err);
-#line 126
-	    }
-#line 126
-	}
-#line 126
-    }
-#line 126
-    err = nc_close(ncid);
-#line 126
-    IF (err)
-#line 126
-	error("nc_close: %s", nc_strerror(err));
-#line 126
-    print_nok(nok);
-#line 126
-}
-#line 126
-
-void
-#line 127
-test_nc_get_var1_schar(void)
-#line 127
-{
-#line 127
-    int ncid;
-#line 127
-    int i;
-#line 127
-    int j;
-#line 127
-    int err;
-#line 127
-    int nok = 0;      /* count of valid comparisons */
-#line 127
-    size_t index[MAX_RANK];
-#line 127
-    double expect;
-#line 127
-    int canConvert;     /* Both text or both numeric */
-#line 127
-    schar value;
-#line 127
-
-#line 127
-#ifdef USE_PNETCDF
-#line 127
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 127
-#else
-#line 127
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 127
-#endif
-#line 127
-    IF (err)
-#line 127
-	error("nc_open: %s", nc_strerror(err));
-#line 127
-    for (i = 0; i < numVars; i++) {
-#line 127
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_SCHAR == NCT_TEXT);
-#line 127
-	for (j = 0; j < var_rank[i]; j++)
-#line 127
-	    index[j] = 0;
-#line 127
-        err = nc_get_var1_schar(BAD_ID, i, index, &value);
-#line 127
-        IF (err != NC_EBADID)
-#line 127
-	    error("bad ncid: status = %d", err);
-#line 127
-        err = nc_get_var1_schar(ncid, BAD_VARID, index, &value);
-#line 127
-        IF (err != NC_ENOTVAR)
-#line 127
-	    error("bad var id: status = %d", err);
-#line 127
-	for (j = 0; j < var_rank[i]; j++) {
-#line 127
-	    index[j] = var_shape[i][j];
-#line 127
-	    err = nc_get_var1_schar(ncid, i, index, &value);
-#line 127
-	    if(!canConvert) {
-#line 127
-		IF(err != NC_ECHAR)
-#line 127
-			error("conversion: status = %d", err);
-#line 127
-	    } else IF (err != NC_EINVALCOORDS)
-#line 127
-		error("bad index: status = %d", err);
-#line 127
-	    index[j] = 0;
-#line 127
-	}
-#line 127
-	for (j = 0; j < var_nels[i]; j++) {
-#line 127
-	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 127
-	    IF (err)
-#line 127
-		error("error in toMixedBase 1");
-#line 127
-	    expect = hash4( var_type[i], var_rank[i], index, NCT_SCHAR );
-#line 127
-	    if (var_rank[i] == 0 && i%2 )
-#line 127
-		err = nc_get_var1_schar(ncid, i, NULL, &value);
-#line 127
-	    else
-#line 127
-		err = nc_get_var1_schar(ncid, i, index, &value);
-#line 127
-            if (canConvert) {
-#line 127
-		if (inRange3(expect,var_type[i], NCT_SCHAR)) {
-#line 127
-		    if (expect >= schar_min && expect <= schar_max) {
-#line 127
-			IF (err) {
-#line 127
-			    error("%s", nc_strerror(err));
-#line 127
-			} else {
-#line 127
-			    IF (!equal(value,expect,var_type[i],NCT_SCHAR)) {
-#line 127
-				error("expected: %G, got: %G", expect,
-#line 127
-				    (double) value);
-#line 127
-			    } else {
-#line 127
-				nok++;
-#line 127
-			    }
-#line 127
-			}
-#line 127
-		    } else {
-#line 127
-			IF (err != NC_ERANGE)
-#line 127
-			    error("Range error: status = %d", err);
-#line 127
-		    }
-#line 127
-                } else {
-#line 127
-                    IF (err != 0 && err != NC_ERANGE)
-#line 127
-                        error("OK or Range error: status = %d", err);
-#line 127
-		}
-#line 127
-	    } else {
-#line 127
-		IF (err != NC_ECHAR)
-#line 127
-		    error("wrong type: status = %d", err);
-#line 127
-	    }
-#line 127
-	}
-#line 127
-    }
-#line 127
-    err = nc_close(ncid);
-#line 127
-    IF (err)
-#line 127
-	error("nc_close: %s", nc_strerror(err));
-#line 127
-    print_nok(nok);
-#line 127
-}
-#line 127
-
-void
-#line 128
-test_nc_get_var1_short(void)
-#line 128
-{
-#line 128
-    int ncid;
-#line 128
-    int i;
-#line 128
-    int j;
-#line 128
-    int err;
-#line 128
-    int nok = 0;      /* count of valid comparisons */
-#line 128
-    size_t index[MAX_RANK];
-#line 128
-    double expect;
-#line 128
-    int canConvert;     /* Both text or both numeric */
-#line 128
-    short value;
-#line 128
-
-#line 128
-#ifdef USE_PNETCDF
-#line 128
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 128
-#else
-#line 128
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 128
-#endif
-#line 128
-    IF (err)
-#line 128
-	error("nc_open: %s", nc_strerror(err));
-#line 128
-    for (i = 0; i < numVars; i++) {
-#line 128
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_SHORT == NCT_TEXT);
-#line 128
-	for (j = 0; j < var_rank[i]; j++)
-#line 128
-	    index[j] = 0;
-#line 128
-        err = nc_get_var1_short(BAD_ID, i, index, &value);
-#line 128
-        IF (err != NC_EBADID)
-#line 128
-	    error("bad ncid: status = %d", err);
-#line 128
-        err = nc_get_var1_short(ncid, BAD_VARID, index, &value);
-#line 128
-        IF (err != NC_ENOTVAR)
-#line 128
-	    error("bad var id: status = %d", err);
-#line 128
-	for (j = 0; j < var_rank[i]; j++) {
-#line 128
-	    index[j] = var_shape[i][j];
-#line 128
-	    err = nc_get_var1_short(ncid, i, index, &value);
-#line 128
-	    if(!canConvert) {
-#line 128
-		IF(err != NC_ECHAR)
-#line 128
-			error("conversion: status = %d", err);
-#line 128
-	    } else IF (err != NC_EINVALCOORDS)
-#line 128
-		error("bad index: status = %d", err);
-#line 128
-	    index[j] = 0;
-#line 128
-	}
-#line 128
-	for (j = 0; j < var_nels[i]; j++) {
-#line 128
-	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 128
-	    IF (err)
-#line 128
-		error("error in toMixedBase 1");
-#line 128
-	    expect = hash4( var_type[i], var_rank[i], index, NCT_SHORT );
-#line 128
-	    if (var_rank[i] == 0 && i%2 )
-#line 128
-		err = nc_get_var1_short(ncid, i, NULL, &value);
-#line 128
-	    else
-#line 128
-		err = nc_get_var1_short(ncid, i, index, &value);
-#line 128
-            if (canConvert) {
-#line 128
-		if (inRange3(expect,var_type[i], NCT_SHORT)) {
-#line 128
-		    if (expect >= short_min && expect <= short_max) {
-#line 128
-			IF (err) {
-#line 128
-			    error("%s", nc_strerror(err));
-#line 128
-			} else {
-#line 128
-			    IF (!equal(value,expect,var_type[i],NCT_SHORT)) {
-#line 128
-				error("expected: %G, got: %G", expect,
-#line 128
-				    (double) value);
-#line 128
-			    } else {
-#line 128
-				nok++;
-#line 128
-			    }
-#line 128
-			}
-#line 128
-		    } else {
-#line 128
-			IF (err != NC_ERANGE)
-#line 128
-			    error("Range error: status = %d", err);
-#line 128
-		    }
-#line 128
-                } else {
-#line 128
-                    IF (err != 0 && err != NC_ERANGE)
-#line 128
-                        error("OK or Range error: status = %d", err);
-#line 128
-		}
-#line 128
-	    } else {
-#line 128
-		IF (err != NC_ECHAR)
-#line 128
-		    error("wrong type: status = %d", err);
-#line 128
-	    }
-#line 128
-	}
-#line 128
-    }
-#line 128
-    err = nc_close(ncid);
-#line 128
-    IF (err)
-#line 128
-	error("nc_close: %s", nc_strerror(err));
-#line 128
-    print_nok(nok);
-#line 128
-}
-#line 128
-
-void
-#line 129
 test_nc_get_var1_int(void)
-#line 129
+#line 125
 {
-#line 129
+#line 125
     int ncid;
-#line 129
+#line 125
     int i;
-#line 129
+#line 125
     int j;
-#line 129
+#line 125
     int err;
-#line 129
+#line 125
     int nok = 0;      /* count of valid comparisons */
-#line 129
+#line 125
     size_t index[MAX_RANK];
-#line 129
+#line 125
     double expect;
-#line 129
+#line 125
     int canConvert;     /* Both text or both numeric */
-#line 129
+#line 125
     int value;
-#line 129
+#line 125
 
-#line 129
-#ifdef USE_PNETCDF
-#line 129
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 129
-#else
-#line 129
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 129
-#endif
-#line 129
+#line 125
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 125
     IF (err)
-#line 129
+#line 125
 	error("nc_open: %s", nc_strerror(err));
-#line 129
+#line 125
     for (i = 0; i < numVars; i++) {
-#line 129
+#line 125
         canConvert = (var_type[i] == NC_CHAR) == (NCT_INT == NCT_TEXT);
-#line 129
+#line 125
 	for (j = 0; j < var_rank[i]; j++)
-#line 129
+#line 125
 	    index[j] = 0;
-#line 129
+#line 125
         err = nc_get_var1_int(BAD_ID, i, index, &value);
-#line 129
+#line 125
         IF (err != NC_EBADID)
-#line 129
+#line 125
 	    error("bad ncid: status = %d", err);
-#line 129
+#line 125
         err = nc_get_var1_int(ncid, BAD_VARID, index, &value);
-#line 129
+#line 125
         IF (err != NC_ENOTVAR)
-#line 129
+#line 125
 	    error("bad var id: status = %d", err);
-#line 129
+#line 125
 	for (j = 0; j < var_rank[i]; j++) {
-#line 129
+#line 125
 	    index[j] = var_shape[i][j];
-#line 129
+#line 125
 	    err = nc_get_var1_int(ncid, i, index, &value);
-#line 129
+#line 125
 	    if(!canConvert) {
-#line 129
+#line 125
 		IF(err != NC_ECHAR)
-#line 129
+#line 125
 			error("conversion: status = %d", err);
-#line 129
+#line 125
 	    } else IF (err != NC_EINVALCOORDS)
-#line 129
+#line 125
 		error("bad index: status = %d", err);
-#line 129
+#line 125
 	    index[j] = 0;
-#line 129
+#line 125
 	}
-#line 129
+#line 125
 	for (j = 0; j < var_nels[i]; j++) {
-#line 129
+#line 125
 	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 129
+#line 125
 	    IF (err)
-#line 129
+#line 125
 		error("error in toMixedBase 1");
-#line 129
+#line 125
 	    expect = hash4( var_type[i], var_rank[i], index, NCT_INT );
-#line 129
+#line 125
 	    if (var_rank[i] == 0 && i%2 )
-#line 129
+#line 125
 		err = nc_get_var1_int(ncid, i, NULL, &value);
-#line 129
+#line 125
 	    else
-#line 129
+#line 125
 		err = nc_get_var1_int(ncid, i, index, &value);
-#line 129
+#line 125
             if (canConvert) {
-#line 129
+#line 125
 		if (inRange3(expect,var_type[i], NCT_INT)) {
-#line 129
+#line 125
 		    if (expect >= int_min && expect <= int_max) {
-#line 129
+#line 125
 			IF (err) {
-#line 129
+#line 125
 			    error("%s", nc_strerror(err));
-#line 129
+#line 125
 			} else {
-#line 129
+#line 125
 			    IF (!equal(value,expect,var_type[i],NCT_INT)) {
-#line 129
+#line 125
 				error("expected: %G, got: %G", expect,
-#line 129
+#line 125
 				    (double) value);
-#line 129
+#line 125
 			    } else {
-#line 129
+#line 125
 				nok++;
-#line 129
+#line 125
 			    }
-#line 129
+#line 125
 			}
-#line 129
+#line 125
 		    } else {
-#line 129
+#line 125
 			IF (err != NC_ERANGE)
-#line 129
+#line 125
 			    error("Range error: status = %d", err);
-#line 129
+#line 125
 		    }
-#line 129
+#line 125
                 } else {
-#line 129
+#line 125
                     IF (err != 0 && err != NC_ERANGE)
-#line 129
+#line 125
                         error("OK or Range error: status = %d", err);
-#line 129
+#line 125
 		}
-#line 129
+#line 125
 	    } else {
-#line 129
+#line 125
 		IF (err != NC_ECHAR)
-#line 129
+#line 125
 		    error("wrong type: status = %d", err);
-#line 129
+#line 125
 	    }
-#line 129
+#line 125
 	}
-#line 129
+#line 125
     }
-#line 129
+#line 125
     err = nc_close(ncid);
-#line 129
+#line 125
     IF (err)
-#line 129
+#line 125
 	error("nc_close: %s", nc_strerror(err));
-#line 129
+#line 125
     print_nok(nok);
-#line 129
+#line 125
 }
-#line 129
+#line 125
 
 void
-#line 130
+#line 126
 test_nc_get_var1_long(void)
-#line 130
+#line 126
 {
-#line 130
+#line 126
     int ncid;
-#line 130
+#line 126
     int i;
-#line 130
+#line 126
     int j;
-#line 130
+#line 126
     int err;
-#line 130
+#line 126
     int nok = 0;      /* count of valid comparisons */
-#line 130
+#line 126
     size_t index[MAX_RANK];
-#line 130
+#line 126
     double expect;
-#line 130
+#line 126
     int canConvert;     /* Both text or both numeric */
-#line 130
+#line 126
     long value;
-#line 130
+#line 126
 
-#line 130
-#ifdef USE_PNETCDF
-#line 130
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 130
-#else
-#line 130
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 130
-#endif
-#line 130
+#line 126
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 126
     IF (err)
-#line 130
+#line 126
 	error("nc_open: %s", nc_strerror(err));
-#line 130
+#line 126
     for (i = 0; i < numVars; i++) {
-#line 130
+#line 126
         canConvert = (var_type[i] == NC_CHAR) == (NCT_LONG == NCT_TEXT);
-#line 130
+#line 126
 	for (j = 0; j < var_rank[i]; j++)
-#line 130
+#line 126
 	    index[j] = 0;
-#line 130
+#line 126
         err = nc_get_var1_long(BAD_ID, i, index, &value);
-#line 130
+#line 126
         IF (err != NC_EBADID)
-#line 130
+#line 126
 	    error("bad ncid: status = %d", err);
-#line 130
+#line 126
         err = nc_get_var1_long(ncid, BAD_VARID, index, &value);
-#line 130
+#line 126
         IF (err != NC_ENOTVAR)
-#line 130
+#line 126
 	    error("bad var id: status = %d", err);
-#line 130
+#line 126
 	for (j = 0; j < var_rank[i]; j++) {
-#line 130
+#line 126
 	    index[j] = var_shape[i][j];
-#line 130
+#line 126
 	    err = nc_get_var1_long(ncid, i, index, &value);
-#line 130
+#line 126
 	    if(!canConvert) {
-#line 130
+#line 126
 		IF(err != NC_ECHAR)
-#line 130
+#line 126
 			error("conversion: status = %d", err);
-#line 130
+#line 126
 	    } else IF (err != NC_EINVALCOORDS)
-#line 130
+#line 126
 		error("bad index: status = %d", err);
-#line 130
+#line 126
 	    index[j] = 0;
-#line 130
+#line 126
 	}
-#line 130
+#line 126
 	for (j = 0; j < var_nels[i]; j++) {
-#line 130
+#line 126
 	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 130
+#line 126
 	    IF (err)
-#line 130
+#line 126
 		error("error in toMixedBase 1");
-#line 130
+#line 126
 	    expect = hash4( var_type[i], var_rank[i], index, NCT_LONG );
-#line 130
+#line 126
 	    if (var_rank[i] == 0 && i%2 )
-#line 130
+#line 126
 		err = nc_get_var1_long(ncid, i, NULL, &value);
-#line 130
+#line 126
 	    else
-#line 130
+#line 126
 		err = nc_get_var1_long(ncid, i, index, &value);
-#line 130
+#line 126
             if (canConvert) {
-#line 130
+#line 126
 		if (inRange3(expect,var_type[i], NCT_LONG)) {
-#line 130
+#line 126
 		    if (expect >= long_min && expect <= long_max) {
-#line 130
+#line 126
 			IF (err) {
-#line 130
+#line 126
 			    error("%s", nc_strerror(err));
-#line 130
+#line 126
 			} else {
-#line 130
+#line 126
 			    IF (!equal(value,expect,var_type[i],NCT_LONG)) {
-#line 130
+#line 126
 				error("expected: %G, got: %G", expect,
-#line 130
+#line 126
 				    (double) value);
-#line 130
+#line 126
 			    } else {
-#line 130
+#line 126
 				nok++;
-#line 130
+#line 126
 			    }
-#line 130
+#line 126
 			}
-#line 130
+#line 126
 		    } else {
-#line 130
+#line 126
 			IF (err != NC_ERANGE)
-#line 130
+#line 126
 			    error("Range error: status = %d", err);
-#line 130
+#line 126
 		    }
-#line 130
+#line 126
                 } else {
-#line 130
+#line 126
                     IF (err != 0 && err != NC_ERANGE)
-#line 130
+#line 126
                         error("OK or Range error: status = %d", err);
-#line 130
+#line 126
 		}
-#line 130
+#line 126
 	    } else {
-#line 130
+#line 126
 		IF (err != NC_ECHAR)
-#line 130
+#line 126
 		    error("wrong type: status = %d", err);
-#line 130
+#line 126
 	    }
-#line 130
+#line 126
 	}
-#line 130
+#line 126
     }
-#line 130
+#line 126
     err = nc_close(ncid);
-#line 130
+#line 126
     IF (err)
-#line 130
+#line 126
 	error("nc_close: %s", nc_strerror(err));
-#line 130
+#line 126
     print_nok(nok);
-#line 130
+#line 126
 }
-#line 130
+#line 126
 
 void
-#line 131
+#line 127
 test_nc_get_var1_float(void)
-#line 131
+#line 127
 {
-#line 131
+#line 127
     int ncid;
-#line 131
+#line 127
     int i;
-#line 131
+#line 127
     int j;
-#line 131
+#line 127
     int err;
-#line 131
+#line 127
     int nok = 0;      /* count of valid comparisons */
-#line 131
+#line 127
     size_t index[MAX_RANK];
-#line 131
+#line 127
     double expect;
-#line 131
+#line 127
     int canConvert;     /* Both text or both numeric */
-#line 131
+#line 127
     float value;
-#line 131
+#line 127
 
-#line 131
-#ifdef USE_PNETCDF
-#line 131
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 131
-#else
-#line 131
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 131
-#endif
-#line 131
+#line 127
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 127
     IF (err)
-#line 131
+#line 127
 	error("nc_open: %s", nc_strerror(err));
-#line 131
+#line 127
     for (i = 0; i < numVars; i++) {
-#line 131
+#line 127
         canConvert = (var_type[i] == NC_CHAR) == (NCT_FLOAT == NCT_TEXT);
-#line 131
+#line 127
 	for (j = 0; j < var_rank[i]; j++)
-#line 131
+#line 127
 	    index[j] = 0;
-#line 131
+#line 127
         err = nc_get_var1_float(BAD_ID, i, index, &value);
-#line 131
+#line 127
         IF (err != NC_EBADID)
-#line 131
+#line 127
 	    error("bad ncid: status = %d", err);
-#line 131
+#line 127
         err = nc_get_var1_float(ncid, BAD_VARID, index, &value);
-#line 131
+#line 127
         IF (err != NC_ENOTVAR)
-#line 131
+#line 127
 	    error("bad var id: status = %d", err);
-#line 131
+#line 127
 	for (j = 0; j < var_rank[i]; j++) {
-#line 131
+#line 127
 	    index[j] = var_shape[i][j];
-#line 131
+#line 127
 	    err = nc_get_var1_float(ncid, i, index, &value);
-#line 131
+#line 127
 	    if(!canConvert) {
-#line 131
+#line 127
 		IF(err != NC_ECHAR)
-#line 131
+#line 127
 			error("conversion: status = %d", err);
-#line 131
+#line 127
 	    } else IF (err != NC_EINVALCOORDS)
-#line 131
+#line 127
 		error("bad index: status = %d", err);
-#line 131
+#line 127
 	    index[j] = 0;
-#line 131
+#line 127
 	}
-#line 131
+#line 127
 	for (j = 0; j < var_nels[i]; j++) {
-#line 131
+#line 127
 	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 131
+#line 127
 	    IF (err)
-#line 131
+#line 127
 		error("error in toMixedBase 1");
-#line 131
+#line 127
 	    expect = hash4( var_type[i], var_rank[i], index, NCT_FLOAT );
-#line 131
+#line 127
 	    if (var_rank[i] == 0 && i%2 )
-#line 131
+#line 127
 		err = nc_get_var1_float(ncid, i, NULL, &value);
-#line 131
+#line 127
 	    else
-#line 131
+#line 127
 		err = nc_get_var1_float(ncid, i, index, &value);
-#line 131
+#line 127
             if (canConvert) {
-#line 131
+#line 127
 		if (inRange3(expect,var_type[i], NCT_FLOAT)) {
-#line 131
+#line 127
 		    if (expect >= float_min && expect <= float_max) {
-#line 131
+#line 127
 			IF (err) {
-#line 131
+#line 127
 			    error("%s", nc_strerror(err));
-#line 131
+#line 127
 			} else {
-#line 131
+#line 127
 			    IF (!equal(value,expect,var_type[i],NCT_FLOAT)) {
-#line 131
+#line 127
 				error("expected: %G, got: %G", expect,
-#line 131
+#line 127
 				    (double) value);
-#line 131
+#line 127
 			    } else {
-#line 131
+#line 127
 				nok++;
-#line 131
+#line 127
 			    }
-#line 131
+#line 127
 			}
-#line 131
+#line 127
 		    } else {
-#line 131
+#line 127
 			IF (err != NC_ERANGE)
-#line 131
+#line 127
 			    error("Range error: status = %d", err);
-#line 131
+#line 127
 		    }
-#line 131
+#line 127
                 } else {
-#line 131
+#line 127
                     IF (err != 0 && err != NC_ERANGE)
-#line 131
+#line 127
                         error("OK or Range error: status = %d", err);
-#line 131
+#line 127
 		}
-#line 131
+#line 127
 	    } else {
-#line 131
+#line 127
 		IF (err != NC_ECHAR)
-#line 131
+#line 127
 		    error("wrong type: status = %d", err);
-#line 131
+#line 127
 	    }
-#line 131
+#line 127
 	}
-#line 131
+#line 127
     }
-#line 131
+#line 127
     err = nc_close(ncid);
-#line 131
+#line 127
     IF (err)
-#line 131
+#line 127
 	error("nc_close: %s", nc_strerror(err));
-#line 131
+#line 127
     print_nok(nok);
-#line 131
+#line 127
 }
-#line 131
+#line 127
 
 void
-#line 132
+#line 128
 test_nc_get_var1_double(void)
-#line 132
+#line 128
 {
-#line 132
+#line 128
     int ncid;
-#line 132
+#line 128
     int i;
-#line 132
+#line 128
     int j;
-#line 132
+#line 128
     int err;
-#line 132
+#line 128
     int nok = 0;      /* count of valid comparisons */
-#line 132
+#line 128
     size_t index[MAX_RANK];
-#line 132
+#line 128
     double expect;
-#line 132
+#line 128
     int canConvert;     /* Both text or both numeric */
-#line 132
+#line 128
     double value;
-#line 132
+#line 128
 
-#line 132
-#ifdef USE_PNETCDF
-#line 132
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 132
-#else
-#line 132
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 132
-#endif
-#line 132
+#line 128
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 128
     IF (err)
-#line 132
+#line 128
 	error("nc_open: %s", nc_strerror(err));
-#line 132
+#line 128
     for (i = 0; i < numVars; i++) {
-#line 132
+#line 128
         canConvert = (var_type[i] == NC_CHAR) == (NCT_DOUBLE == NCT_TEXT);
-#line 132
+#line 128
 	for (j = 0; j < var_rank[i]; j++)
-#line 132
+#line 128
 	    index[j] = 0;
-#line 132
+#line 128
         err = nc_get_var1_double(BAD_ID, i, index, &value);
-#line 132
+#line 128
         IF (err != NC_EBADID)
-#line 132
+#line 128
 	    error("bad ncid: status = %d", err);
-#line 132
+#line 128
         err = nc_get_var1_double(ncid, BAD_VARID, index, &value);
-#line 132
+#line 128
         IF (err != NC_ENOTVAR)
-#line 132
+#line 128
 	    error("bad var id: status = %d", err);
-#line 132
+#line 128
 	for (j = 0; j < var_rank[i]; j++) {
-#line 132
+#line 128
 	    index[j] = var_shape[i][j];
-#line 132
+#line 128
 	    err = nc_get_var1_double(ncid, i, index, &value);
-#line 132
+#line 128
 	    if(!canConvert) {
-#line 132
+#line 128
 		IF(err != NC_ECHAR)
-#line 132
+#line 128
 			error("conversion: status = %d", err);
-#line 132
+#line 128
 	    } else IF (err != NC_EINVALCOORDS)
-#line 132
+#line 128
 		error("bad index: status = %d", err);
-#line 132
+#line 128
 	    index[j] = 0;
-#line 132
+#line 128
 	}
-#line 132
+#line 128
 	for (j = 0; j < var_nels[i]; j++) {
-#line 132
+#line 128
 	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 132
+#line 128
 	    IF (err)
-#line 132
+#line 128
 		error("error in toMixedBase 1");
-#line 132
+#line 128
 	    expect = hash4( var_type[i], var_rank[i], index, NCT_DOUBLE );
-#line 132
+#line 128
 	    if (var_rank[i] == 0 && i%2 )
-#line 132
+#line 128
 		err = nc_get_var1_double(ncid, i, NULL, &value);
-#line 132
+#line 128
 	    else
-#line 132
+#line 128
 		err = nc_get_var1_double(ncid, i, index, &value);
-#line 132
+#line 128
             if (canConvert) {
-#line 132
+#line 128
 		if (inRange3(expect,var_type[i], NCT_DOUBLE)) {
-#line 132
+#line 128
 		    if (expect >= double_min && expect <= double_max) {
-#line 132
+#line 128
 			IF (err) {
-#line 132
+#line 128
 			    error("%s", nc_strerror(err));
-#line 132
+#line 128
 			} else {
-#line 132
+#line 128
 			    IF (!equal(value,expect,var_type[i],NCT_DOUBLE)) {
-#line 132
+#line 128
 				error("expected: %G, got: %G", expect,
-#line 132
+#line 128
 				    (double) value);
-#line 132
+#line 128
 			    } else {
-#line 132
+#line 128
 				nok++;
-#line 132
+#line 128
 			    }
-#line 132
+#line 128
 			}
-#line 132
+#line 128
 		    } else {
-#line 132
+#line 128
 			IF (err != NC_ERANGE)
-#line 132
+#line 128
 			    error("Range error: status = %d", err);
-#line 132
+#line 128
 		    }
-#line 132
+#line 128
                 } else {
-#line 132
+#line 128
                     IF (err != 0 && err != NC_ERANGE)
-#line 132
+#line 128
                         error("OK or Range error: status = %d", err);
-#line 132
+#line 128
 		}
-#line 132
+#line 128
 	    } else {
-#line 132
+#line 128
 		IF (err != NC_ECHAR)
-#line 132
+#line 128
 		    error("wrong type: status = %d", err);
-#line 132
+#line 128
 	    }
-#line 132
+#line 128
 	}
-#line 132
+#line 128
     }
-#line 132
+#line 128
     err = nc_close(ncid);
-#line 132
+#line 128
     IF (err)
-#line 132
+#line 128
 	error("nc_close: %s", nc_strerror(err));
-#line 132
+#line 128
     print_nok(nok);
-#line 132
+#line 128
 }
-#line 132
+#line 128
 
 void
-#line 133
+#line 129
 test_nc_get_var1_ushort(void)
-#line 133
+#line 129
 {
-#line 133
+#line 129
     int ncid;
-#line 133
+#line 129
     int i;
-#line 133
+#line 129
     int j;
-#line 133
+#line 129
     int err;
-#line 133
+#line 129
     int nok = 0;      /* count of valid comparisons */
-#line 133
+#line 129
     size_t index[MAX_RANK];
-#line 133
+#line 129
     double expect;
-#line 133
+#line 129
     int canConvert;     /* Both text or both numeric */
-#line 133
+#line 129
     ushort value;
-#line 133
+#line 129
 
-#line 133
-#ifdef USE_PNETCDF
-#line 133
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 133
-#else
-#line 133
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 133
-#endif
-#line 133
+#line 129
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 129
     IF (err)
-#line 133
+#line 129
 	error("nc_open: %s", nc_strerror(err));
-#line 133
+#line 129
     for (i = 0; i < numVars; i++) {
-#line 133
+#line 129
         canConvert = (var_type[i] == NC_CHAR) == (NCT_USHORT == NCT_TEXT);
-#line 133
+#line 129
 	for (j = 0; j < var_rank[i]; j++)
-#line 133
+#line 129
 	    index[j] = 0;
-#line 133
+#line 129
         err = nc_get_var1_ushort(BAD_ID, i, index, &value);
-#line 133
+#line 129
         IF (err != NC_EBADID)
-#line 133
+#line 129
 	    error("bad ncid: status = %d", err);
-#line 133
+#line 129
         err = nc_get_var1_ushort(ncid, BAD_VARID, index, &value);
-#line 133
+#line 129
         IF (err != NC_ENOTVAR)
-#line 133
+#line 129
 	    error("bad var id: status = %d", err);
-#line 133
+#line 129
 	for (j = 0; j < var_rank[i]; j++) {
-#line 133
+#line 129
 	    index[j] = var_shape[i][j];
-#line 133
+#line 129
 	    err = nc_get_var1_ushort(ncid, i, index, &value);
-#line 133
+#line 129
 	    if(!canConvert) {
-#line 133
+#line 129
 		IF(err != NC_ECHAR)
-#line 133
+#line 129
 			error("conversion: status = %d", err);
-#line 133
+#line 129
 	    } else IF (err != NC_EINVALCOORDS)
-#line 133
+#line 129
 		error("bad index: status = %d", err);
-#line 133
+#line 129
 	    index[j] = 0;
-#line 133
+#line 129
 	}
-#line 133
+#line 129
 	for (j = 0; j < var_nels[i]; j++) {
-#line 133
+#line 129
 	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 133
+#line 129
 	    IF (err)
-#line 133
+#line 129
 		error("error in toMixedBase 1");
-#line 133
+#line 129
 	    expect = hash4( var_type[i], var_rank[i], index, NCT_USHORT );
-#line 133
+#line 129
 	    if (var_rank[i] == 0 && i%2 )
-#line 133
+#line 129
 		err = nc_get_var1_ushort(ncid, i, NULL, &value);
-#line 133
+#line 129
 	    else
-#line 133
+#line 129
 		err = nc_get_var1_ushort(ncid, i, index, &value);
-#line 133
+#line 129
             if (canConvert) {
-#line 133
+#line 129
 		if (inRange3(expect,var_type[i], NCT_USHORT)) {
-#line 133
+#line 129
 		    if (expect >= ushort_min && expect <= ushort_max) {
-#line 133
+#line 129
 			IF (err) {
-#line 133
+#line 129
 			    error("%s", nc_strerror(err));
-#line 133
+#line 129
 			} else {
-#line 133
+#line 129
 			    IF (!equal(value,expect,var_type[i],NCT_USHORT)) {
-#line 133
+#line 129
 				error("expected: %G, got: %G", expect,
-#line 133
+#line 129
 				    (double) value);
-#line 133
+#line 129
 			    } else {
-#line 133
+#line 129
 				nok++;
-#line 133
+#line 129
 			    }
-#line 133
+#line 129
 			}
-#line 133
+#line 129
 		    } else {
-#line 133
+#line 129
 			IF (err != NC_ERANGE)
-#line 133
+#line 129
 			    error("Range error: status = %d", err);
-#line 133
+#line 129
 		    }
-#line 133
+#line 129
                 } else {
-#line 133
+#line 129
                     IF (err != 0 && err != NC_ERANGE)
-#line 133
+#line 129
                         error("OK or Range error: status = %d", err);
-#line 133
+#line 129
 		}
-#line 133
+#line 129
 	    } else {
-#line 133
+#line 129
 		IF (err != NC_ECHAR)
-#line 133
+#line 129
 		    error("wrong type: status = %d", err);
-#line 133
+#line 129
 	    }
-#line 133
+#line 129
 	}
-#line 133
+#line 129
     }
-#line 133
+#line 129
     err = nc_close(ncid);
-#line 133
+#line 129
     IF (err)
-#line 133
+#line 129
 	error("nc_close: %s", nc_strerror(err));
-#line 133
+#line 129
     print_nok(nok);
-#line 133
+#line 129
 }
-#line 133
+#line 129
 
 void
-#line 134
+#line 130
 test_nc_get_var1_uint(void)
-#line 134
+#line 130
 {
-#line 134
+#line 130
     int ncid;
-#line 134
+#line 130
     int i;
-#line 134
+#line 130
     int j;
-#line 134
+#line 130
     int err;
-#line 134
+#line 130
     int nok = 0;      /* count of valid comparisons */
-#line 134
+#line 130
     size_t index[MAX_RANK];
-#line 134
+#line 130
     double expect;
-#line 134
+#line 130
     int canConvert;     /* Both text or both numeric */
-#line 134
+#line 130
     uint value;
-#line 134
+#line 130
 
-#line 134
-#ifdef USE_PNETCDF
-#line 134
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 134
-#else
-#line 134
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 134
-#endif
-#line 134
+#line 130
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 130
     IF (err)
-#line 134
+#line 130
 	error("nc_open: %s", nc_strerror(err));
-#line 134
+#line 130
     for (i = 0; i < numVars; i++) {
-#line 134
+#line 130
         canConvert = (var_type[i] == NC_CHAR) == (NCT_UINT == NCT_TEXT);
-#line 134
+#line 130
 	for (j = 0; j < var_rank[i]; j++)
-#line 134
+#line 130
 	    index[j] = 0;
-#line 134
+#line 130
         err = nc_get_var1_uint(BAD_ID, i, index, &value);
-#line 134
+#line 130
         IF (err != NC_EBADID)
-#line 134
+#line 130
 	    error("bad ncid: status = %d", err);
-#line 134
+#line 130
         err = nc_get_var1_uint(ncid, BAD_VARID, index, &value);
-#line 134
+#line 130
         IF (err != NC_ENOTVAR)
-#line 134
+#line 130
 	    error("bad var id: status = %d", err);
-#line 134
+#line 130
 	for (j = 0; j < var_rank[i]; j++) {
-#line 134
+#line 130
 	    index[j] = var_shape[i][j];
-#line 134
+#line 130
 	    err = nc_get_var1_uint(ncid, i, index, &value);
-#line 134
+#line 130
 	    if(!canConvert) {
-#line 134
+#line 130
 		IF(err != NC_ECHAR)
-#line 134
+#line 130
 			error("conversion: status = %d", err);
-#line 134
+#line 130
 	    } else IF (err != NC_EINVALCOORDS)
-#line 134
+#line 130
 		error("bad index: status = %d", err);
-#line 134
+#line 130
 	    index[j] = 0;
-#line 134
+#line 130
 	}
-#line 134
+#line 130
 	for (j = 0; j < var_nels[i]; j++) {
-#line 134
+#line 130
 	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 134
+#line 130
 	    IF (err)
-#line 134
+#line 130
 		error("error in toMixedBase 1");
-#line 134
+#line 130
 	    expect = hash4( var_type[i], var_rank[i], index, NCT_UINT );
-#line 134
+#line 130
 	    if (var_rank[i] == 0 && i%2 )
-#line 134
+#line 130
 		err = nc_get_var1_uint(ncid, i, NULL, &value);
-#line 134
+#line 130
 	    else
-#line 134
+#line 130
 		err = nc_get_var1_uint(ncid, i, index, &value);
-#line 134
+#line 130
             if (canConvert) {
-#line 134
+#line 130
 		if (inRange3(expect,var_type[i], NCT_UINT)) {
-#line 134
+#line 130
 		    if (expect >= uint_min && expect <= uint_max) {
-#line 134
+#line 130
 			IF (err) {
-#line 134
+#line 130
 			    error("%s", nc_strerror(err));
-#line 134
+#line 130
 			} else {
-#line 134
+#line 130
 			    IF (!equal(value,expect,var_type[i],NCT_UINT)) {
-#line 134
+#line 130
 				error("expected: %G, got: %G", expect,
-#line 134
+#line 130
 				    (double) value);
-#line 134
+#line 130
 			    } else {
-#line 134
+#line 130
 				nok++;
-#line 134
+#line 130
 			    }
-#line 134
+#line 130
 			}
-#line 134
+#line 130
 		    } else {
-#line 134
+#line 130
 			IF (err != NC_ERANGE)
-#line 134
+#line 130
 			    error("Range error: status = %d", err);
-#line 134
+#line 130
 		    }
-#line 134
+#line 130
                 } else {
-#line 134
+#line 130
                     IF (err != 0 && err != NC_ERANGE)
-#line 134
+#line 130
                         error("OK or Range error: status = %d", err);
-#line 134
+#line 130
 		}
-#line 134
+#line 130
 	    } else {
-#line 134
+#line 130
 		IF (err != NC_ECHAR)
-#line 134
+#line 130
 		    error("wrong type: status = %d", err);
-#line 134
+#line 130
 	    }
-#line 134
+#line 130
 	}
-#line 134
+#line 130
     }
-#line 134
+#line 130
     err = nc_close(ncid);
-#line 134
+#line 130
     IF (err)
-#line 134
+#line 130
 	error("nc_close: %s", nc_strerror(err));
-#line 134
+#line 130
     print_nok(nok);
-#line 134
+#line 130
 }
-#line 134
+#line 130
 
 void
-#line 135
+#line 131
 test_nc_get_var1_longlong(void)
-#line 135
+#line 131
 {
-#line 135
+#line 131
     int ncid;
-#line 135
+#line 131
     int i;
-#line 135
+#line 131
     int j;
-#line 135
+#line 131
     int err;
-#line 135
+#line 131
     int nok = 0;      /* count of valid comparisons */
-#line 135
+#line 131
     size_t index[MAX_RANK];
-#line 135
+#line 131
     double expect;
-#line 135
+#line 131
     int canConvert;     /* Both text or both numeric */
-#line 135
+#line 131
     longlong value;
-#line 135
+#line 131
 
-#line 135
-#ifdef USE_PNETCDF
-#line 135
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 135
-#else
-#line 135
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 135
-#endif
-#line 135
+#line 131
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 131
     IF (err)
-#line 135
+#line 131
 	error("nc_open: %s", nc_strerror(err));
-#line 135
+#line 131
     for (i = 0; i < numVars; i++) {
-#line 135
+#line 131
         canConvert = (var_type[i] == NC_CHAR) == (NCT_LONGLONG == NCT_TEXT);
-#line 135
+#line 131
 	for (j = 0; j < var_rank[i]; j++)
-#line 135
+#line 131
 	    index[j] = 0;
-#line 135
+#line 131
         err = nc_get_var1_longlong(BAD_ID, i, index, &value);
-#line 135
+#line 131
         IF (err != NC_EBADID)
-#line 135
+#line 131
 	    error("bad ncid: status = %d", err);
-#line 135
+#line 131
         err = nc_get_var1_longlong(ncid, BAD_VARID, index, &value);
-#line 135
+#line 131
         IF (err != NC_ENOTVAR)
-#line 135
+#line 131
 	    error("bad var id: status = %d", err);
-#line 135
+#line 131
 	for (j = 0; j < var_rank[i]; j++) {
-#line 135
+#line 131
 	    index[j] = var_shape[i][j];
-#line 135
+#line 131
 	    err = nc_get_var1_longlong(ncid, i, index, &value);
-#line 135
+#line 131
 	    if(!canConvert) {
-#line 135
+#line 131
 		IF(err != NC_ECHAR)
-#line 135
+#line 131
 			error("conversion: status = %d", err);
-#line 135
+#line 131
 	    } else IF (err != NC_EINVALCOORDS)
-#line 135
+#line 131
 		error("bad index: status = %d", err);
-#line 135
+#line 131
 	    index[j] = 0;
-#line 135
+#line 131
 	}
-#line 135
+#line 131
 	for (j = 0; j < var_nels[i]; j++) {
-#line 135
+#line 131
 	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 135
+#line 131
 	    IF (err)
-#line 135
+#line 131
 		error("error in toMixedBase 1");
-#line 135
+#line 131
 	    expect = hash4( var_type[i], var_rank[i], index, NCT_LONGLONG );
-#line 135
+#line 131
 	    if (var_rank[i] == 0 && i%2 )
-#line 135
+#line 131
 		err = nc_get_var1_longlong(ncid, i, NULL, &value);
-#line 135
+#line 131
 	    else
-#line 135
+#line 131
 		err = nc_get_var1_longlong(ncid, i, index, &value);
-#line 135
+#line 131
             if (canConvert) {
-#line 135
+#line 131
 		if (inRange3(expect,var_type[i], NCT_LONGLONG)) {
-#line 135
+#line 131
 		    if (expect >= longlong_min && expect <= longlong_max) {
-#line 135
+#line 131
 			IF (err) {
-#line 135
+#line 131
 			    error("%s", nc_strerror(err));
-#line 135
+#line 131
 			} else {
-#line 135
+#line 131
 			    IF (!equal(value,expect,var_type[i],NCT_LONGLONG)) {
-#line 135
+#line 131
 				error("expected: %G, got: %G", expect,
-#line 135
+#line 131
 				    (double) value);
-#line 135
+#line 131
 			    } else {
-#line 135
+#line 131
 				nok++;
-#line 135
+#line 131
 			    }
-#line 135
+#line 131
 			}
-#line 135
+#line 131
 		    } else {
-#line 135
+#line 131
 			IF (err != NC_ERANGE)
-#line 135
+#line 131
 			    error("Range error: status = %d", err);
-#line 135
+#line 131
 		    }
-#line 135
+#line 131
                 } else {
-#line 135
+#line 131
                     IF (err != 0 && err != NC_ERANGE)
-#line 135
+#line 131
                         error("OK or Range error: status = %d", err);
-#line 135
+#line 131
 		}
-#line 135
+#line 131
 	    } else {
-#line 135
+#line 131
 		IF (err != NC_ECHAR)
-#line 135
+#line 131
 		    error("wrong type: status = %d", err);
-#line 135
+#line 131
 	    }
-#line 135
+#line 131
 	}
-#line 135
+#line 131
     }
-#line 135
+#line 131
     err = nc_close(ncid);
-#line 135
+#line 131
     IF (err)
-#line 135
+#line 131
 	error("nc_close: %s", nc_strerror(err));
-#line 135
+#line 131
     print_nok(nok);
-#line 135
+#line 131
 }
-#line 135
+#line 131
 
 void
-#line 136
+#line 132
 test_nc_get_var1_ulonglong(void)
-#line 136
+#line 132
 {
-#line 136
+#line 132
     int ncid;
-#line 136
+#line 132
     int i;
-#line 136
+#line 132
     int j;
-#line 136
+#line 132
     int err;
-#line 136
+#line 132
     int nok = 0;      /* count of valid comparisons */
-#line 136
+#line 132
     size_t index[MAX_RANK];
-#line 136
+#line 132
     double expect;
-#line 136
+#line 132
     int canConvert;     /* Both text or both numeric */
-#line 136
+#line 132
     ulonglong value;
-#line 136
+#line 132
 
-#line 136
-#ifdef USE_PNETCDF
-#line 136
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 136
-#else
-#line 136
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 136
-#endif
-#line 136
+#line 132
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 132
     IF (err)
-#line 136
+#line 132
 	error("nc_open: %s", nc_strerror(err));
-#line 136
+#line 132
     for (i = 0; i < numVars; i++) {
-#line 136
+#line 132
         canConvert = (var_type[i] == NC_CHAR) == (NCT_ULONGLONG == NCT_TEXT);
-#line 136
+#line 132
 	for (j = 0; j < var_rank[i]; j++)
-#line 136
+#line 132
 	    index[j] = 0;
-#line 136
+#line 132
         err = nc_get_var1_ulonglong(BAD_ID, i, index, &value);
-#line 136
+#line 132
         IF (err != NC_EBADID)
-#line 136
+#line 132
 	    error("bad ncid: status = %d", err);
-#line 136
+#line 132
         err = nc_get_var1_ulonglong(ncid, BAD_VARID, index, &value);
-#line 136
+#line 132
         IF (err != NC_ENOTVAR)
-#line 136
+#line 132
 	    error("bad var id: status = %d", err);
-#line 136
+#line 132
 	for (j = 0; j < var_rank[i]; j++) {
-#line 136
+#line 132
 	    index[j] = var_shape[i][j];
-#line 136
+#line 132
 	    err = nc_get_var1_ulonglong(ncid, i, index, &value);
-#line 136
+#line 132
 	    if(!canConvert) {
-#line 136
+#line 132
 		IF(err != NC_ECHAR)
-#line 136
+#line 132
 			error("conversion: status = %d", err);
-#line 136
+#line 132
 	    } else IF (err != NC_EINVALCOORDS)
-#line 136
+#line 132
 		error("bad index: status = %d", err);
-#line 136
+#line 132
 	    index[j] = 0;
-#line 136
+#line 132
 	}
-#line 136
+#line 132
 	for (j = 0; j < var_nels[i]; j++) {
-#line 136
+#line 132
 	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 136
+#line 132
 	    IF (err)
-#line 136
+#line 132
 		error("error in toMixedBase 1");
-#line 136
+#line 132
 	    expect = hash4( var_type[i], var_rank[i], index, NCT_ULONGLONG );
-#line 136
+#line 132
 	    if (var_rank[i] == 0 && i%2 )
-#line 136
+#line 132
 		err = nc_get_var1_ulonglong(ncid, i, NULL, &value);
-#line 136
+#line 132
 	    else
-#line 136
+#line 132
 		err = nc_get_var1_ulonglong(ncid, i, index, &value);
-#line 136
+#line 132
             if (canConvert) {
-#line 136
+#line 132
 		if (inRange3(expect,var_type[i], NCT_ULONGLONG)) {
-#line 136
+#line 132
 		    if (expect >= ulonglong_min && expect <= ulonglong_max) {
-#line 136
+#line 132
 			IF (err) {
-#line 136
+#line 132
 			    error("%s", nc_strerror(err));
-#line 136
+#line 132
 			} else {
-#line 136
+#line 132
 			    IF (!equal(value,expect,var_type[i],NCT_ULONGLONG)) {
-#line 136
+#line 132
 				error("expected: %G, got: %G", expect,
-#line 136
+#line 132
 				    (double) value);
-#line 136
+#line 132
 			    } else {
-#line 136
+#line 132
 				nok++;
-#line 136
+#line 132
 			    }
-#line 136
+#line 132
 			}
-#line 136
+#line 132
 		    } else {
-#line 136
+#line 132
 			IF (err != NC_ERANGE)
-#line 136
+#line 132
 			    error("Range error: status = %d", err);
-#line 136
+#line 132
 		    }
-#line 136
+#line 132
                 } else {
-#line 136
+#line 132
                     IF (err != 0 && err != NC_ERANGE)
-#line 136
+#line 132
                         error("OK or Range error: status = %d", err);
-#line 136
+#line 132
 		}
-#line 136
+#line 132
 	    } else {
-#line 136
+#line 132
 		IF (err != NC_ECHAR)
-#line 136
+#line 132
 		    error("wrong type: status = %d", err);
-#line 136
+#line 132
 	    }
-#line 136
+#line 132
 	}
-#line 136
+#line 132
     }
-#line 136
+#line 132
     err = nc_close(ncid);
-#line 136
+#line 132
     IF (err)
-#line 136
+#line 132
 	error("nc_close: %s", nc_strerror(err));
-#line 136
+#line 132
     print_nok(nok);
-#line 136
+#line 132
 }
-#line 136
+#line 132
 
 
 
+#line 229
+
+void
+#line 230
+test_nc_get_var_text(void)
+#line 230
+{
+#line 230
+    int ncid;
+#line 230
+    int i;
+#line 230
+    int j;
+#line 230
+    int err;
+#line 230
+    int allInExtRange;	/* all values within external range? */
+#line 230
+    int allInIntRange;	/* all values within internal range? */
+#line 230
+    int nels;
+#line 230
+    int nok = 0;      /* count of valid comparisons */
+#line 230
+    size_t index[MAX_RANK];
+#line 230
+    int canConvert;     /* Both text or both numeric */
+#line 230
+    text value[MAX_NELS];
+#line 230
+    double expect[MAX_NELS];
+#line 230
+
+#line 230
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 230
+    IF (err)
+#line 230
+	error("nc_open: %s", nc_strerror(err));
+#line 230
+    for (i = 0; i < numVars; i++) {
+#line 230
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_TEXT == NCT_TEXT);
+#line 230
+        assert(var_rank[i] <= MAX_RANK);
+#line 230
+        assert(var_nels[i] <= MAX_NELS);
+#line 230
+        err = nc_get_var_text(BAD_ID, i, value);
+#line 230
+        IF (err != NC_EBADID)
+#line 230
+	    error("bad ncid: status = %d", err);
+#line 230
+        err = nc_get_var_text(ncid, BAD_VARID, value);
+#line 230
+        IF (err != NC_ENOTVAR)
+#line 230
+	    error("bad var id: status = %d", err);
+#line 230
+
+#line 230
+	nels = 1;
+#line 230
+	for (j = 0; j < var_rank[i]; j++) {
+#line 230
+	    nels *= var_shape[i][j];
+#line 230
+	}
+#line 230
+	allInExtRange = allInIntRange = 1;
+#line 230
+	for (j = 0; j < nels; j++) {
+#line 230
+	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
+#line 230
+	    IF (err)
+#line 230
+		error("error in toMixedBase 1");
+#line 230
+	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_TEXT);
+#line 230
+	    if (inRange3(expect[j],var_type[i], NCT_TEXT)) {
+#line 230
+		allInIntRange = allInIntRange && expect[j] >= text_min
+#line 230
+			    && expect[j] <= text_max;
+#line 230
+	    } else {
+#line 230
+		allInExtRange = 0;
+#line 230
+	    }
+#line 230
+	}
+#line 230
+	err = nc_get_var_text(ncid, i, value);
+#line 230
+	if (canConvert) {
+#line 230
+	    if (allInExtRange) {
+#line 230
+		if (allInIntRange) {
+#line 230
+		    IF (err)
+#line 230
+			error("%s", nc_strerror(err));
+#line 230
+		} else {
+#line 230
+		    IF (err != NC_ERANGE)
+#line 230
+			error("Range error: status = %d", err);
+#line 230
+		}
+#line 230
+	    } else {
+#line 230
+		IF (err != 0 && err != NC_ERANGE)
+#line 230
+		    error("OK or Range error: status = %d", err);
+#line 230
+	    }
+#line 230
+	    for (j = 0; j < nels; j++) {
+#line 230
+		if (inRange3(expect[j],var_type[i],NCT_TEXT)
+#line 230
+			&& expect[j] >= text_min && expect[j] <= text_max) {
+#line 230
+		    IF (!equal(value[j],expect[j],var_type[i],NCT_TEXT)){
+#line 230
+			error("value read not that expected");
+#line 230
+			if (verbose) {
+#line 230
+			    error("\n");
+#line 230
+			    error("varid: %d, ", i);
+#line 230
+			    error("var_name: %s, ", var_name[i]);
+#line 230
+			    error("element number: %d ", j);
+#line 230
+			    error("expect: %g", expect[j]);
+#line 230
+			    error("got: %g", (double) value[j]);
+#line 230
+			}
+#line 230
+		    } else {
+#line 230
+			nok++;
+#line 230
+		    }
+#line 230
+		}
+#line 230
+	    }
+#line 230
+	} else {
+#line 230
+	    IF (nels > 0 && err != NC_ECHAR)
+#line 230
+		error("wrong type: status = %d", err);
+#line 230
+	}
+#line 230
+    }
+#line 230
+    err = nc_close(ncid);
+#line 230
+    IF (err)
+#line 230
+	error("nc_close: %s", nc_strerror(err));
+#line 230
+    print_nok(nok);
+#line 230
+}
+#line 230
+
+void
+#line 231
+test_nc_get_var_uchar(void)
+#line 231
+{
+#line 231
+    int ncid;
+#line 231
+    int i;
+#line 231
+    int j;
+#line 231
+    int err;
+#line 231
+    int allInExtRange;	/* all values within external range? */
+#line 231
+    int allInIntRange;	/* all values within internal range? */
+#line 231
+    int nels;
+#line 231
+    int nok = 0;      /* count of valid comparisons */
+#line 231
+    size_t index[MAX_RANK];
+#line 231
+    int canConvert;     /* Both text or both numeric */
+#line 231
+    uchar value[MAX_NELS];
+#line 231
+    double expect[MAX_NELS];
+#line 231
+
+#line 231
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 231
+    IF (err)
+#line 231
+	error("nc_open: %s", nc_strerror(err));
+#line 231
+    for (i = 0; i < numVars; i++) {
+#line 231
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_UCHAR == NCT_TEXT);
+#line 231
+        assert(var_rank[i] <= MAX_RANK);
+#line 231
+        assert(var_nels[i] <= MAX_NELS);
+#line 231
+        err = nc_get_var_uchar(BAD_ID, i, value);
+#line 231
+        IF (err != NC_EBADID)
+#line 231
+	    error("bad ncid: status = %d", err);
+#line 231
+        err = nc_get_var_uchar(ncid, BAD_VARID, value);
+#line 231
+        IF (err != NC_ENOTVAR)
+#line 231
+	    error("bad var id: status = %d", err);
+#line 231
+
+#line 231
+	nels = 1;
+#line 231
+	for (j = 0; j < var_rank[i]; j++) {
+#line 231
+	    nels *= var_shape[i][j];
+#line 231
+	}
+#line 231
+	allInExtRange = allInIntRange = 1;
+#line 231
+	for (j = 0; j < nels; j++) {
+#line 231
+	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
+#line 231
+	    IF (err)
+#line 231
+		error("error in toMixedBase 1");
+#line 231
+	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_UCHAR);
+#line 231
+	    if (inRange3(expect[j],var_type[i], NCT_UCHAR)) {
+#line 231
+		allInIntRange = allInIntRange && expect[j] >= uchar_min
+#line 231
+			    && expect[j] <= uchar_max;
+#line 231
+	    } else {
+#line 231
+		allInExtRange = 0;
+#line 231
+	    }
+#line 231
+	}
+#line 231
+	err = nc_get_var_uchar(ncid, i, value);
+#line 231
+	if (canConvert) {
+#line 231
+	    if (allInExtRange) {
+#line 231
+		if (allInIntRange) {
+#line 231
+		    IF (err)
+#line 231
+			error("%s", nc_strerror(err));
+#line 231
+		} else {
+#line 231
+		    IF (err != NC_ERANGE)
+#line 231
+			error("Range error: status = %d", err);
+#line 231
+		}
+#line 231
+	    } else {
+#line 231
+		IF (err != 0 && err != NC_ERANGE)
+#line 231
+		    error("OK or Range error: status = %d", err);
+#line 231
+	    }
+#line 231
+	    for (j = 0; j < nels; j++) {
+#line 231
+		if (inRange3(expect[j],var_type[i],NCT_UCHAR)
+#line 231
+			&& expect[j] >= uchar_min && expect[j] <= uchar_max) {
+#line 231
+		    IF (!equal(value[j],expect[j],var_type[i],NCT_UCHAR)){
+#line 231
+			error("value read not that expected");
+#line 231
+			if (verbose) {
+#line 231
+			    error("\n");
+#line 231
+			    error("varid: %d, ", i);
+#line 231
+			    error("var_name: %s, ", var_name[i]);
+#line 231
+			    error("element number: %d ", j);
+#line 231
+			    error("expect: %g", expect[j]);
+#line 231
+			    error("got: %g", (double) value[j]);
+#line 231
+			}
+#line 231
+		    } else {
+#line 231
+			nok++;
+#line 231
+		    }
+#line 231
+		}
+#line 231
+	    }
+#line 231
+	} else {
+#line 231
+	    IF (nels > 0 && err != NC_ECHAR)
+#line 231
+		error("wrong type: status = %d", err);
+#line 231
+	}
+#line 231
+    }
+#line 231
+    err = nc_close(ncid);
+#line 231
+    IF (err)
+#line 231
+	error("nc_close: %s", nc_strerror(err));
+#line 231
+    print_nok(nok);
+#line 231
+}
+#line 231
+
+void
+#line 232
+test_nc_get_var_schar(void)
+#line 232
+{
+#line 232
+    int ncid;
+#line 232
+    int i;
+#line 232
+    int j;
+#line 232
+    int err;
+#line 232
+    int allInExtRange;	/* all values within external range? */
+#line 232
+    int allInIntRange;	/* all values within internal range? */
+#line 232
+    int nels;
+#line 232
+    int nok = 0;      /* count of valid comparisons */
+#line 232
+    size_t index[MAX_RANK];
+#line 232
+    int canConvert;     /* Both text or both numeric */
+#line 232
+    schar value[MAX_NELS];
+#line 232
+    double expect[MAX_NELS];
+#line 232
+
+#line 232
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 232
+    IF (err)
+#line 232
+	error("nc_open: %s", nc_strerror(err));
+#line 232
+    for (i = 0; i < numVars; i++) {
+#line 232
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_SCHAR == NCT_TEXT);
+#line 232
+        assert(var_rank[i] <= MAX_RANK);
+#line 232
+        assert(var_nels[i] <= MAX_NELS);
+#line 232
+        err = nc_get_var_schar(BAD_ID, i, value);
+#line 232
+        IF (err != NC_EBADID)
+#line 232
+	    error("bad ncid: status = %d", err);
+#line 232
+        err = nc_get_var_schar(ncid, BAD_VARID, value);
+#line 232
+        IF (err != NC_ENOTVAR)
+#line 232
+	    error("bad var id: status = %d", err);
+#line 232
+
+#line 232
+	nels = 1;
+#line 232
+	for (j = 0; j < var_rank[i]; j++) {
+#line 232
+	    nels *= var_shape[i][j];
+#line 232
+	}
+#line 232
+	allInExtRange = allInIntRange = 1;
+#line 232
+	for (j = 0; j < nels; j++) {
+#line 232
+	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
+#line 232
+	    IF (err)
+#line 232
+		error("error in toMixedBase 1");
+#line 232
+	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_SCHAR);
+#line 232
+	    if (inRange3(expect[j],var_type[i], NCT_SCHAR)) {
+#line 232
+		allInIntRange = allInIntRange && expect[j] >= schar_min
+#line 232
+			    && expect[j] <= schar_max;
+#line 232
+	    } else {
+#line 232
+		allInExtRange = 0;
+#line 232
+	    }
+#line 232
+	}
+#line 232
+	err = nc_get_var_schar(ncid, i, value);
+#line 232
+	if (canConvert) {
+#line 232
+	    if (allInExtRange) {
+#line 232
+		if (allInIntRange) {
+#line 232
+		    IF (err)
+#line 232
+			error("%s", nc_strerror(err));
+#line 232
+		} else {
+#line 232
+		    IF (err != NC_ERANGE)
+#line 232
+			error("Range error: status = %d", err);
+#line 232
+		}
+#line 232
+	    } else {
+#line 232
+		IF (err != 0 && err != NC_ERANGE)
+#line 232
+		    error("OK or Range error: status = %d", err);
+#line 232
+	    }
+#line 232
+	    for (j = 0; j < nels; j++) {
+#line 232
+		if (inRange3(expect[j],var_type[i],NCT_SCHAR)
+#line 232
+			&& expect[j] >= schar_min && expect[j] <= schar_max) {
+#line 232
+		    IF (!equal(value[j],expect[j],var_type[i],NCT_SCHAR)){
+#line 232
+			error("value read not that expected");
+#line 232
+			if (verbose) {
+#line 232
+			    error("\n");
+#line 232
+			    error("varid: %d, ", i);
+#line 232
+			    error("var_name: %s, ", var_name[i]);
+#line 232
+			    error("element number: %d ", j);
+#line 232
+			    error("expect: %g", expect[j]);
+#line 232
+			    error("got: %g", (double) value[j]);
+#line 232
+			}
+#line 232
+		    } else {
+#line 232
+			nok++;
+#line 232
+		    }
+#line 232
+		}
+#line 232
+	    }
+#line 232
+	} else {
+#line 232
+	    IF (nels > 0 && err != NC_ECHAR)
+#line 232
+		error("wrong type: status = %d", err);
+#line 232
+	}
+#line 232
+    }
+#line 232
+    err = nc_close(ncid);
+#line 232
+    IF (err)
+#line 232
+	error("nc_close: %s", nc_strerror(err));
+#line 232
+    print_nok(nok);
+#line 232
+}
+#line 232
+
+void
+#line 233
+test_nc_get_var_short(void)
+#line 233
+{
+#line 233
+    int ncid;
+#line 233
+    int i;
+#line 233
+    int j;
+#line 233
+    int err;
+#line 233
+    int allInExtRange;	/* all values within external range? */
+#line 233
+    int allInIntRange;	/* all values within internal range? */
+#line 233
+    int nels;
+#line 233
+    int nok = 0;      /* count of valid comparisons */
+#line 233
+    size_t index[MAX_RANK];
+#line 233
+    int canConvert;     /* Both text or both numeric */
+#line 233
+    short value[MAX_NELS];
+#line 233
+    double expect[MAX_NELS];
+#line 233
+
+#line 233
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 233
+    IF (err)
+#line 233
+	error("nc_open: %s", nc_strerror(err));
+#line 233
+    for (i = 0; i < numVars; i++) {
+#line 233
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_SHORT == NCT_TEXT);
+#line 233
+        assert(var_rank[i] <= MAX_RANK);
+#line 233
+        assert(var_nels[i] <= MAX_NELS);
+#line 233
+        err = nc_get_var_short(BAD_ID, i, value);
+#line 233
+        IF (err != NC_EBADID)
+#line 233
+	    error("bad ncid: status = %d", err);
+#line 233
+        err = nc_get_var_short(ncid, BAD_VARID, value);
+#line 233
+        IF (err != NC_ENOTVAR)
+#line 233
+	    error("bad var id: status = %d", err);
+#line 233
+
+#line 233
+	nels = 1;
+#line 233
+	for (j = 0; j < var_rank[i]; j++) {
+#line 233
+	    nels *= var_shape[i][j];
+#line 233
+	}
+#line 233
+	allInExtRange = allInIntRange = 1;
+#line 233
+	for (j = 0; j < nels; j++) {
+#line 233
+	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
+#line 233
+	    IF (err)
+#line 233
+		error("error in toMixedBase 1");
+#line 233
+	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_SHORT);
+#line 233
+	    if (inRange3(expect[j],var_type[i], NCT_SHORT)) {
+#line 233
+		allInIntRange = allInIntRange && expect[j] >= short_min
+#line 233
+			    && expect[j] <= short_max;
+#line 233
+	    } else {
+#line 233
+		allInExtRange = 0;
+#line 233
+	    }
+#line 233
+	}
+#line 233
+	err = nc_get_var_short(ncid, i, value);
+#line 233
+	if (canConvert) {
+#line 233
+	    if (allInExtRange) {
+#line 233
+		if (allInIntRange) {
+#line 233
+		    IF (err)
+#line 233
+			error("%s", nc_strerror(err));
+#line 233
+		} else {
+#line 233
+		    IF (err != NC_ERANGE)
+#line 233
+			error("Range error: status = %d", err);
+#line 233
+		}
+#line 233
+	    } else {
+#line 233
+		IF (err != 0 && err != NC_ERANGE)
+#line 233
+		    error("OK or Range error: status = %d", err);
+#line 233
+	    }
+#line 233
+	    for (j = 0; j < nels; j++) {
+#line 233
+		if (inRange3(expect[j],var_type[i],NCT_SHORT)
+#line 233
+			&& expect[j] >= short_min && expect[j] <= short_max) {
+#line 233
+		    IF (!equal(value[j],expect[j],var_type[i],NCT_SHORT)){
+#line 233
+			error("value read not that expected");
+#line 233
+			if (verbose) {
+#line 233
+			    error("\n");
+#line 233
+			    error("varid: %d, ", i);
+#line 233
+			    error("var_name: %s, ", var_name[i]);
+#line 233
+			    error("element number: %d ", j);
+#line 233
+			    error("expect: %g", expect[j]);
+#line 233
+			    error("got: %g", (double) value[j]);
+#line 233
+			}
+#line 233
+		    } else {
+#line 233
+			nok++;
+#line 233
+		    }
+#line 233
+		}
+#line 233
+	    }
+#line 233
+	} else {
+#line 233
+	    IF (nels > 0 && err != NC_ECHAR)
+#line 233
+		error("wrong type: status = %d", err);
+#line 233
+	}
+#line 233
+    }
+#line 233
+    err = nc_close(ncid);
+#line 233
+    IF (err)
+#line 233
+	error("nc_close: %s", nc_strerror(err));
+#line 233
+    print_nok(nok);
+#line 233
+}
+#line 233
+
+void
+#line 234
+test_nc_get_var_int(void)
+#line 234
+{
+#line 234
+    int ncid;
+#line 234
+    int i;
+#line 234
+    int j;
+#line 234
+    int err;
+#line 234
+    int allInExtRange;	/* all values within external range? */
+#line 234
+    int allInIntRange;	/* all values within internal range? */
+#line 234
+    int nels;
+#line 234
+    int nok = 0;      /* count of valid comparisons */
+#line 234
+    size_t index[MAX_RANK];
+#line 234
+    int canConvert;     /* Both text or both numeric */
+#line 234
+    int value[MAX_NELS];
+#line 234
+    double expect[MAX_NELS];
+#line 234
+
+#line 234
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 234
+    IF (err)
+#line 234
+	error("nc_open: %s", nc_strerror(err));
+#line 234
+    for (i = 0; i < numVars; i++) {
+#line 234
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_INT == NCT_TEXT);
+#line 234
+        assert(var_rank[i] <= MAX_RANK);
+#line 234
+        assert(var_nels[i] <= MAX_NELS);
+#line 234
+        err = nc_get_var_int(BAD_ID, i, value);
+#line 234
+        IF (err != NC_EBADID)
+#line 234
+	    error("bad ncid: status = %d", err);
+#line 234
+        err = nc_get_var_int(ncid, BAD_VARID, value);
+#line 234
+        IF (err != NC_ENOTVAR)
+#line 234
+	    error("bad var id: status = %d", err);
+#line 234
+
+#line 234
+	nels = 1;
+#line 234
+	for (j = 0; j < var_rank[i]; j++) {
+#line 234
+	    nels *= var_shape[i][j];
+#line 234
+	}
+#line 234
+	allInExtRange = allInIntRange = 1;
+#line 234
+	for (j = 0; j < nels; j++) {
+#line 234
+	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
+#line 234
+	    IF (err)
+#line 234
+		error("error in toMixedBase 1");
+#line 234
+	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_INT);
+#line 234
+	    if (inRange3(expect[j],var_type[i], NCT_INT)) {
+#line 234
+		allInIntRange = allInIntRange && expect[j] >= int_min
+#line 234
+			    && expect[j] <= int_max;
+#line 234
+	    } else {
+#line 234
+		allInExtRange = 0;
+#line 234
+	    }
+#line 234
+	}
+#line 234
+	err = nc_get_var_int(ncid, i, value);
+#line 234
+	if (canConvert) {
+#line 234
+	    if (allInExtRange) {
+#line 234
+		if (allInIntRange) {
+#line 234
+		    IF (err)
+#line 234
+			error("%s", nc_strerror(err));
+#line 234
+		} else {
+#line 234
+		    IF (err != NC_ERANGE)
+#line 234
+			error("Range error: status = %d", err);
+#line 234
+		}
+#line 234
+	    } else {
+#line 234
+		IF (err != 0 && err != NC_ERANGE)
+#line 234
+		    error("OK or Range error: status = %d", err);
+#line 234
+	    }
+#line 234
+	    for (j = 0; j < nels; j++) {
+#line 234
+		if (inRange3(expect[j],var_type[i],NCT_INT)
+#line 234
+			&& expect[j] >= int_min && expect[j] <= int_max) {
+#line 234
+		    IF (!equal(value[j],expect[j],var_type[i],NCT_INT)){
+#line 234
+			error("value read not that expected");
+#line 234
+			if (verbose) {
+#line 234
+			    error("\n");
+#line 234
+			    error("varid: %d, ", i);
+#line 234
+			    error("var_name: %s, ", var_name[i]);
+#line 234
+			    error("element number: %d ", j);
+#line 234
+			    error("expect: %g", expect[j]);
+#line 234
+			    error("got: %g", (double) value[j]);
+#line 234
+			}
+#line 234
+		    } else {
+#line 234
+			nok++;
+#line 234
+		    }
+#line 234
+		}
+#line 234
+	    }
+#line 234
+	} else {
+#line 234
+	    IF (nels > 0 && err != NC_ECHAR)
+#line 234
+		error("wrong type: status = %d", err);
+#line 234
+	}
+#line 234
+    }
+#line 234
+    err = nc_close(ncid);
+#line 234
+    IF (err)
+#line 234
+	error("nc_close: %s", nc_strerror(err));
+#line 234
+    print_nok(nok);
+#line 234
+}
+#line 234
+
+void
+#line 235
+test_nc_get_var_long(void)
+#line 235
+{
+#line 235
+    int ncid;
+#line 235
+    int i;
+#line 235
+    int j;
+#line 235
+    int err;
+#line 235
+    int allInExtRange;	/* all values within external range? */
+#line 235
+    int allInIntRange;	/* all values within internal range? */
+#line 235
+    int nels;
+#line 235
+    int nok = 0;      /* count of valid comparisons */
+#line 235
+    size_t index[MAX_RANK];
+#line 235
+    int canConvert;     /* Both text or both numeric */
+#line 235
+    long value[MAX_NELS];
+#line 235
+    double expect[MAX_NELS];
+#line 235
+
+#line 235
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 235
+    IF (err)
+#line 235
+	error("nc_open: %s", nc_strerror(err));
+#line 235
+    for (i = 0; i < numVars; i++) {
+#line 235
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_LONG == NCT_TEXT);
+#line 235
+        assert(var_rank[i] <= MAX_RANK);
+#line 235
+        assert(var_nels[i] <= MAX_NELS);
+#line 235
+        err = nc_get_var_long(BAD_ID, i, value);
+#line 235
+        IF (err != NC_EBADID)
+#line 235
+	    error("bad ncid: status = %d", err);
+#line 235
+        err = nc_get_var_long(ncid, BAD_VARID, value);
+#line 235
+        IF (err != NC_ENOTVAR)
+#line 235
+	    error("bad var id: status = %d", err);
+#line 235
+
+#line 235
+	nels = 1;
+#line 235
+	for (j = 0; j < var_rank[i]; j++) {
+#line 235
+	    nels *= var_shape[i][j];
+#line 235
+	}
+#line 235
+	allInExtRange = allInIntRange = 1;
+#line 235
+	for (j = 0; j < nels; j++) {
+#line 235
+	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
+#line 235
+	    IF (err)
+#line 235
+		error("error in toMixedBase 1");
+#line 235
+	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_LONG);
+#line 235
+	    if (inRange3(expect[j],var_type[i], NCT_LONG)) {
+#line 235
+		allInIntRange = allInIntRange && expect[j] >= long_min
+#line 235
+			    && expect[j] <= long_max;
+#line 235
+	    } else {
+#line 235
+		allInExtRange = 0;
+#line 235
+	    }
+#line 235
+	}
+#line 235
+	err = nc_get_var_long(ncid, i, value);
+#line 235
+	if (canConvert) {
+#line 235
+	    if (allInExtRange) {
+#line 235
+		if (allInIntRange) {
+#line 235
+		    IF (err)
+#line 235
+			error("%s", nc_strerror(err));
+#line 235
+		} else {
+#line 235
+		    IF (err != NC_ERANGE)
+#line 235
+			error("Range error: status = %d", err);
+#line 235
+		}
+#line 235
+	    } else {
+#line 235
+		IF (err != 0 && err != NC_ERANGE)
+#line 235
+		    error("OK or Range error: status = %d", err);
+#line 235
+	    }
+#line 235
+	    for (j = 0; j < nels; j++) {
+#line 235
+		if (inRange3(expect[j],var_type[i],NCT_LONG)
+#line 235
+			&& expect[j] >= long_min && expect[j] <= long_max) {
+#line 235
+		    IF (!equal(value[j],expect[j],var_type[i],NCT_LONG)){
+#line 235
+			error("value read not that expected");
+#line 235
+			if (verbose) {
+#line 235
+			    error("\n");
+#line 235
+			    error("varid: %d, ", i);
+#line 235
+			    error("var_name: %s, ", var_name[i]);
+#line 235
+			    error("element number: %d ", j);
+#line 235
+			    error("expect: %g", expect[j]);
+#line 235
+			    error("got: %g", (double) value[j]);
+#line 235
+			}
+#line 235
+		    } else {
+#line 235
+			nok++;
+#line 235
+		    }
+#line 235
+		}
+#line 235
+	    }
+#line 235
+	} else {
+#line 235
+	    IF (nels > 0 && err != NC_ECHAR)
+#line 235
+		error("wrong type: status = %d", err);
+#line 235
+	}
+#line 235
+    }
+#line 235
+    err = nc_close(ncid);
+#line 235
+    IF (err)
+#line 235
+	error("nc_close: %s", nc_strerror(err));
+#line 235
+    print_nok(nok);
+#line 235
+}
+#line 235
+
+void
+#line 236
+test_nc_get_var_float(void)
+#line 236
+{
+#line 236
+    int ncid;
+#line 236
+    int i;
+#line 236
+    int j;
+#line 236
+    int err;
+#line 236
+    int allInExtRange;	/* all values within external range? */
+#line 236
+    int allInIntRange;	/* all values within internal range? */
+#line 236
+    int nels;
+#line 236
+    int nok = 0;      /* count of valid comparisons */
+#line 236
+    size_t index[MAX_RANK];
+#line 236
+    int canConvert;     /* Both text or both numeric */
+#line 236
+    float value[MAX_NELS];
+#line 236
+    double expect[MAX_NELS];
+#line 236
+
+#line 236
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 236
+    IF (err)
+#line 236
+	error("nc_open: %s", nc_strerror(err));
+#line 236
+    for (i = 0; i < numVars; i++) {
+#line 236
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_FLOAT == NCT_TEXT);
+#line 236
+        assert(var_rank[i] <= MAX_RANK);
+#line 236
+        assert(var_nels[i] <= MAX_NELS);
+#line 236
+        err = nc_get_var_float(BAD_ID, i, value);
+#line 236
+        IF (err != NC_EBADID)
+#line 236
+	    error("bad ncid: status = %d", err);
+#line 236
+        err = nc_get_var_float(ncid, BAD_VARID, value);
+#line 236
+        IF (err != NC_ENOTVAR)
+#line 236
+	    error("bad var id: status = %d", err);
+#line 236
+
+#line 236
+	nels = 1;
+#line 236
+	for (j = 0; j < var_rank[i]; j++) {
+#line 236
+	    nels *= var_shape[i][j];
+#line 236
+	}
+#line 236
+	allInExtRange = allInIntRange = 1;
+#line 236
+	for (j = 0; j < nels; j++) {
+#line 236
+	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
+#line 236
+	    IF (err)
+#line 236
+		error("error in toMixedBase 1");
+#line 236
+	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_FLOAT);
+#line 236
+	    if (inRange3(expect[j],var_type[i], NCT_FLOAT)) {
+#line 236
+		allInIntRange = allInIntRange && expect[j] >= float_min
+#line 236
+			    && expect[j] <= float_max;
+#line 236
+	    } else {
+#line 236
+		allInExtRange = 0;
+#line 236
+	    }
+#line 236
+	}
+#line 236
+	err = nc_get_var_float(ncid, i, value);
+#line 236
+	if (canConvert) {
+#line 236
+	    if (allInExtRange) {
+#line 236
+		if (allInIntRange) {
+#line 236
+		    IF (err)
+#line 236
+			error("%s", nc_strerror(err));
+#line 236
+		} else {
+#line 236
+		    IF (err != NC_ERANGE)
+#line 236
+			error("Range error: status = %d", err);
+#line 236
+		}
+#line 236
+	    } else {
+#line 236
+		IF (err != 0 && err != NC_ERANGE)
+#line 236
+		    error("OK or Range error: status = %d", err);
+#line 236
+	    }
+#line 236
+	    for (j = 0; j < nels; j++) {
+#line 236
+		if (inRange3(expect[j],var_type[i],NCT_FLOAT)
+#line 236
+			&& expect[j] >= float_min && expect[j] <= float_max) {
+#line 236
+		    IF (!equal(value[j],expect[j],var_type[i],NCT_FLOAT)){
+#line 236
+			error("value read not that expected");
+#line 236
+			if (verbose) {
+#line 236
+			    error("\n");
+#line 236
+			    error("varid: %d, ", i);
+#line 236
+			    error("var_name: %s, ", var_name[i]);
+#line 236
+			    error("element number: %d ", j);
+#line 236
+			    error("expect: %g", expect[j]);
+#line 236
+			    error("got: %g", (double) value[j]);
+#line 236
+			}
+#line 236
+		    } else {
+#line 236
+			nok++;
+#line 236
+		    }
+#line 236
+		}
+#line 236
+	    }
+#line 236
+	} else {
+#line 236
+	    IF (nels > 0 && err != NC_ECHAR)
+#line 236
+		error("wrong type: status = %d", err);
+#line 236
+	}
+#line 236
+    }
+#line 236
+    err = nc_close(ncid);
+#line 236
+    IF (err)
+#line 236
+	error("nc_close: %s", nc_strerror(err));
+#line 236
+    print_nok(nok);
+#line 236
+}
+#line 236
+
+void
+#line 237
+test_nc_get_var_double(void)
+#line 237
+{
+#line 237
+    int ncid;
+#line 237
+    int i;
+#line 237
+    int j;
+#line 237
+    int err;
+#line 237
+    int allInExtRange;	/* all values within external range? */
+#line 237
+    int allInIntRange;	/* all values within internal range? */
+#line 237
+    int nels;
+#line 237
+    int nok = 0;      /* count of valid comparisons */
+#line 237
+    size_t index[MAX_RANK];
+#line 237
+    int canConvert;     /* Both text or both numeric */
+#line 237
+    double value[MAX_NELS];
+#line 237
+    double expect[MAX_NELS];
+#line 237
+
+#line 237
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 237
+    IF (err)
+#line 237
+	error("nc_open: %s", nc_strerror(err));
+#line 237
+    for (i = 0; i < numVars; i++) {
+#line 237
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_DOUBLE == NCT_TEXT);
+#line 237
+        assert(var_rank[i] <= MAX_RANK);
+#line 237
+        assert(var_nels[i] <= MAX_NELS);
+#line 237
+        err = nc_get_var_double(BAD_ID, i, value);
+#line 237
+        IF (err != NC_EBADID)
+#line 237
+	    error("bad ncid: status = %d", err);
+#line 237
+        err = nc_get_var_double(ncid, BAD_VARID, value);
+#line 237
+        IF (err != NC_ENOTVAR)
+#line 237
+	    error("bad var id: status = %d", err);
+#line 237
+
+#line 237
+	nels = 1;
+#line 237
+	for (j = 0; j < var_rank[i]; j++) {
+#line 237
+	    nels *= var_shape[i][j];
+#line 237
+	}
+#line 237
+	allInExtRange = allInIntRange = 1;
+#line 237
+	for (j = 0; j < nels; j++) {
+#line 237
+	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
+#line 237
+	    IF (err)
+#line 237
+		error("error in toMixedBase 1");
+#line 237
+	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_DOUBLE);
+#line 237
+	    if (inRange3(expect[j],var_type[i], NCT_DOUBLE)) {
+#line 237
+		allInIntRange = allInIntRange && expect[j] >= double_min
+#line 237
+			    && expect[j] <= double_max;
+#line 237
+	    } else {
+#line 237
+		allInExtRange = 0;
+#line 237
+	    }
+#line 237
+	}
+#line 237
+	err = nc_get_var_double(ncid, i, value);
+#line 237
+	if (canConvert) {
+#line 237
+	    if (allInExtRange) {
+#line 237
+		if (allInIntRange) {
+#line 237
+		    IF (err)
+#line 237
+			error("%s", nc_strerror(err));
+#line 237
+		} else {
+#line 237
+		    IF (err != NC_ERANGE)
+#line 237
+			error("Range error: status = %d", err);
+#line 237
+		}
+#line 237
+	    } else {
+#line 237
+		IF (err != 0 && err != NC_ERANGE)
+#line 237
+		    error("OK or Range error: status = %d", err);
+#line 237
+	    }
+#line 237
+	    for (j = 0; j < nels; j++) {
+#line 237
+		if (inRange3(expect[j],var_type[i],NCT_DOUBLE)
+#line 237
+			&& expect[j] >= double_min && expect[j] <= double_max) {
+#line 237
+		    IF (!equal(value[j],expect[j],var_type[i],NCT_DOUBLE)){
+#line 237
+			error("value read not that expected");
+#line 237
+			if (verbose) {
+#line 237
+			    error("\n");
+#line 237
+			    error("varid: %d, ", i);
+#line 237
+			    error("var_name: %s, ", var_name[i]);
+#line 237
+			    error("element number: %d ", j);
+#line 237
+			    error("expect: %g", expect[j]);
+#line 237
+			    error("got: %g", (double) value[j]);
+#line 237
+			}
+#line 237
+		    } else {
+#line 237
+			nok++;
+#line 237
+		    }
+#line 237
+		}
+#line 237
+	    }
+#line 237
+	} else {
+#line 237
+	    IF (nels > 0 && err != NC_ECHAR)
+#line 237
+		error("wrong type: status = %d", err);
+#line 237
+	}
+#line 237
+    }
+#line 237
+    err = nc_close(ncid);
+#line 237
+    IF (err)
+#line 237
+	error("nc_close: %s", nc_strerror(err));
+#line 237
+    print_nok(nok);
+#line 237
+}
 #line 237
 
 void
 #line 238
-test_nc_get_var_text(void)
-#line 238
-{
-#line 238
-    int ncid;
-#line 238
-    int i;
-#line 238
-    int j;
-#line 238
-    int err;
-#line 238
-    int allInExtRange;	/* all values within external range? */
-#line 238
-    int allInIntRange;	/* all values within internal range? */
-#line 238
-    int nels;
-#line 238
-    int nok = 0;      /* count of valid comparisons */
-#line 238
-    size_t index[MAX_RANK];
-#line 238
-    int canConvert;     /* Both text or both numeric */
-#line 238
-    text value[MAX_NELS];
-#line 238
-    double expect[MAX_NELS];
-#line 238
-
-#line 238
-#ifdef USE_PNETCDF
-#line 238
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 238
-#else
-#line 238
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 238
-#endif
-#line 238
-    IF (err)
-#line 238
-	error("nc_open: %s", nc_strerror(err));
-#line 238
-    for (i = 0; i < numVars; i++) {
-#line 238
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_TEXT == NCT_TEXT);
-#line 238
-        assert(var_rank[i] <= MAX_RANK);
-#line 238
-        assert(var_nels[i] <= MAX_NELS);
-#line 238
-        err = nc_get_var_text(BAD_ID, i, value);
-#line 238
-        IF (err != NC_EBADID)
-#line 238
-	    error("bad ncid: status = %d", err);
-#line 238
-        err = nc_get_var_text(ncid, BAD_VARID, value);
-#line 238
-        IF (err != NC_ENOTVAR)
-#line 238
-	    error("bad var id: status = %d", err);
-#line 238
-
-#line 238
-	nels = 1;
-#line 238
-	for (j = 0; j < var_rank[i]; j++) {
-#line 238
-	    nels *= var_shape[i][j];
-#line 238
-	}
-#line 238
-	allInExtRange = allInIntRange = 1;
-#line 238
-	for (j = 0; j < nels; j++) {
-#line 238
-	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 238
-	    IF (err)
-#line 238
-		error("error in toMixedBase 1");
-#line 238
-	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_TEXT);
-#line 238
-	    if (inRange3(expect[j],var_type[i], NCT_TEXT)) {
-#line 238
-		allInIntRange = allInIntRange && expect[j] >= text_min
-#line 238
-			    && expect[j] <= text_max;
-#line 238
-	    } else {
-#line 238
-		allInExtRange = 0;
-#line 238
-	    }
-#line 238
-	}
-#line 238
-	err = nc_get_var_text(ncid, i, value);
-#line 238
-	if (canConvert) {
-#line 238
-	    if (allInExtRange) {
-#line 238
-		if (allInIntRange) {
-#line 238
-		    IF (err)
-#line 238
-			error("%s", nc_strerror(err));
-#line 238
-		} else {
-#line 238
-		    IF (err != NC_ERANGE)
-#line 238
-			error("Range error: status = %d", err);
-#line 238
-		}
-#line 238
-	    } else {
-#line 238
-		IF (err != 0 && err != NC_ERANGE)
-#line 238
-		    error("OK or Range error: status = %d", err);
-#line 238
-	    }
-#line 238
-	    for (j = 0; j < nels; j++) {
-#line 238
-		if (inRange3(expect[j],var_type[i],NCT_TEXT)
-#line 238
-			&& expect[j] >= text_min && expect[j] <= text_max) {
-#line 238
-		    IF (!equal(value[j],expect[j],var_type[i],NCT_TEXT)){
-#line 238
-			error("value read not that expected");
-#line 238
-			if (verbose) {
-#line 238
-			    error("\n");
-#line 238
-			    error("varid: %d, ", i);
-#line 238
-			    error("var_name: %s, ", var_name[i]);
-#line 238
-			    error("element number: %d ", j);
-#line 238
-			    error("expect: %g", expect[j]);
-#line 238
-			    error("got: %g", (double) value[j]);
-#line 238
-			}
-#line 238
-		    } else {
-#line 238
-			nok++;
-#line 238
-		    }
-#line 238
-		}
-#line 238
-	    }
-#line 238
-	} else {
-#line 238
-	    IF (nels > 0 && err != NC_ECHAR)
-#line 238
-		error("wrong type: status = %d", err);
-#line 238
-	}
-#line 238
-    }
-#line 238
-    err = nc_close(ncid);
-#line 238
-    IF (err)
-#line 238
-	error("nc_close: %s", nc_strerror(err));
-#line 238
-    print_nok(nok);
-#line 238
-}
-#line 238
-
-void
-#line 239
-test_nc_get_var_uchar(void)
-#line 239
-{
-#line 239
-    int ncid;
-#line 239
-    int i;
-#line 239
-    int j;
-#line 239
-    int err;
-#line 239
-    int allInExtRange;	/* all values within external range? */
-#line 239
-    int allInIntRange;	/* all values within internal range? */
-#line 239
-    int nels;
-#line 239
-    int nok = 0;      /* count of valid comparisons */
-#line 239
-    size_t index[MAX_RANK];
-#line 239
-    int canConvert;     /* Both text or both numeric */
-#line 239
-    uchar value[MAX_NELS];
-#line 239
-    double expect[MAX_NELS];
-#line 239
-
-#line 239
-#ifdef USE_PNETCDF
-#line 239
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 239
-#else
-#line 239
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 239
-#endif
-#line 239
-    IF (err)
-#line 239
-	error("nc_open: %s", nc_strerror(err));
-#line 239
-    for (i = 0; i < numVars; i++) {
-#line 239
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_UCHAR == NCT_TEXT);
-#line 239
-        assert(var_rank[i] <= MAX_RANK);
-#line 239
-        assert(var_nels[i] <= MAX_NELS);
-#line 239
-        err = nc_get_var_uchar(BAD_ID, i, value);
-#line 239
-        IF (err != NC_EBADID)
-#line 239
-	    error("bad ncid: status = %d", err);
-#line 239
-        err = nc_get_var_uchar(ncid, BAD_VARID, value);
-#line 239
-        IF (err != NC_ENOTVAR)
-#line 239
-	    error("bad var id: status = %d", err);
-#line 239
-
-#line 239
-	nels = 1;
-#line 239
-	for (j = 0; j < var_rank[i]; j++) {
-#line 239
-	    nels *= var_shape[i][j];
-#line 239
-	}
-#line 239
-	allInExtRange = allInIntRange = 1;
-#line 239
-	for (j = 0; j < nels; j++) {
-#line 239
-	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 239
-	    IF (err)
-#line 239
-		error("error in toMixedBase 1");
-#line 239
-	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_UCHAR);
-#line 239
-	    if (inRange3(expect[j],var_type[i], NCT_UCHAR)) {
-#line 239
-		allInIntRange = allInIntRange && expect[j] >= uchar_min
-#line 239
-			    && expect[j] <= uchar_max;
-#line 239
-	    } else {
-#line 239
-		allInExtRange = 0;
-#line 239
-	    }
-#line 239
-	}
-#line 239
-	err = nc_get_var_uchar(ncid, i, value);
-#line 239
-	if (canConvert) {
-#line 239
-	    if (allInExtRange) {
-#line 239
-		if (allInIntRange) {
-#line 239
-		    IF (err)
-#line 239
-			error("%s", nc_strerror(err));
-#line 239
-		} else {
-#line 239
-		    IF (err != NC_ERANGE)
-#line 239
-			error("Range error: status = %d", err);
-#line 239
-		}
-#line 239
-	    } else {
-#line 239
-		IF (err != 0 && err != NC_ERANGE)
-#line 239
-		    error("OK or Range error: status = %d", err);
-#line 239
-	    }
-#line 239
-	    for (j = 0; j < nels; j++) {
-#line 239
-		if (inRange3(expect[j],var_type[i],NCT_UCHAR)
-#line 239
-			&& expect[j] >= uchar_min && expect[j] <= uchar_max) {
-#line 239
-		    IF (!equal(value[j],expect[j],var_type[i],NCT_UCHAR)){
-#line 239
-			error("value read not that expected");
-#line 239
-			if (verbose) {
-#line 239
-			    error("\n");
-#line 239
-			    error("varid: %d, ", i);
-#line 239
-			    error("var_name: %s, ", var_name[i]);
-#line 239
-			    error("element number: %d ", j);
-#line 239
-			    error("expect: %g", expect[j]);
-#line 239
-			    error("got: %g", (double) value[j]);
-#line 239
-			}
-#line 239
-		    } else {
-#line 239
-			nok++;
-#line 239
-		    }
-#line 239
-		}
-#line 239
-	    }
-#line 239
-	} else {
-#line 239
-	    IF (nels > 0 && err != NC_ECHAR)
-#line 239
-		error("wrong type: status = %d", err);
-#line 239
-	}
-#line 239
-    }
-#line 239
-    err = nc_close(ncid);
-#line 239
-    IF (err)
-#line 239
-	error("nc_close: %s", nc_strerror(err));
-#line 239
-    print_nok(nok);
-#line 239
-}
-#line 239
-
-void
-#line 240
-test_nc_get_var_schar(void)
-#line 240
-{
-#line 240
-    int ncid;
-#line 240
-    int i;
-#line 240
-    int j;
-#line 240
-    int err;
-#line 240
-    int allInExtRange;	/* all values within external range? */
-#line 240
-    int allInIntRange;	/* all values within internal range? */
-#line 240
-    int nels;
-#line 240
-    int nok = 0;      /* count of valid comparisons */
-#line 240
-    size_t index[MAX_RANK];
-#line 240
-    int canConvert;     /* Both text or both numeric */
-#line 240
-    schar value[MAX_NELS];
-#line 240
-    double expect[MAX_NELS];
-#line 240
-
-#line 240
-#ifdef USE_PNETCDF
-#line 240
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 240
-#else
-#line 240
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 240
-#endif
-#line 240
-    IF (err)
-#line 240
-	error("nc_open: %s", nc_strerror(err));
-#line 240
-    for (i = 0; i < numVars; i++) {
-#line 240
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_SCHAR == NCT_TEXT);
-#line 240
-        assert(var_rank[i] <= MAX_RANK);
-#line 240
-        assert(var_nels[i] <= MAX_NELS);
-#line 240
-        err = nc_get_var_schar(BAD_ID, i, value);
-#line 240
-        IF (err != NC_EBADID)
-#line 240
-	    error("bad ncid: status = %d", err);
-#line 240
-        err = nc_get_var_schar(ncid, BAD_VARID, value);
-#line 240
-        IF (err != NC_ENOTVAR)
-#line 240
-	    error("bad var id: status = %d", err);
-#line 240
-
-#line 240
-	nels = 1;
-#line 240
-	for (j = 0; j < var_rank[i]; j++) {
-#line 240
-	    nels *= var_shape[i][j];
-#line 240
-	}
-#line 240
-	allInExtRange = allInIntRange = 1;
-#line 240
-	for (j = 0; j < nels; j++) {
-#line 240
-	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 240
-	    IF (err)
-#line 240
-		error("error in toMixedBase 1");
-#line 240
-	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_SCHAR);
-#line 240
-	    if (inRange3(expect[j],var_type[i], NCT_SCHAR)) {
-#line 240
-		allInIntRange = allInIntRange && expect[j] >= schar_min
-#line 240
-			    && expect[j] <= schar_max;
-#line 240
-	    } else {
-#line 240
-		allInExtRange = 0;
-#line 240
-	    }
-#line 240
-	}
-#line 240
-	err = nc_get_var_schar(ncid, i, value);
-#line 240
-	if (canConvert) {
-#line 240
-	    if (allInExtRange) {
-#line 240
-		if (allInIntRange) {
-#line 240
-		    IF (err)
-#line 240
-			error("%s", nc_strerror(err));
-#line 240
-		} else {
-#line 240
-		    IF (err != NC_ERANGE)
-#line 240
-			error("Range error: status = %d", err);
-#line 240
-		}
-#line 240
-	    } else {
-#line 240
-		IF (err != 0 && err != NC_ERANGE)
-#line 240
-		    error("OK or Range error: status = %d", err);
-#line 240
-	    }
-#line 240
-	    for (j = 0; j < nels; j++) {
-#line 240
-		if (inRange3(expect[j],var_type[i],NCT_SCHAR)
-#line 240
-			&& expect[j] >= schar_min && expect[j] <= schar_max) {
-#line 240
-		    IF (!equal(value[j],expect[j],var_type[i],NCT_SCHAR)){
-#line 240
-			error("value read not that expected");
-#line 240
-			if (verbose) {
-#line 240
-			    error("\n");
-#line 240
-			    error("varid: %d, ", i);
-#line 240
-			    error("var_name: %s, ", var_name[i]);
-#line 240
-			    error("element number: %d ", j);
-#line 240
-			    error("expect: %g", expect[j]);
-#line 240
-			    error("got: %g", (double) value[j]);
-#line 240
-			}
-#line 240
-		    } else {
-#line 240
-			nok++;
-#line 240
-		    }
-#line 240
-		}
-#line 240
-	    }
-#line 240
-	} else {
-#line 240
-	    IF (nels > 0 && err != NC_ECHAR)
-#line 240
-		error("wrong type: status = %d", err);
-#line 240
-	}
-#line 240
-    }
-#line 240
-    err = nc_close(ncid);
-#line 240
-    IF (err)
-#line 240
-	error("nc_close: %s", nc_strerror(err));
-#line 240
-    print_nok(nok);
-#line 240
-}
-#line 240
-
-void
-#line 241
-test_nc_get_var_short(void)
-#line 241
-{
-#line 241
-    int ncid;
-#line 241
-    int i;
-#line 241
-    int j;
-#line 241
-    int err;
-#line 241
-    int allInExtRange;	/* all values within external range? */
-#line 241
-    int allInIntRange;	/* all values within internal range? */
-#line 241
-    int nels;
-#line 241
-    int nok = 0;      /* count of valid comparisons */
-#line 241
-    size_t index[MAX_RANK];
-#line 241
-    int canConvert;     /* Both text or both numeric */
-#line 241
-    short value[MAX_NELS];
-#line 241
-    double expect[MAX_NELS];
-#line 241
-
-#line 241
-#ifdef USE_PNETCDF
-#line 241
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 241
-#else
-#line 241
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 241
-#endif
-#line 241
-    IF (err)
-#line 241
-	error("nc_open: %s", nc_strerror(err));
-#line 241
-    for (i = 0; i < numVars; i++) {
-#line 241
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_SHORT == NCT_TEXT);
-#line 241
-        assert(var_rank[i] <= MAX_RANK);
-#line 241
-        assert(var_nels[i] <= MAX_NELS);
-#line 241
-        err = nc_get_var_short(BAD_ID, i, value);
-#line 241
-        IF (err != NC_EBADID)
-#line 241
-	    error("bad ncid: status = %d", err);
-#line 241
-        err = nc_get_var_short(ncid, BAD_VARID, value);
-#line 241
-        IF (err != NC_ENOTVAR)
-#line 241
-	    error("bad var id: status = %d", err);
-#line 241
-
-#line 241
-	nels = 1;
-#line 241
-	for (j = 0; j < var_rank[i]; j++) {
-#line 241
-	    nels *= var_shape[i][j];
-#line 241
-	}
-#line 241
-	allInExtRange = allInIntRange = 1;
-#line 241
-	for (j = 0; j < nels; j++) {
-#line 241
-	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 241
-	    IF (err)
-#line 241
-		error("error in toMixedBase 1");
-#line 241
-	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_SHORT);
-#line 241
-	    if (inRange3(expect[j],var_type[i], NCT_SHORT)) {
-#line 241
-		allInIntRange = allInIntRange && expect[j] >= short_min
-#line 241
-			    && expect[j] <= short_max;
-#line 241
-	    } else {
-#line 241
-		allInExtRange = 0;
-#line 241
-	    }
-#line 241
-	}
-#line 241
-	err = nc_get_var_short(ncid, i, value);
-#line 241
-	if (canConvert) {
-#line 241
-	    if (allInExtRange) {
-#line 241
-		if (allInIntRange) {
-#line 241
-		    IF (err)
-#line 241
-			error("%s", nc_strerror(err));
-#line 241
-		} else {
-#line 241
-		    IF (err != NC_ERANGE)
-#line 241
-			error("Range error: status = %d", err);
-#line 241
-		}
-#line 241
-	    } else {
-#line 241
-		IF (err != 0 && err != NC_ERANGE)
-#line 241
-		    error("OK or Range error: status = %d", err);
-#line 241
-	    }
-#line 241
-	    for (j = 0; j < nels; j++) {
-#line 241
-		if (inRange3(expect[j],var_type[i],NCT_SHORT)
-#line 241
-			&& expect[j] >= short_min && expect[j] <= short_max) {
-#line 241
-		    IF (!equal(value[j],expect[j],var_type[i],NCT_SHORT)){
-#line 241
-			error("value read not that expected");
-#line 241
-			if (verbose) {
-#line 241
-			    error("\n");
-#line 241
-			    error("varid: %d, ", i);
-#line 241
-			    error("var_name: %s, ", var_name[i]);
-#line 241
-			    error("element number: %d ", j);
-#line 241
-			    error("expect: %g", expect[j]);
-#line 241
-			    error("got: %g", (double) value[j]);
-#line 241
-			}
-#line 241
-		    } else {
-#line 241
-			nok++;
-#line 241
-		    }
-#line 241
-		}
-#line 241
-	    }
-#line 241
-	} else {
-#line 241
-	    IF (nels > 0 && err != NC_ECHAR)
-#line 241
-		error("wrong type: status = %d", err);
-#line 241
-	}
-#line 241
-    }
-#line 241
-    err = nc_close(ncid);
-#line 241
-    IF (err)
-#line 241
-	error("nc_close: %s", nc_strerror(err));
-#line 241
-    print_nok(nok);
-#line 241
-}
-#line 241
-
-void
-#line 242
-test_nc_get_var_int(void)
-#line 242
-{
-#line 242
-    int ncid;
-#line 242
-    int i;
-#line 242
-    int j;
-#line 242
-    int err;
-#line 242
-    int allInExtRange;	/* all values within external range? */
-#line 242
-    int allInIntRange;	/* all values within internal range? */
-#line 242
-    int nels;
-#line 242
-    int nok = 0;      /* count of valid comparisons */
-#line 242
-    size_t index[MAX_RANK];
-#line 242
-    int canConvert;     /* Both text or both numeric */
-#line 242
-    int value[MAX_NELS];
-#line 242
-    double expect[MAX_NELS];
-#line 242
-
-#line 242
-#ifdef USE_PNETCDF
-#line 242
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 242
-#else
-#line 242
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 242
-#endif
-#line 242
-    IF (err)
-#line 242
-	error("nc_open: %s", nc_strerror(err));
-#line 242
-    for (i = 0; i < numVars; i++) {
-#line 242
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_INT == NCT_TEXT);
-#line 242
-        assert(var_rank[i] <= MAX_RANK);
-#line 242
-        assert(var_nels[i] <= MAX_NELS);
-#line 242
-        err = nc_get_var_int(BAD_ID, i, value);
-#line 242
-        IF (err != NC_EBADID)
-#line 242
-	    error("bad ncid: status = %d", err);
-#line 242
-        err = nc_get_var_int(ncid, BAD_VARID, value);
-#line 242
-        IF (err != NC_ENOTVAR)
-#line 242
-	    error("bad var id: status = %d", err);
-#line 242
-
-#line 242
-	nels = 1;
-#line 242
-	for (j = 0; j < var_rank[i]; j++) {
-#line 242
-	    nels *= var_shape[i][j];
-#line 242
-	}
-#line 242
-	allInExtRange = allInIntRange = 1;
-#line 242
-	for (j = 0; j < nels; j++) {
-#line 242
-	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 242
-	    IF (err)
-#line 242
-		error("error in toMixedBase 1");
-#line 242
-	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_INT);
-#line 242
-	    if (inRange3(expect[j],var_type[i], NCT_INT)) {
-#line 242
-		allInIntRange = allInIntRange && expect[j] >= int_min
-#line 242
-			    && expect[j] <= int_max;
-#line 242
-	    } else {
-#line 242
-		allInExtRange = 0;
-#line 242
-	    }
-#line 242
-	}
-#line 242
-	err = nc_get_var_int(ncid, i, value);
-#line 242
-	if (canConvert) {
-#line 242
-	    if (allInExtRange) {
-#line 242
-		if (allInIntRange) {
-#line 242
-		    IF (err)
-#line 242
-			error("%s", nc_strerror(err));
-#line 242
-		} else {
-#line 242
-		    IF (err != NC_ERANGE)
-#line 242
-			error("Range error: status = %d", err);
-#line 242
-		}
-#line 242
-	    } else {
-#line 242
-		IF (err != 0 && err != NC_ERANGE)
-#line 242
-		    error("OK or Range error: status = %d", err);
-#line 242
-	    }
-#line 242
-	    for (j = 0; j < nels; j++) {
-#line 242
-		if (inRange3(expect[j],var_type[i],NCT_INT)
-#line 242
-			&& expect[j] >= int_min && expect[j] <= int_max) {
-#line 242
-		    IF (!equal(value[j],expect[j],var_type[i],NCT_INT)){
-#line 242
-			error("value read not that expected");
-#line 242
-			if (verbose) {
-#line 242
-			    error("\n");
-#line 242
-			    error("varid: %d, ", i);
-#line 242
-			    error("var_name: %s, ", var_name[i]);
-#line 242
-			    error("element number: %d ", j);
-#line 242
-			    error("expect: %g", expect[j]);
-#line 242
-			    error("got: %g", (double) value[j]);
-#line 242
-			}
-#line 242
-		    } else {
-#line 242
-			nok++;
-#line 242
-		    }
-#line 242
-		}
-#line 242
-	    }
-#line 242
-	} else {
-#line 242
-	    IF (nels > 0 && err != NC_ECHAR)
-#line 242
-		error("wrong type: status = %d", err);
-#line 242
-	}
-#line 242
-    }
-#line 242
-    err = nc_close(ncid);
-#line 242
-    IF (err)
-#line 242
-	error("nc_close: %s", nc_strerror(err));
-#line 242
-    print_nok(nok);
-#line 242
-}
-#line 242
-
-void
-#line 243
-test_nc_get_var_long(void)
-#line 243
-{
-#line 243
-    int ncid;
-#line 243
-    int i;
-#line 243
-    int j;
-#line 243
-    int err;
-#line 243
-    int allInExtRange;	/* all values within external range? */
-#line 243
-    int allInIntRange;	/* all values within internal range? */
-#line 243
-    int nels;
-#line 243
-    int nok = 0;      /* count of valid comparisons */
-#line 243
-    size_t index[MAX_RANK];
-#line 243
-    int canConvert;     /* Both text or both numeric */
-#line 243
-    long value[MAX_NELS];
-#line 243
-    double expect[MAX_NELS];
-#line 243
-
-#line 243
-#ifdef USE_PNETCDF
-#line 243
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 243
-#else
-#line 243
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 243
-#endif
-#line 243
-    IF (err)
-#line 243
-	error("nc_open: %s", nc_strerror(err));
-#line 243
-    for (i = 0; i < numVars; i++) {
-#line 243
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_LONG == NCT_TEXT);
-#line 243
-        assert(var_rank[i] <= MAX_RANK);
-#line 243
-        assert(var_nels[i] <= MAX_NELS);
-#line 243
-        err = nc_get_var_long(BAD_ID, i, value);
-#line 243
-        IF (err != NC_EBADID)
-#line 243
-	    error("bad ncid: status = %d", err);
-#line 243
-        err = nc_get_var_long(ncid, BAD_VARID, value);
-#line 243
-        IF (err != NC_ENOTVAR)
-#line 243
-	    error("bad var id: status = %d", err);
-#line 243
-
-#line 243
-	nels = 1;
-#line 243
-	for (j = 0; j < var_rank[i]; j++) {
-#line 243
-	    nels *= var_shape[i][j];
-#line 243
-	}
-#line 243
-	allInExtRange = allInIntRange = 1;
-#line 243
-	for (j = 0; j < nels; j++) {
-#line 243
-	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 243
-	    IF (err)
-#line 243
-		error("error in toMixedBase 1");
-#line 243
-	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_LONG);
-#line 243
-	    if (inRange3(expect[j],var_type[i], NCT_LONG)) {
-#line 243
-		allInIntRange = allInIntRange && expect[j] >= long_min
-#line 243
-			    && expect[j] <= long_max;
-#line 243
-	    } else {
-#line 243
-		allInExtRange = 0;
-#line 243
-	    }
-#line 243
-	}
-#line 243
-	err = nc_get_var_long(ncid, i, value);
-#line 243
-	if (canConvert) {
-#line 243
-	    if (allInExtRange) {
-#line 243
-		if (allInIntRange) {
-#line 243
-		    IF (err)
-#line 243
-			error("%s", nc_strerror(err));
-#line 243
-		} else {
-#line 243
-		    IF (err != NC_ERANGE)
-#line 243
-			error("Range error: status = %d", err);
-#line 243
-		}
-#line 243
-	    } else {
-#line 243
-		IF (err != 0 && err != NC_ERANGE)
-#line 243
-		    error("OK or Range error: status = %d", err);
-#line 243
-	    }
-#line 243
-	    for (j = 0; j < nels; j++) {
-#line 243
-		if (inRange3(expect[j],var_type[i],NCT_LONG)
-#line 243
-			&& expect[j] >= long_min && expect[j] <= long_max) {
-#line 243
-		    IF (!equal(value[j],expect[j],var_type[i],NCT_LONG)){
-#line 243
-			error("value read not that expected");
-#line 243
-			if (verbose) {
-#line 243
-			    error("\n");
-#line 243
-			    error("varid: %d, ", i);
-#line 243
-			    error("var_name: %s, ", var_name[i]);
-#line 243
-			    error("element number: %d ", j);
-#line 243
-			    error("expect: %g", expect[j]);
-#line 243
-			    error("got: %g", (double) value[j]);
-#line 243
-			}
-#line 243
-		    } else {
-#line 243
-			nok++;
-#line 243
-		    }
-#line 243
-		}
-#line 243
-	    }
-#line 243
-	} else {
-#line 243
-	    IF (nels > 0 && err != NC_ECHAR)
-#line 243
-		error("wrong type: status = %d", err);
-#line 243
-	}
-#line 243
-    }
-#line 243
-    err = nc_close(ncid);
-#line 243
-    IF (err)
-#line 243
-	error("nc_close: %s", nc_strerror(err));
-#line 243
-    print_nok(nok);
-#line 243
-}
-#line 243
-
-void
-#line 244
-test_nc_get_var_float(void)
-#line 244
-{
-#line 244
-    int ncid;
-#line 244
-    int i;
-#line 244
-    int j;
-#line 244
-    int err;
-#line 244
-    int allInExtRange;	/* all values within external range? */
-#line 244
-    int allInIntRange;	/* all values within internal range? */
-#line 244
-    int nels;
-#line 244
-    int nok = 0;      /* count of valid comparisons */
-#line 244
-    size_t index[MAX_RANK];
-#line 244
-    int canConvert;     /* Both text or both numeric */
-#line 244
-    float value[MAX_NELS];
-#line 244
-    double expect[MAX_NELS];
-#line 244
-
-#line 244
-#ifdef USE_PNETCDF
-#line 244
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 244
-#else
-#line 244
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 244
-#endif
-#line 244
-    IF (err)
-#line 244
-	error("nc_open: %s", nc_strerror(err));
-#line 244
-    for (i = 0; i < numVars; i++) {
-#line 244
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_FLOAT == NCT_TEXT);
-#line 244
-        assert(var_rank[i] <= MAX_RANK);
-#line 244
-        assert(var_nels[i] <= MAX_NELS);
-#line 244
-        err = nc_get_var_float(BAD_ID, i, value);
-#line 244
-        IF (err != NC_EBADID)
-#line 244
-	    error("bad ncid: status = %d", err);
-#line 244
-        err = nc_get_var_float(ncid, BAD_VARID, value);
-#line 244
-        IF (err != NC_ENOTVAR)
-#line 244
-	    error("bad var id: status = %d", err);
-#line 244
-
-#line 244
-	nels = 1;
-#line 244
-	for (j = 0; j < var_rank[i]; j++) {
-#line 244
-	    nels *= var_shape[i][j];
-#line 244
-	}
-#line 244
-	allInExtRange = allInIntRange = 1;
-#line 244
-	for (j = 0; j < nels; j++) {
-#line 244
-	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 244
-	    IF (err)
-#line 244
-		error("error in toMixedBase 1");
-#line 244
-	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_FLOAT);
-#line 244
-	    if (inRange3(expect[j],var_type[i], NCT_FLOAT)) {
-#line 244
-		allInIntRange = allInIntRange && expect[j] >= float_min
-#line 244
-			    && expect[j] <= float_max;
-#line 244
-	    } else {
-#line 244
-		allInExtRange = 0;
-#line 244
-	    }
-#line 244
-	}
-#line 244
-	err = nc_get_var_float(ncid, i, value);
-#line 244
-	if (canConvert) {
-#line 244
-	    if (allInExtRange) {
-#line 244
-		if (allInIntRange) {
-#line 244
-		    IF (err)
-#line 244
-			error("%s", nc_strerror(err));
-#line 244
-		} else {
-#line 244
-		    IF (err != NC_ERANGE)
-#line 244
-			error("Range error: status = %d", err);
-#line 244
-		}
-#line 244
-	    } else {
-#line 244
-		IF (err != 0 && err != NC_ERANGE)
-#line 244
-		    error("OK or Range error: status = %d", err);
-#line 244
-	    }
-#line 244
-	    for (j = 0; j < nels; j++) {
-#line 244
-		if (inRange3(expect[j],var_type[i],NCT_FLOAT)
-#line 244
-			&& expect[j] >= float_min && expect[j] <= float_max) {
-#line 244
-		    IF (!equal(value[j],expect[j],var_type[i],NCT_FLOAT)){
-#line 244
-			error("value read not that expected");
-#line 244
-			if (verbose) {
-#line 244
-			    error("\n");
-#line 244
-			    error("varid: %d, ", i);
-#line 244
-			    error("var_name: %s, ", var_name[i]);
-#line 244
-			    error("element number: %d ", j);
-#line 244
-			    error("expect: %g", expect[j]);
-#line 244
-			    error("got: %g", (double) value[j]);
-#line 244
-			}
-#line 244
-		    } else {
-#line 244
-			nok++;
-#line 244
-		    }
-#line 244
-		}
-#line 244
-	    }
-#line 244
-	} else {
-#line 244
-	    IF (nels > 0 && err != NC_ECHAR)
-#line 244
-		error("wrong type: status = %d", err);
-#line 244
-	}
-#line 244
-    }
-#line 244
-    err = nc_close(ncid);
-#line 244
-    IF (err)
-#line 244
-	error("nc_close: %s", nc_strerror(err));
-#line 244
-    print_nok(nok);
-#line 244
-}
-#line 244
-
-void
-#line 245
-test_nc_get_var_double(void)
-#line 245
-{
-#line 245
-    int ncid;
-#line 245
-    int i;
-#line 245
-    int j;
-#line 245
-    int err;
-#line 245
-    int allInExtRange;	/* all values within external range? */
-#line 245
-    int allInIntRange;	/* all values within internal range? */
-#line 245
-    int nels;
-#line 245
-    int nok = 0;      /* count of valid comparisons */
-#line 245
-    size_t index[MAX_RANK];
-#line 245
-    int canConvert;     /* Both text or both numeric */
-#line 245
-    double value[MAX_NELS];
-#line 245
-    double expect[MAX_NELS];
-#line 245
-
-#line 245
-#ifdef USE_PNETCDF
-#line 245
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 245
-#else
-#line 245
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 245
-#endif
-#line 245
-    IF (err)
-#line 245
-	error("nc_open: %s", nc_strerror(err));
-#line 245
-    for (i = 0; i < numVars; i++) {
-#line 245
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_DOUBLE == NCT_TEXT);
-#line 245
-        assert(var_rank[i] <= MAX_RANK);
-#line 245
-        assert(var_nels[i] <= MAX_NELS);
-#line 245
-        err = nc_get_var_double(BAD_ID, i, value);
-#line 245
-        IF (err != NC_EBADID)
-#line 245
-	    error("bad ncid: status = %d", err);
-#line 245
-        err = nc_get_var_double(ncid, BAD_VARID, value);
-#line 245
-        IF (err != NC_ENOTVAR)
-#line 245
-	    error("bad var id: status = %d", err);
-#line 245
-
-#line 245
-	nels = 1;
-#line 245
-	for (j = 0; j < var_rank[i]; j++) {
-#line 245
-	    nels *= var_shape[i][j];
-#line 245
-	}
-#line 245
-	allInExtRange = allInIntRange = 1;
-#line 245
-	for (j = 0; j < nels; j++) {
-#line 245
-	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 245
-	    IF (err)
-#line 245
-		error("error in toMixedBase 1");
-#line 245
-	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_DOUBLE);
-#line 245
-	    if (inRange3(expect[j],var_type[i], NCT_DOUBLE)) {
-#line 245
-		allInIntRange = allInIntRange && expect[j] >= double_min
-#line 245
-			    && expect[j] <= double_max;
-#line 245
-	    } else {
-#line 245
-		allInExtRange = 0;
-#line 245
-	    }
-#line 245
-	}
-#line 245
-	err = nc_get_var_double(ncid, i, value);
-#line 245
-	if (canConvert) {
-#line 245
-	    if (allInExtRange) {
-#line 245
-		if (allInIntRange) {
-#line 245
-		    IF (err)
-#line 245
-			error("%s", nc_strerror(err));
-#line 245
-		} else {
-#line 245
-		    IF (err != NC_ERANGE)
-#line 245
-			error("Range error: status = %d", err);
-#line 245
-		}
-#line 245
-	    } else {
-#line 245
-		IF (err != 0 && err != NC_ERANGE)
-#line 245
-		    error("OK or Range error: status = %d", err);
-#line 245
-	    }
-#line 245
-	    for (j = 0; j < nels; j++) {
-#line 245
-		if (inRange3(expect[j],var_type[i],NCT_DOUBLE)
-#line 245
-			&& expect[j] >= double_min && expect[j] <= double_max) {
-#line 245
-		    IF (!equal(value[j],expect[j],var_type[i],NCT_DOUBLE)){
-#line 245
-			error("value read not that expected");
-#line 245
-			if (verbose) {
-#line 245
-			    error("\n");
-#line 245
-			    error("varid: %d, ", i);
-#line 245
-			    error("var_name: %s, ", var_name[i]);
-#line 245
-			    error("element number: %d ", j);
-#line 245
-			    error("expect: %g", expect[j]);
-#line 245
-			    error("got: %g", (double) value[j]);
-#line 245
-			}
-#line 245
-		    } else {
-#line 245
-			nok++;
-#line 245
-		    }
-#line 245
-		}
-#line 245
-	    }
-#line 245
-	} else {
-#line 245
-	    IF (nels > 0 && err != NC_ECHAR)
-#line 245
-		error("wrong type: status = %d", err);
-#line 245
-	}
-#line 245
-    }
-#line 245
-    err = nc_close(ncid);
-#line 245
-    IF (err)
-#line 245
-	error("nc_close: %s", nc_strerror(err));
-#line 245
-    print_nok(nok);
-#line 245
-}
-#line 245
-
-void
-#line 246
 test_nc_get_var_ushort(void)
-#line 246
+#line 238
 {
-#line 246
+#line 238
     int ncid;
-#line 246
+#line 238
     int i;
-#line 246
+#line 238
     int j;
-#line 246
+#line 238
     int err;
-#line 246
+#line 238
     int allInExtRange;	/* all values within external range? */
-#line 246
+#line 238
     int allInIntRange;	/* all values within internal range? */
-#line 246
+#line 238
     int nels;
-#line 246
+#line 238
     int nok = 0;      /* count of valid comparisons */
-#line 246
+#line 238
     size_t index[MAX_RANK];
-#line 246
+#line 238
     int canConvert;     /* Both text or both numeric */
-#line 246
+#line 238
     ushort value[MAX_NELS];
-#line 246
+#line 238
     double expect[MAX_NELS];
-#line 246
+#line 238
 
-#line 246
-#ifdef USE_PNETCDF
-#line 246
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 246
-#else
-#line 246
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 246
-#endif
-#line 246
+#line 238
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 238
     IF (err)
-#line 246
+#line 238
 	error("nc_open: %s", nc_strerror(err));
-#line 246
+#line 238
     for (i = 0; i < numVars; i++) {
-#line 246
+#line 238
         canConvert = (var_type[i] == NC_CHAR) == (NCT_USHORT == NCT_TEXT);
-#line 246
+#line 238
         assert(var_rank[i] <= MAX_RANK);
-#line 246
+#line 238
         assert(var_nels[i] <= MAX_NELS);
-#line 246
+#line 238
         err = nc_get_var_ushort(BAD_ID, i, value);
-#line 246
+#line 238
         IF (err != NC_EBADID)
-#line 246
+#line 238
 	    error("bad ncid: status = %d", err);
-#line 246
+#line 238
         err = nc_get_var_ushort(ncid, BAD_VARID, value);
-#line 246
+#line 238
         IF (err != NC_ENOTVAR)
-#line 246
+#line 238
 	    error("bad var id: status = %d", err);
-#line 246
+#line 238
 
-#line 246
+#line 238
 	nels = 1;
-#line 246
+#line 238
 	for (j = 0; j < var_rank[i]; j++) {
-#line 246
+#line 238
 	    nels *= var_shape[i][j];
-#line 246
+#line 238
 	}
-#line 246
+#line 238
 	allInExtRange = allInIntRange = 1;
-#line 246
+#line 238
 	for (j = 0; j < nels; j++) {
-#line 246
+#line 238
 	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 246
+#line 238
 	    IF (err)
-#line 246
+#line 238
 		error("error in toMixedBase 1");
-#line 246
+#line 238
 	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_USHORT);
-#line 246
+#line 238
 	    if (inRange3(expect[j],var_type[i], NCT_USHORT)) {
-#line 246
+#line 238
 		allInIntRange = allInIntRange && expect[j] >= ushort_min
-#line 246
+#line 238
 			    && expect[j] <= ushort_max;
-#line 246
+#line 238
 	    } else {
-#line 246
+#line 238
 		allInExtRange = 0;
-#line 246
+#line 238
 	    }
-#line 246
+#line 238
 	}
-#line 246
+#line 238
 	err = nc_get_var_ushort(ncid, i, value);
-#line 246
+#line 238
 	if (canConvert) {
-#line 246
+#line 238
 	    if (allInExtRange) {
-#line 246
+#line 238
 		if (allInIntRange) {
-#line 246
+#line 238
 		    IF (err)
-#line 246
+#line 238
 			error("%s", nc_strerror(err));
-#line 246
+#line 238
 		} else {
-#line 246
+#line 238
 		    IF (err != NC_ERANGE)
-#line 246
+#line 238
 			error("Range error: status = %d", err);
-#line 246
+#line 238
 		}
-#line 246
+#line 238
 	    } else {
-#line 246
+#line 238
 		IF (err != 0 && err != NC_ERANGE)
-#line 246
+#line 238
 		    error("OK or Range error: status = %d", err);
-#line 246
+#line 238
 	    }
-#line 246
+#line 238
 	    for (j = 0; j < nels; j++) {
-#line 246
+#line 238
 		if (inRange3(expect[j],var_type[i],NCT_USHORT)
-#line 246
+#line 238
 			&& expect[j] >= ushort_min && expect[j] <= ushort_max) {
-#line 246
+#line 238
 		    IF (!equal(value[j],expect[j],var_type[i],NCT_USHORT)){
-#line 246
+#line 238
 			error("value read not that expected");
-#line 246
+#line 238
 			if (verbose) {
-#line 246
+#line 238
 			    error("\n");
-#line 246
+#line 238
 			    error("varid: %d, ", i);
-#line 246
+#line 238
 			    error("var_name: %s, ", var_name[i]);
-#line 246
+#line 238
 			    error("element number: %d ", j);
-#line 246
+#line 238
 			    error("expect: %g", expect[j]);
-#line 246
+#line 238
 			    error("got: %g", (double) value[j]);
-#line 246
+#line 238
 			}
-#line 246
+#line 238
 		    } else {
-#line 246
+#line 238
 			nok++;
-#line 246
+#line 238
 		    }
-#line 246
+#line 238
 		}
-#line 246
+#line 238
 	    }
-#line 246
+#line 238
 	} else {
-#line 246
+#line 238
 	    IF (nels > 0 && err != NC_ECHAR)
-#line 246
+#line 238
 		error("wrong type: status = %d", err);
-#line 246
+#line 238
 	}
-#line 246
+#line 238
     }
-#line 246
+#line 238
     err = nc_close(ncid);
-#line 246
+#line 238
     IF (err)
-#line 246
+#line 238
 	error("nc_close: %s", nc_strerror(err));
-#line 246
+#line 238
     print_nok(nok);
-#line 246
+#line 238
 }
-#line 246
+#line 238
 
 void
-#line 247
+#line 239
 test_nc_get_var_uint(void)
-#line 247
+#line 239
 {
-#line 247
+#line 239
     int ncid;
-#line 247
+#line 239
     int i;
-#line 247
+#line 239
     int j;
-#line 247
+#line 239
     int err;
-#line 247
+#line 239
     int allInExtRange;	/* all values within external range? */
-#line 247
+#line 239
     int allInIntRange;	/* all values within internal range? */
-#line 247
+#line 239
     int nels;
-#line 247
+#line 239
     int nok = 0;      /* count of valid comparisons */
-#line 247
+#line 239
     size_t index[MAX_RANK];
-#line 247
+#line 239
     int canConvert;     /* Both text or both numeric */
-#line 247
+#line 239
     uint value[MAX_NELS];
-#line 247
+#line 239
     double expect[MAX_NELS];
-#line 247
+#line 239
 
-#line 247
-#ifdef USE_PNETCDF
-#line 247
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 247
-#else
-#line 247
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 247
-#endif
-#line 247
+#line 239
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 239
     IF (err)
-#line 247
+#line 239
 	error("nc_open: %s", nc_strerror(err));
-#line 247
+#line 239
     for (i = 0; i < numVars; i++) {
-#line 247
+#line 239
         canConvert = (var_type[i] == NC_CHAR) == (NCT_UINT == NCT_TEXT);
-#line 247
+#line 239
         assert(var_rank[i] <= MAX_RANK);
-#line 247
+#line 239
         assert(var_nels[i] <= MAX_NELS);
-#line 247
+#line 239
         err = nc_get_var_uint(BAD_ID, i, value);
-#line 247
+#line 239
         IF (err != NC_EBADID)
-#line 247
+#line 239
 	    error("bad ncid: status = %d", err);
-#line 247
+#line 239
         err = nc_get_var_uint(ncid, BAD_VARID, value);
-#line 247
+#line 239
         IF (err != NC_ENOTVAR)
-#line 247
+#line 239
 	    error("bad var id: status = %d", err);
-#line 247
+#line 239
 
-#line 247
+#line 239
 	nels = 1;
-#line 247
+#line 239
 	for (j = 0; j < var_rank[i]; j++) {
-#line 247
+#line 239
 	    nels *= var_shape[i][j];
-#line 247
+#line 239
 	}
-#line 247
+#line 239
 	allInExtRange = allInIntRange = 1;
-#line 247
+#line 239
 	for (j = 0; j < nels; j++) {
-#line 247
+#line 239
 	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 247
+#line 239
 	    IF (err)
-#line 247
+#line 239
 		error("error in toMixedBase 1");
-#line 247
+#line 239
 	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_UINT);
-#line 247
+#line 239
 	    if (inRange3(expect[j],var_type[i], NCT_UINT)) {
-#line 247
+#line 239
 		allInIntRange = allInIntRange && expect[j] >= uint_min
-#line 247
+#line 239
 			    && expect[j] <= uint_max;
-#line 247
+#line 239
 	    } else {
-#line 247
+#line 239
 		allInExtRange = 0;
-#line 247
+#line 239
 	    }
-#line 247
+#line 239
 	}
-#line 247
+#line 239
 	err = nc_get_var_uint(ncid, i, value);
-#line 247
+#line 239
 	if (canConvert) {
-#line 247
+#line 239
 	    if (allInExtRange) {
-#line 247
+#line 239
 		if (allInIntRange) {
-#line 247
+#line 239
 		    IF (err)
-#line 247
+#line 239
 			error("%s", nc_strerror(err));
-#line 247
+#line 239
 		} else {
-#line 247
+#line 239
 		    IF (err != NC_ERANGE)
-#line 247
+#line 239
 			error("Range error: status = %d", err);
-#line 247
+#line 239
 		}
-#line 247
+#line 239
 	    } else {
-#line 247
+#line 239
 		IF (err != 0 && err != NC_ERANGE)
-#line 247
+#line 239
 		    error("OK or Range error: status = %d", err);
-#line 247
+#line 239
 	    }
-#line 247
+#line 239
 	    for (j = 0; j < nels; j++) {
-#line 247
+#line 239
 		if (inRange3(expect[j],var_type[i],NCT_UINT)
-#line 247
+#line 239
 			&& expect[j] >= uint_min && expect[j] <= uint_max) {
-#line 247
+#line 239
 		    IF (!equal(value[j],expect[j],var_type[i],NCT_UINT)){
-#line 247
+#line 239
 			error("value read not that expected");
-#line 247
+#line 239
 			if (verbose) {
-#line 247
+#line 239
 			    error("\n");
-#line 247
+#line 239
 			    error("varid: %d, ", i);
-#line 247
+#line 239
 			    error("var_name: %s, ", var_name[i]);
-#line 247
+#line 239
 			    error("element number: %d ", j);
-#line 247
+#line 239
 			    error("expect: %g", expect[j]);
-#line 247
+#line 239
 			    error("got: %g", (double) value[j]);
-#line 247
+#line 239
 			}
-#line 247
+#line 239
 		    } else {
-#line 247
+#line 239
 			nok++;
-#line 247
+#line 239
 		    }
-#line 247
+#line 239
 		}
-#line 247
+#line 239
 	    }
-#line 247
+#line 239
 	} else {
-#line 247
+#line 239
 	    IF (nels > 0 && err != NC_ECHAR)
-#line 247
+#line 239
 		error("wrong type: status = %d", err);
-#line 247
+#line 239
 	}
-#line 247
+#line 239
     }
-#line 247
+#line 239
     err = nc_close(ncid);
-#line 247
+#line 239
     IF (err)
-#line 247
+#line 239
 	error("nc_close: %s", nc_strerror(err));
-#line 247
+#line 239
     print_nok(nok);
-#line 247
+#line 239
 }
-#line 247
+#line 239
 
 void
-#line 248
+#line 240
 test_nc_get_var_longlong(void)
-#line 248
+#line 240
 {
-#line 248
+#line 240
     int ncid;
-#line 248
+#line 240
     int i;
-#line 248
+#line 240
     int j;
-#line 248
+#line 240
     int err;
-#line 248
+#line 240
     int allInExtRange;	/* all values within external range? */
-#line 248
+#line 240
     int allInIntRange;	/* all values within internal range? */
-#line 248
+#line 240
     int nels;
-#line 248
+#line 240
     int nok = 0;      /* count of valid comparisons */
-#line 248
+#line 240
     size_t index[MAX_RANK];
-#line 248
+#line 240
     int canConvert;     /* Both text or both numeric */
-#line 248
+#line 240
     longlong value[MAX_NELS];
-#line 248
+#line 240
     double expect[MAX_NELS];
-#line 248
+#line 240
 
-#line 248
-#ifdef USE_PNETCDF
-#line 248
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 248
-#else
-#line 248
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 248
-#endif
-#line 248
+#line 240
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 240
     IF (err)
-#line 248
+#line 240
 	error("nc_open: %s", nc_strerror(err));
-#line 248
+#line 240
     for (i = 0; i < numVars; i++) {
-#line 248
+#line 240
         canConvert = (var_type[i] == NC_CHAR) == (NCT_LONGLONG == NCT_TEXT);
-#line 248
+#line 240
         assert(var_rank[i] <= MAX_RANK);
-#line 248
+#line 240
         assert(var_nels[i] <= MAX_NELS);
-#line 248
+#line 240
         err = nc_get_var_longlong(BAD_ID, i, value);
-#line 248
+#line 240
         IF (err != NC_EBADID)
-#line 248
+#line 240
 	    error("bad ncid: status = %d", err);
-#line 248
+#line 240
         err = nc_get_var_longlong(ncid, BAD_VARID, value);
-#line 248
+#line 240
         IF (err != NC_ENOTVAR)
-#line 248
+#line 240
 	    error("bad var id: status = %d", err);
-#line 248
+#line 240
 
-#line 248
+#line 240
 	nels = 1;
-#line 248
+#line 240
 	for (j = 0; j < var_rank[i]; j++) {
-#line 248
+#line 240
 	    nels *= var_shape[i][j];
-#line 248
+#line 240
 	}
-#line 248
+#line 240
 	allInExtRange = allInIntRange = 1;
-#line 248
+#line 240
 	for (j = 0; j < nels; j++) {
-#line 248
+#line 240
 	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 248
+#line 240
 	    IF (err)
-#line 248
+#line 240
 		error("error in toMixedBase 1");
-#line 248
+#line 240
 	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_LONGLONG);
-#line 248
+#line 240
 	    if (inRange3(expect[j],var_type[i], NCT_LONGLONG)) {
-#line 248
+#line 240
 		allInIntRange = allInIntRange && expect[j] >= longlong_min
-#line 248
+#line 240
 			    && expect[j] <= longlong_max;
-#line 248
+#line 240
 	    } else {
-#line 248
+#line 240
 		allInExtRange = 0;
-#line 248
+#line 240
 	    }
-#line 248
+#line 240
 	}
-#line 248
+#line 240
 	err = nc_get_var_longlong(ncid, i, value);
-#line 248
+#line 240
 	if (canConvert) {
-#line 248
+#line 240
 	    if (allInExtRange) {
-#line 248
+#line 240
 		if (allInIntRange) {
-#line 248
+#line 240
 		    IF (err)
-#line 248
+#line 240
 			error("%s", nc_strerror(err));
-#line 248
+#line 240
 		} else {
-#line 248
+#line 240
 		    IF (err != NC_ERANGE)
-#line 248
+#line 240
 			error("Range error: status = %d", err);
-#line 248
+#line 240
 		}
-#line 248
+#line 240
 	    } else {
-#line 248
+#line 240
 		IF (err != 0 && err != NC_ERANGE)
-#line 248
+#line 240
 		    error("OK or Range error: status = %d", err);
-#line 248
+#line 240
 	    }
-#line 248
+#line 240
 	    for (j = 0; j < nels; j++) {
-#line 248
+#line 240
 		if (inRange3(expect[j],var_type[i],NCT_LONGLONG)
-#line 248
+#line 240
 			&& expect[j] >= longlong_min && expect[j] <= longlong_max) {
-#line 248
+#line 240
 		    IF (!equal(value[j],expect[j],var_type[i],NCT_LONGLONG)){
-#line 248
+#line 240
 			error("value read not that expected");
-#line 248
+#line 240
 			if (verbose) {
-#line 248
+#line 240
 			    error("\n");
-#line 248
+#line 240
 			    error("varid: %d, ", i);
-#line 248
+#line 240
 			    error("var_name: %s, ", var_name[i]);
-#line 248
+#line 240
 			    error("element number: %d ", j);
-#line 248
+#line 240
 			    error("expect: %g", expect[j]);
-#line 248
+#line 240
 			    error("got: %g", (double) value[j]);
-#line 248
+#line 240
 			}
-#line 248
+#line 240
 		    } else {
-#line 248
+#line 240
 			nok++;
-#line 248
+#line 240
 		    }
-#line 248
+#line 240
 		}
-#line 248
+#line 240
 	    }
-#line 248
+#line 240
 	} else {
-#line 248
+#line 240
 	    IF (nels > 0 && err != NC_ECHAR)
-#line 248
+#line 240
 		error("wrong type: status = %d", err);
-#line 248
+#line 240
 	}
-#line 248
+#line 240
     }
-#line 248
+#line 240
     err = nc_close(ncid);
-#line 248
+#line 240
     IF (err)
-#line 248
+#line 240
 	error("nc_close: %s", nc_strerror(err));
-#line 248
+#line 240
     print_nok(nok);
-#line 248
+#line 240
 }
-#line 248
+#line 240
 
 void
-#line 249
+#line 241
 test_nc_get_var_ulonglong(void)
-#line 249
+#line 241
 {
-#line 249
+#line 241
     int ncid;
-#line 249
+#line 241
     int i;
-#line 249
+#line 241
     int j;
-#line 249
+#line 241
     int err;
-#line 249
+#line 241
     int allInExtRange;	/* all values within external range? */
-#line 249
+#line 241
     int allInIntRange;	/* all values within internal range? */
-#line 249
+#line 241
     int nels;
-#line 249
+#line 241
     int nok = 0;      /* count of valid comparisons */
-#line 249
+#line 241
     size_t index[MAX_RANK];
-#line 249
+#line 241
     int canConvert;     /* Both text or both numeric */
-#line 249
+#line 241
     ulonglong value[MAX_NELS];
-#line 249
+#line 241
     double expect[MAX_NELS];
-#line 249
+#line 241
 
-#line 249
-#ifdef USE_PNETCDF
-#line 249
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 249
-#else
-#line 249
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 249
-#endif
-#line 249
+#line 241
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 241
     IF (err)
-#line 249
+#line 241
 	error("nc_open: %s", nc_strerror(err));
-#line 249
+#line 241
     for (i = 0; i < numVars; i++) {
-#line 249
+#line 241
         canConvert = (var_type[i] == NC_CHAR) == (NCT_ULONGLONG == NCT_TEXT);
-#line 249
+#line 241
         assert(var_rank[i] <= MAX_RANK);
-#line 249
+#line 241
         assert(var_nels[i] <= MAX_NELS);
-#line 249
+#line 241
         err = nc_get_var_ulonglong(BAD_ID, i, value);
-#line 249
+#line 241
         IF (err != NC_EBADID)
-#line 249
+#line 241
 	    error("bad ncid: status = %d", err);
-#line 249
+#line 241
         err = nc_get_var_ulonglong(ncid, BAD_VARID, value);
-#line 249
+#line 241
         IF (err != NC_ENOTVAR)
-#line 249
+#line 241
 	    error("bad var id: status = %d", err);
-#line 249
+#line 241
 
-#line 249
+#line 241
 	nels = 1;
-#line 249
+#line 241
 	for (j = 0; j < var_rank[i]; j++) {
-#line 249
+#line 241
 	    nels *= var_shape[i][j];
-#line 249
+#line 241
 	}
-#line 249
+#line 241
 	allInExtRange = allInIntRange = 1;
-#line 249
+#line 241
 	for (j = 0; j < nels; j++) {
-#line 249
+#line 241
 	    err = toMixedBase(j, var_rank[i], var_shape[i], index);
-#line 249
+#line 241
 	    IF (err)
-#line 249
+#line 241
 		error("error in toMixedBase 1");
-#line 249
+#line 241
 	    expect[j] = hash4(var_type[i], var_rank[i], index, NCT_ULONGLONG);
-#line 249
+#line 241
 	    if (inRange3(expect[j],var_type[i], NCT_ULONGLONG)) {
-#line 249
+#line 241
 		allInIntRange = allInIntRange && expect[j] >= ulonglong_min
-#line 249
+#line 241
 			    && expect[j] <= ulonglong_max;
-#line 249
+#line 241
 	    } else {
-#line 249
+#line 241
 		allInExtRange = 0;
-#line 249
+#line 241
 	    }
-#line 249
+#line 241
 	}
-#line 249
+#line 241
 	err = nc_get_var_ulonglong(ncid, i, value);
-#line 249
+#line 241
 	if (canConvert) {
-#line 249
+#line 241
 	    if (allInExtRange) {
-#line 249
+#line 241
 		if (allInIntRange) {
-#line 249
+#line 241
 		    IF (err)
-#line 249
+#line 241
 			error("%s", nc_strerror(err));
-#line 249
+#line 241
 		} else {
-#line 249
+#line 241
 		    IF (err != NC_ERANGE)
-#line 249
+#line 241
 			error("Range error: status = %d", err);
-#line 249
+#line 241
 		}
-#line 249
+#line 241
 	    } else {
-#line 249
+#line 241
 		IF (err != 0 && err != NC_ERANGE)
-#line 249
+#line 241
 		    error("OK or Range error: status = %d", err);
-#line 249
+#line 241
 	    }
-#line 249
+#line 241
 	    for (j = 0; j < nels; j++) {
-#line 249
+#line 241
 		if (inRange3(expect[j],var_type[i],NCT_ULONGLONG)
-#line 249
+#line 241
 			&& expect[j] >= ulonglong_min && expect[j] <= ulonglong_max) {
-#line 249
+#line 241
 		    IF (!equal(value[j],expect[j],var_type[i],NCT_ULONGLONG)){
-#line 249
+#line 241
 			error("value read not that expected");
-#line 249
+#line 241
 			if (verbose) {
-#line 249
+#line 241
 			    error("\n");
-#line 249
+#line 241
 			    error("varid: %d, ", i);
-#line 249
+#line 241
 			    error("var_name: %s, ", var_name[i]);
-#line 249
+#line 241
 			    error("element number: %d ", j);
-#line 249
+#line 241
 			    error("expect: %g", expect[j]);
-#line 249
+#line 241
 			    error("got: %g", (double) value[j]);
-#line 249
+#line 241
 			}
-#line 249
+#line 241
 		    } else {
-#line 249
+#line 241
 			nok++;
-#line 249
+#line 241
 		    }
-#line 249
+#line 241
 		}
-#line 249
+#line 241
 	    }
-#line 249
+#line 241
 	} else {
-#line 249
+#line 241
 	    IF (nels > 0 && err != NC_ECHAR)
-#line 249
+#line 241
 		error("wrong type: status = %d", err);
-#line 249
+#line 241
 	}
-#line 249
+#line 241
     }
-#line 249
+#line 241
     err = nc_close(ncid);
-#line 249
+#line 241
     IF (err)
-#line 249
+#line 241
 	error("nc_close: %s", nc_strerror(err));
-#line 249
+#line 241
     print_nok(nok);
-#line 249
+#line 241
 }
-#line 249
+#line 241
 
 
 
+#line 413
+
+void
+#line 414
+test_nc_get_vara_text(void)
+#line 414
+{
+#line 414
+    int ncid;
+#line 414
+    int d;
+#line 414
+    int i;
+#line 414
+    int j;
+#line 414
+    int k;
+#line 414
+    int err;
+#line 414
+    int allInExtRange;	/* all values within external range? */
+#line 414
+    int allInIntRange;	/* all values within internal range? */
+#line 414
+    int nels;
+#line 414
+    int nslabs;
+#line 414
+    int nok = 0;      /* count of valid comparisons */
+#line 414
+    size_t start[MAX_RANK];
+#line 414
+    size_t edge[MAX_RANK];
+#line 414
+    size_t index[MAX_RANK];
+#line 414
+    size_t mid[MAX_RANK];
+#line 414
+    int canConvert;     /* Both text or both numeric */
+#line 414
+    text value[MAX_NELS];
+#line 414
+    double expect[MAX_NELS];
+#line 414
+
+#line 414
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 414
+    IF (err)
+#line 414
+	error("nc_open: %s", nc_strerror(err));
+#line 414
+    for (i = 0; i < numVars; i++) {
+#line 414
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_TEXT == NCT_TEXT);
+#line 414
+        assert(var_rank[i] <= MAX_RANK);
+#line 414
+        assert(var_nels[i] <= MAX_NELS);
+#line 414
+	for (j = 0; j < var_rank[i]; j++) {
+#line 414
+	    start[j] = 0;
+#line 414
+	    edge[j] = 1;
+#line 414
+	}
+#line 414
+        err = nc_get_vara_text(BAD_ID, i, start, edge, value);
+#line 414
+        IF (err != NC_EBADID)
+#line 414
+	    error("bad ncid: status = %d", err);
+#line 414
+        err = nc_get_vara_text(ncid, BAD_VARID, start, edge, value);
+#line 414
+        IF (err != NC_ENOTVAR)
+#line 414
+	    error("bad var id: status = %d", err);
+#line 414
+	for (j = 0; j < var_rank[i]; j++) {
+#line 414
+	    start[j] = var_shape[i][j];
+#line 414
+	    err = nc_get_vara_text(ncid, i, start, edge, value);
+#line 414
+            IF (canConvert && err != NC_EINVALCOORDS)
+#line 414
+                error("bad index: status = %d", err);
+#line 414
+	    start[j] = 0;
+#line 414
+	    edge[j] = var_shape[i][j] + 1;
+#line 414
+	    err = nc_get_vara_text(ncid, i, start, edge, value);
+#line 414
+            IF (canConvert && err != NC_EEDGE)
+#line 414
+		error("bad edge: status = %d", err);
+#line 414
+	    edge[j] = 1;
+#line 414
+	}
+#line 414
+            /* Check non-scalars for correct error returned even when */
+#line 414
+            /* there is nothing to get (edge[j]==0) */
+#line 414
+	if(var_rank[i] > 0) {
+#line 414
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 414
+		edge[j] = 0;
+#line 414
+	    }
+#line 414
+	    err = nc_get_vara_text(BAD_ID, i, start, edge, value);
+#line 414
+	    IF (err != NC_EBADID) 
+#line 414
+		error("bad ncid: status = %d", err);
+#line 414
+	    err = nc_get_vara_text(ncid, BAD_VARID, start, edge, value);
+#line 414
+	    IF (err != NC_ENOTVAR) 
+#line 414
+		error("bad var id: status = %d", err);
+#line 414
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 414
+		if (var_dimid[i][j] > 0) {		/* skip record dim */
+#line 414
+		    start[j] = var_shape[i][j];
+#line 414
+		    err = nc_get_vara_text(ncid, i, start, edge, value);
+#line 414
+		    IF (canConvert && err != NC_EINVALCOORDS)
+#line 414
+			error("bad start: status = %d", err);
+#line 414
+		    start[j] = 0;
+#line 414
+		}
+#line 414
+	    }
+#line 414
+	    err = nc_get_vara_text(ncid, i, start, edge, value);
+#line 414
+	    if (canConvert) {
+#line 414
+		IF (err) 
+#line 414
+		    error("%s", nc_strerror(err));
+#line 414
+	    } else {
+#line 414
+		IF (err != NC_ECHAR)
+#line 414
+		    error("wrong type: status = %d", err);
+#line 414
+	    }
+#line 414
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 414
+		edge[j] = 1;
+#line 414
+	    }
+#line 414
+	}            /* Choose a random point dividing each dim into 2 parts */
+#line 414
+            /* get 2^rank (nslabs) slabs so defined */
+#line 414
+        nslabs = 1;
+#line 414
+        for (j = 0; j < var_rank[i]; j++) {
+#line 414
+            mid[j] = roll( var_shape[i][j] );
+#line 414
+            nslabs *= 2;
+#line 414
+        }
+#line 414
+            /* bits of k determine whether to get lower or upper part of dim */
+#line 414
+        for (k = 0; k < nslabs; k++) {
+#line 414
+            nels = 1;
+#line 414
+            for (j = 0; j < var_rank[i]; j++) {
+#line 414
+                if ((k >> j) & 1) {
+#line 414
+                    start[j] = 0;
+#line 414
+                    edge[j] = mid[j];
+#line 414
+                }else{
+#line 414
+                    start[j] = mid[j];
+#line 414
+                    edge[j] = var_shape[i][j] - mid[j];
+#line 414
+                }
+#line 414
+                nels *= edge[j];
+#line 414
+            }
+#line 414
+	    allInExtRange = allInIntRange = 1;
+#line 414
+            for (j = 0; j < nels; j++) {
+#line 414
+                err = toMixedBase(j, var_rank[i], edge, index);
+#line 414
+                IF (err)
+#line 414
+                    error("error in toMixedBase 1");
+#line 414
+                for (d = 0; d < var_rank[i]; d++)
+#line 414
+                    index[d] += start[d];
+#line 414
+                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_TEXT);
+#line 414
+		if (inRange3(expect[j],var_type[i], NCT_TEXT)) {
+#line 414
+		    allInIntRange = allInIntRange && expect[j] >= text_min
+#line 414
+				&& expect[j] <= text_max;
+#line 414
+		} else {
+#line 414
+		    allInExtRange = 0;
+#line 414
+		}
+#line 414
+	    }
+#line 414
+            if (var_rank[i] == 0 && i%2)
+#line 414
+		err = nc_get_vara_text(ncid, i, NULL, NULL, value);
+#line 414
+	    else
+#line 414
+		err = nc_get_vara_text(ncid, i, start, edge, value);
+#line 414
+            if (canConvert) {
+#line 414
+		if (allInExtRange) {
+#line 414
+		    if (allInIntRange) {
+#line 414
+			IF (err)
+#line 414
+			    error("%s", nc_strerror(err));
+#line 414
+		    } else {
+#line 414
+			IF (err != NC_ERANGE)
+#line 414
+			    error("Range error: status = %d", err);
+#line 414
+		    }
+#line 414
+		} else {
+#line 414
+		    IF (err != 0 && err != NC_ERANGE)
+#line 414
+			error("OK or Range error: status = %d", err);
+#line 414
+		}
+#line 414
+		for (j = 0; j < nels; j++) {
+#line 414
+		    if (inRange3(expect[j],var_type[i],NCT_TEXT)
+#line 414
+			    && expect[j] >= text_min && expect[j] <= text_max) {
+#line 414
+			IF (!equal(value[j],expect[j],var_type[i],NCT_TEXT)){
+#line 414
+			    error("value read not that expected");
+#line 414
+			    if (verbose) {
+#line 414
+				error("\n");
+#line 414
+				error("varid: %d, ", i);
+#line 414
+				error("var_name: %s, ", var_name[i]);
+#line 414
+				error("element number: %d ", j);
+#line 414
+				error("expect: %g", expect[j]);
+#line 414
+				error("got: %g", (double) value[j]);
+#line 414
+			    }
+#line 414
+			} else {
+#line 414
+			    nok++;
+#line 414
+			}
+#line 414
+		    }
+#line 414
+		}
+#line 414
+            } else {
+#line 414
+                IF (nels > 0 && err != NC_ECHAR)
+#line 414
+                    error("wrong type: status = %d", err);
+#line 414
+            }
+#line 414
+        }
+#line 414
+    }
+#line 414
+    err = nc_close(ncid);
+#line 414
+    IF (err)
+#line 414
+	error("nc_close: %s", nc_strerror(err));
+#line 414
+    print_nok(nok);
+#line 414
+}
+#line 414
+
+void
+#line 415
+test_nc_get_vara_uchar(void)
+#line 415
+{
+#line 415
+    int ncid;
+#line 415
+    int d;
+#line 415
+    int i;
+#line 415
+    int j;
+#line 415
+    int k;
+#line 415
+    int err;
+#line 415
+    int allInExtRange;	/* all values within external range? */
+#line 415
+    int allInIntRange;	/* all values within internal range? */
+#line 415
+    int nels;
+#line 415
+    int nslabs;
+#line 415
+    int nok = 0;      /* count of valid comparisons */
+#line 415
+    size_t start[MAX_RANK];
+#line 415
+    size_t edge[MAX_RANK];
+#line 415
+    size_t index[MAX_RANK];
+#line 415
+    size_t mid[MAX_RANK];
+#line 415
+    int canConvert;     /* Both text or both numeric */
+#line 415
+    uchar value[MAX_NELS];
+#line 415
+    double expect[MAX_NELS];
+#line 415
+
+#line 415
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 415
+    IF (err)
+#line 415
+	error("nc_open: %s", nc_strerror(err));
+#line 415
+    for (i = 0; i < numVars; i++) {
+#line 415
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_UCHAR == NCT_TEXT);
+#line 415
+        assert(var_rank[i] <= MAX_RANK);
+#line 415
+        assert(var_nels[i] <= MAX_NELS);
+#line 415
+	for (j = 0; j < var_rank[i]; j++) {
+#line 415
+	    start[j] = 0;
+#line 415
+	    edge[j] = 1;
+#line 415
+	}
+#line 415
+        err = nc_get_vara_uchar(BAD_ID, i, start, edge, value);
+#line 415
+        IF (err != NC_EBADID)
+#line 415
+	    error("bad ncid: status = %d", err);
+#line 415
+        err = nc_get_vara_uchar(ncid, BAD_VARID, start, edge, value);
+#line 415
+        IF (err != NC_ENOTVAR)
+#line 415
+	    error("bad var id: status = %d", err);
+#line 415
+	for (j = 0; j < var_rank[i]; j++) {
+#line 415
+	    start[j] = var_shape[i][j];
+#line 415
+	    err = nc_get_vara_uchar(ncid, i, start, edge, value);
+#line 415
+            IF (canConvert && err != NC_EINVALCOORDS)
+#line 415
+                error("bad index: status = %d", err);
+#line 415
+	    start[j] = 0;
+#line 415
+	    edge[j] = var_shape[i][j] + 1;
+#line 415
+	    err = nc_get_vara_uchar(ncid, i, start, edge, value);
+#line 415
+            IF (canConvert && err != NC_EEDGE)
+#line 415
+		error("bad edge: status = %d", err);
+#line 415
+	    edge[j] = 1;
+#line 415
+	}
+#line 415
+            /* Check non-scalars for correct error returned even when */
+#line 415
+            /* there is nothing to get (edge[j]==0) */
+#line 415
+	if(var_rank[i] > 0) {
+#line 415
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 415
+		edge[j] = 0;
+#line 415
+	    }
+#line 415
+	    err = nc_get_vara_uchar(BAD_ID, i, start, edge, value);
+#line 415
+	    IF (err != NC_EBADID) 
+#line 415
+		error("bad ncid: status = %d", err);
+#line 415
+	    err = nc_get_vara_uchar(ncid, BAD_VARID, start, edge, value);
+#line 415
+	    IF (err != NC_ENOTVAR) 
+#line 415
+		error("bad var id: status = %d", err);
+#line 415
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 415
+		if (var_dimid[i][j] > 0) {		/* skip record dim */
+#line 415
+		    start[j] = var_shape[i][j];
+#line 415
+		    err = nc_get_vara_uchar(ncid, i, start, edge, value);
+#line 415
+		    IF (canConvert && err != NC_EINVALCOORDS)
+#line 415
+			error("bad start: status = %d", err);
+#line 415
+		    start[j] = 0;
+#line 415
+		}
+#line 415
+	    }
+#line 415
+	    err = nc_get_vara_uchar(ncid, i, start, edge, value);
+#line 415
+	    if (canConvert) {
+#line 415
+		IF (err) 
+#line 415
+		    error("%s", nc_strerror(err));
+#line 415
+	    } else {
+#line 415
+		IF (err != NC_ECHAR)
+#line 415
+		    error("wrong type: status = %d", err);
+#line 415
+	    }
+#line 415
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 415
+		edge[j] = 1;
+#line 415
+	    }
+#line 415
+	}            /* Choose a random point dividing each dim into 2 parts */
+#line 415
+            /* get 2^rank (nslabs) slabs so defined */
+#line 415
+        nslabs = 1;
+#line 415
+        for (j = 0; j < var_rank[i]; j++) {
+#line 415
+            mid[j] = roll( var_shape[i][j] );
+#line 415
+            nslabs *= 2;
+#line 415
+        }
+#line 415
+            /* bits of k determine whether to get lower or upper part of dim */
+#line 415
+        for (k = 0; k < nslabs; k++) {
+#line 415
+            nels = 1;
+#line 415
+            for (j = 0; j < var_rank[i]; j++) {
+#line 415
+                if ((k >> j) & 1) {
+#line 415
+                    start[j] = 0;
+#line 415
+                    edge[j] = mid[j];
+#line 415
+                }else{
+#line 415
+                    start[j] = mid[j];
+#line 415
+                    edge[j] = var_shape[i][j] - mid[j];
+#line 415
+                }
+#line 415
+                nels *= edge[j];
+#line 415
+            }
+#line 415
+	    allInExtRange = allInIntRange = 1;
+#line 415
+            for (j = 0; j < nels; j++) {
+#line 415
+                err = toMixedBase(j, var_rank[i], edge, index);
+#line 415
+                IF (err)
+#line 415
+                    error("error in toMixedBase 1");
+#line 415
+                for (d = 0; d < var_rank[i]; d++)
+#line 415
+                    index[d] += start[d];
+#line 415
+                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_UCHAR);
+#line 415
+		if (inRange3(expect[j],var_type[i], NCT_UCHAR)) {
+#line 415
+		    allInIntRange = allInIntRange && expect[j] >= uchar_min
+#line 415
+				&& expect[j] <= uchar_max;
+#line 415
+		} else {
+#line 415
+		    allInExtRange = 0;
+#line 415
+		}
+#line 415
+	    }
+#line 415
+            if (var_rank[i] == 0 && i%2)
+#line 415
+		err = nc_get_vara_uchar(ncid, i, NULL, NULL, value);
+#line 415
+	    else
+#line 415
+		err = nc_get_vara_uchar(ncid, i, start, edge, value);
+#line 415
+            if (canConvert) {
+#line 415
+		if (allInExtRange) {
+#line 415
+		    if (allInIntRange) {
+#line 415
+			IF (err)
+#line 415
+			    error("%s", nc_strerror(err));
+#line 415
+		    } else {
+#line 415
+			IF (err != NC_ERANGE)
+#line 415
+			    error("Range error: status = %d", err);
+#line 415
+		    }
+#line 415
+		} else {
+#line 415
+		    IF (err != 0 && err != NC_ERANGE)
+#line 415
+			error("OK or Range error: status = %d", err);
+#line 415
+		}
+#line 415
+		for (j = 0; j < nels; j++) {
+#line 415
+		    if (inRange3(expect[j],var_type[i],NCT_UCHAR)
+#line 415
+			    && expect[j] >= uchar_min && expect[j] <= uchar_max) {
+#line 415
+			IF (!equal(value[j],expect[j],var_type[i],NCT_UCHAR)){
+#line 415
+			    error("value read not that expected");
+#line 415
+			    if (verbose) {
+#line 415
+				error("\n");
+#line 415
+				error("varid: %d, ", i);
+#line 415
+				error("var_name: %s, ", var_name[i]);
+#line 415
+				error("element number: %d ", j);
+#line 415
+				error("expect: %g", expect[j]);
+#line 415
+				error("got: %g", (double) value[j]);
+#line 415
+			    }
+#line 415
+			} else {
+#line 415
+			    nok++;
+#line 415
+			}
+#line 415
+		    }
+#line 415
+		}
+#line 415
+            } else {
+#line 415
+                IF (nels > 0 && err != NC_ECHAR)
+#line 415
+                    error("wrong type: status = %d", err);
+#line 415
+            }
+#line 415
+        }
+#line 415
+    }
+#line 415
+    err = nc_close(ncid);
+#line 415
+    IF (err)
+#line 415
+	error("nc_close: %s", nc_strerror(err));
+#line 415
+    print_nok(nok);
+#line 415
+}
+#line 415
+
+void
+#line 416
+test_nc_get_vara_schar(void)
+#line 416
+{
+#line 416
+    int ncid;
+#line 416
+    int d;
+#line 416
+    int i;
+#line 416
+    int j;
+#line 416
+    int k;
+#line 416
+    int err;
+#line 416
+    int allInExtRange;	/* all values within external range? */
+#line 416
+    int allInIntRange;	/* all values within internal range? */
+#line 416
+    int nels;
+#line 416
+    int nslabs;
+#line 416
+    int nok = 0;      /* count of valid comparisons */
+#line 416
+    size_t start[MAX_RANK];
+#line 416
+    size_t edge[MAX_RANK];
+#line 416
+    size_t index[MAX_RANK];
+#line 416
+    size_t mid[MAX_RANK];
+#line 416
+    int canConvert;     /* Both text or both numeric */
+#line 416
+    schar value[MAX_NELS];
+#line 416
+    double expect[MAX_NELS];
+#line 416
+
+#line 416
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 416
+    IF (err)
+#line 416
+	error("nc_open: %s", nc_strerror(err));
+#line 416
+    for (i = 0; i < numVars; i++) {
+#line 416
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_SCHAR == NCT_TEXT);
+#line 416
+        assert(var_rank[i] <= MAX_RANK);
+#line 416
+        assert(var_nels[i] <= MAX_NELS);
+#line 416
+	for (j = 0; j < var_rank[i]; j++) {
+#line 416
+	    start[j] = 0;
+#line 416
+	    edge[j] = 1;
+#line 416
+	}
+#line 416
+        err = nc_get_vara_schar(BAD_ID, i, start, edge, value);
+#line 416
+        IF (err != NC_EBADID)
+#line 416
+	    error("bad ncid: status = %d", err);
+#line 416
+        err = nc_get_vara_schar(ncid, BAD_VARID, start, edge, value);
+#line 416
+        IF (err != NC_ENOTVAR)
+#line 416
+	    error("bad var id: status = %d", err);
+#line 416
+	for (j = 0; j < var_rank[i]; j++) {
+#line 416
+	    start[j] = var_shape[i][j];
+#line 416
+	    err = nc_get_vara_schar(ncid, i, start, edge, value);
+#line 416
+            IF (canConvert && err != NC_EINVALCOORDS)
+#line 416
+                error("bad index: status = %d", err);
+#line 416
+	    start[j] = 0;
+#line 416
+	    edge[j] = var_shape[i][j] + 1;
+#line 416
+	    err = nc_get_vara_schar(ncid, i, start, edge, value);
+#line 416
+            IF (canConvert && err != NC_EEDGE)
+#line 416
+		error("bad edge: status = %d", err);
+#line 416
+	    edge[j] = 1;
+#line 416
+	}
+#line 416
+            /* Check non-scalars for correct error returned even when */
+#line 416
+            /* there is nothing to get (edge[j]==0) */
+#line 416
+	if(var_rank[i] > 0) {
+#line 416
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 416
+		edge[j] = 0;
+#line 416
+	    }
+#line 416
+	    err = nc_get_vara_schar(BAD_ID, i, start, edge, value);
+#line 416
+	    IF (err != NC_EBADID) 
+#line 416
+		error("bad ncid: status = %d", err);
+#line 416
+	    err = nc_get_vara_schar(ncid, BAD_VARID, start, edge, value);
+#line 416
+	    IF (err != NC_ENOTVAR) 
+#line 416
+		error("bad var id: status = %d", err);
+#line 416
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 416
+		if (var_dimid[i][j] > 0) {		/* skip record dim */
+#line 416
+		    start[j] = var_shape[i][j];
+#line 416
+		    err = nc_get_vara_schar(ncid, i, start, edge, value);
+#line 416
+		    IF (canConvert && err != NC_EINVALCOORDS)
+#line 416
+			error("bad start: status = %d", err);
+#line 416
+		    start[j] = 0;
+#line 416
+		}
+#line 416
+	    }
+#line 416
+	    err = nc_get_vara_schar(ncid, i, start, edge, value);
+#line 416
+	    if (canConvert) {
+#line 416
+		IF (err) 
+#line 416
+		    error("%s", nc_strerror(err));
+#line 416
+	    } else {
+#line 416
+		IF (err != NC_ECHAR)
+#line 416
+		    error("wrong type: status = %d", err);
+#line 416
+	    }
+#line 416
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 416
+		edge[j] = 1;
+#line 416
+	    }
+#line 416
+	}            /* Choose a random point dividing each dim into 2 parts */
+#line 416
+            /* get 2^rank (nslabs) slabs so defined */
+#line 416
+        nslabs = 1;
+#line 416
+        for (j = 0; j < var_rank[i]; j++) {
+#line 416
+            mid[j] = roll( var_shape[i][j] );
+#line 416
+            nslabs *= 2;
+#line 416
+        }
+#line 416
+            /* bits of k determine whether to get lower or upper part of dim */
+#line 416
+        for (k = 0; k < nslabs; k++) {
+#line 416
+            nels = 1;
+#line 416
+            for (j = 0; j < var_rank[i]; j++) {
+#line 416
+                if ((k >> j) & 1) {
+#line 416
+                    start[j] = 0;
+#line 416
+                    edge[j] = mid[j];
+#line 416
+                }else{
+#line 416
+                    start[j] = mid[j];
+#line 416
+                    edge[j] = var_shape[i][j] - mid[j];
+#line 416
+                }
+#line 416
+                nels *= edge[j];
+#line 416
+            }
+#line 416
+	    allInExtRange = allInIntRange = 1;
+#line 416
+            for (j = 0; j < nels; j++) {
+#line 416
+                err = toMixedBase(j, var_rank[i], edge, index);
+#line 416
+                IF (err)
+#line 416
+                    error("error in toMixedBase 1");
+#line 416
+                for (d = 0; d < var_rank[i]; d++)
+#line 416
+                    index[d] += start[d];
+#line 416
+                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_SCHAR);
+#line 416
+		if (inRange3(expect[j],var_type[i], NCT_SCHAR)) {
+#line 416
+		    allInIntRange = allInIntRange && expect[j] >= schar_min
+#line 416
+				&& expect[j] <= schar_max;
+#line 416
+		} else {
+#line 416
+		    allInExtRange = 0;
+#line 416
+		}
+#line 416
+	    }
+#line 416
+            if (var_rank[i] == 0 && i%2)
+#line 416
+		err = nc_get_vara_schar(ncid, i, NULL, NULL, value);
+#line 416
+	    else
+#line 416
+		err = nc_get_vara_schar(ncid, i, start, edge, value);
+#line 416
+            if (canConvert) {
+#line 416
+		if (allInExtRange) {
+#line 416
+		    if (allInIntRange) {
+#line 416
+			IF (err)
+#line 416
+			    error("%s", nc_strerror(err));
+#line 416
+		    } else {
+#line 416
+			IF (err != NC_ERANGE)
+#line 416
+			    error("Range error: status = %d", err);
+#line 416
+		    }
+#line 416
+		} else {
+#line 416
+		    IF (err != 0 && err != NC_ERANGE)
+#line 416
+			error("OK or Range error: status = %d", err);
+#line 416
+		}
+#line 416
+		for (j = 0; j < nels; j++) {
+#line 416
+		    if (inRange3(expect[j],var_type[i],NCT_SCHAR)
+#line 416
+			    && expect[j] >= schar_min && expect[j] <= schar_max) {
+#line 416
+			IF (!equal(value[j],expect[j],var_type[i],NCT_SCHAR)){
+#line 416
+			    error("value read not that expected");
+#line 416
+			    if (verbose) {
+#line 416
+				error("\n");
+#line 416
+				error("varid: %d, ", i);
+#line 416
+				error("var_name: %s, ", var_name[i]);
+#line 416
+				error("element number: %d ", j);
+#line 416
+				error("expect: %g", expect[j]);
+#line 416
+				error("got: %g", (double) value[j]);
+#line 416
+			    }
+#line 416
+			} else {
+#line 416
+			    nok++;
+#line 416
+			}
+#line 416
+		    }
+#line 416
+		}
+#line 416
+            } else {
+#line 416
+                IF (nels > 0 && err != NC_ECHAR)
+#line 416
+                    error("wrong type: status = %d", err);
+#line 416
+            }
+#line 416
+        }
+#line 416
+    }
+#line 416
+    err = nc_close(ncid);
+#line 416
+    IF (err)
+#line 416
+	error("nc_close: %s", nc_strerror(err));
+#line 416
+    print_nok(nok);
+#line 416
+}
+#line 416
+
+void
+#line 417
+test_nc_get_vara_short(void)
+#line 417
+{
+#line 417
+    int ncid;
+#line 417
+    int d;
+#line 417
+    int i;
+#line 417
+    int j;
+#line 417
+    int k;
+#line 417
+    int err;
+#line 417
+    int allInExtRange;	/* all values within external range? */
+#line 417
+    int allInIntRange;	/* all values within internal range? */
+#line 417
+    int nels;
+#line 417
+    int nslabs;
+#line 417
+    int nok = 0;      /* count of valid comparisons */
+#line 417
+    size_t start[MAX_RANK];
+#line 417
+    size_t edge[MAX_RANK];
+#line 417
+    size_t index[MAX_RANK];
+#line 417
+    size_t mid[MAX_RANK];
+#line 417
+    int canConvert;     /* Both text or both numeric */
+#line 417
+    short value[MAX_NELS];
+#line 417
+    double expect[MAX_NELS];
+#line 417
+
+#line 417
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 417
+    IF (err)
+#line 417
+	error("nc_open: %s", nc_strerror(err));
+#line 417
+    for (i = 0; i < numVars; i++) {
+#line 417
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_SHORT == NCT_TEXT);
+#line 417
+        assert(var_rank[i] <= MAX_RANK);
+#line 417
+        assert(var_nels[i] <= MAX_NELS);
+#line 417
+	for (j = 0; j < var_rank[i]; j++) {
+#line 417
+	    start[j] = 0;
+#line 417
+	    edge[j] = 1;
+#line 417
+	}
+#line 417
+        err = nc_get_vara_short(BAD_ID, i, start, edge, value);
+#line 417
+        IF (err != NC_EBADID)
+#line 417
+	    error("bad ncid: status = %d", err);
+#line 417
+        err = nc_get_vara_short(ncid, BAD_VARID, start, edge, value);
+#line 417
+        IF (err != NC_ENOTVAR)
+#line 417
+	    error("bad var id: status = %d", err);
+#line 417
+	for (j = 0; j < var_rank[i]; j++) {
+#line 417
+	    start[j] = var_shape[i][j];
+#line 417
+	    err = nc_get_vara_short(ncid, i, start, edge, value);
+#line 417
+            IF (canConvert && err != NC_EINVALCOORDS)
+#line 417
+                error("bad index: status = %d", err);
+#line 417
+	    start[j] = 0;
+#line 417
+	    edge[j] = var_shape[i][j] + 1;
+#line 417
+	    err = nc_get_vara_short(ncid, i, start, edge, value);
+#line 417
+            IF (canConvert && err != NC_EEDGE)
+#line 417
+		error("bad edge: status = %d", err);
+#line 417
+	    edge[j] = 1;
+#line 417
+	}
+#line 417
+            /* Check non-scalars for correct error returned even when */
+#line 417
+            /* there is nothing to get (edge[j]==0) */
+#line 417
+	if(var_rank[i] > 0) {
+#line 417
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 417
+		edge[j] = 0;
+#line 417
+	    }
+#line 417
+	    err = nc_get_vara_short(BAD_ID, i, start, edge, value);
+#line 417
+	    IF (err != NC_EBADID) 
+#line 417
+		error("bad ncid: status = %d", err);
+#line 417
+	    err = nc_get_vara_short(ncid, BAD_VARID, start, edge, value);
+#line 417
+	    IF (err != NC_ENOTVAR) 
+#line 417
+		error("bad var id: status = %d", err);
+#line 417
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 417
+		if (var_dimid[i][j] > 0) {		/* skip record dim */
+#line 417
+		    start[j] = var_shape[i][j];
+#line 417
+		    err = nc_get_vara_short(ncid, i, start, edge, value);
+#line 417
+		    IF (canConvert && err != NC_EINVALCOORDS)
+#line 417
+			error("bad start: status = %d", err);
+#line 417
+		    start[j] = 0;
+#line 417
+		}
+#line 417
+	    }
+#line 417
+	    err = nc_get_vara_short(ncid, i, start, edge, value);
+#line 417
+	    if (canConvert) {
+#line 417
+		IF (err) 
+#line 417
+		    error("%s", nc_strerror(err));
+#line 417
+	    } else {
+#line 417
+		IF (err != NC_ECHAR)
+#line 417
+		    error("wrong type: status = %d", err);
+#line 417
+	    }
+#line 417
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 417
+		edge[j] = 1;
+#line 417
+	    }
+#line 417
+	}            /* Choose a random point dividing each dim into 2 parts */
+#line 417
+            /* get 2^rank (nslabs) slabs so defined */
+#line 417
+        nslabs = 1;
+#line 417
+        for (j = 0; j < var_rank[i]; j++) {
+#line 417
+            mid[j] = roll( var_shape[i][j] );
+#line 417
+            nslabs *= 2;
+#line 417
+        }
+#line 417
+            /* bits of k determine whether to get lower or upper part of dim */
+#line 417
+        for (k = 0; k < nslabs; k++) {
+#line 417
+            nels = 1;
+#line 417
+            for (j = 0; j < var_rank[i]; j++) {
+#line 417
+                if ((k >> j) & 1) {
+#line 417
+                    start[j] = 0;
+#line 417
+                    edge[j] = mid[j];
+#line 417
+                }else{
+#line 417
+                    start[j] = mid[j];
+#line 417
+                    edge[j] = var_shape[i][j] - mid[j];
+#line 417
+                }
+#line 417
+                nels *= edge[j];
+#line 417
+            }
+#line 417
+	    allInExtRange = allInIntRange = 1;
+#line 417
+            for (j = 0; j < nels; j++) {
+#line 417
+                err = toMixedBase(j, var_rank[i], edge, index);
+#line 417
+                IF (err)
+#line 417
+                    error("error in toMixedBase 1");
+#line 417
+                for (d = 0; d < var_rank[i]; d++)
+#line 417
+                    index[d] += start[d];
+#line 417
+                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_SHORT);
+#line 417
+		if (inRange3(expect[j],var_type[i], NCT_SHORT)) {
+#line 417
+		    allInIntRange = allInIntRange && expect[j] >= short_min
+#line 417
+				&& expect[j] <= short_max;
+#line 417
+		} else {
+#line 417
+		    allInExtRange = 0;
+#line 417
+		}
+#line 417
+	    }
+#line 417
+            if (var_rank[i] == 0 && i%2)
+#line 417
+		err = nc_get_vara_short(ncid, i, NULL, NULL, value);
+#line 417
+	    else
+#line 417
+		err = nc_get_vara_short(ncid, i, start, edge, value);
+#line 417
+            if (canConvert) {
+#line 417
+		if (allInExtRange) {
+#line 417
+		    if (allInIntRange) {
+#line 417
+			IF (err)
+#line 417
+			    error("%s", nc_strerror(err));
+#line 417
+		    } else {
+#line 417
+			IF (err != NC_ERANGE)
+#line 417
+			    error("Range error: status = %d", err);
+#line 417
+		    }
+#line 417
+		} else {
+#line 417
+		    IF (err != 0 && err != NC_ERANGE)
+#line 417
+			error("OK or Range error: status = %d", err);
+#line 417
+		}
+#line 417
+		for (j = 0; j < nels; j++) {
+#line 417
+		    if (inRange3(expect[j],var_type[i],NCT_SHORT)
+#line 417
+			    && expect[j] >= short_min && expect[j] <= short_max) {
+#line 417
+			IF (!equal(value[j],expect[j],var_type[i],NCT_SHORT)){
+#line 417
+			    error("value read not that expected");
+#line 417
+			    if (verbose) {
+#line 417
+				error("\n");
+#line 417
+				error("varid: %d, ", i);
+#line 417
+				error("var_name: %s, ", var_name[i]);
+#line 417
+				error("element number: %d ", j);
+#line 417
+				error("expect: %g", expect[j]);
+#line 417
+				error("got: %g", (double) value[j]);
+#line 417
+			    }
+#line 417
+			} else {
+#line 417
+			    nok++;
+#line 417
+			}
+#line 417
+		    }
+#line 417
+		}
+#line 417
+            } else {
+#line 417
+                IF (nels > 0 && err != NC_ECHAR)
+#line 417
+                    error("wrong type: status = %d", err);
+#line 417
+            }
+#line 417
+        }
+#line 417
+    }
+#line 417
+    err = nc_close(ncid);
+#line 417
+    IF (err)
+#line 417
+	error("nc_close: %s", nc_strerror(err));
+#line 417
+    print_nok(nok);
+#line 417
+}
+#line 417
+
+void
+#line 418
+test_nc_get_vara_int(void)
+#line 418
+{
+#line 418
+    int ncid;
+#line 418
+    int d;
+#line 418
+    int i;
+#line 418
+    int j;
+#line 418
+    int k;
+#line 418
+    int err;
+#line 418
+    int allInExtRange;	/* all values within external range? */
+#line 418
+    int allInIntRange;	/* all values within internal range? */
+#line 418
+    int nels;
+#line 418
+    int nslabs;
+#line 418
+    int nok = 0;      /* count of valid comparisons */
+#line 418
+    size_t start[MAX_RANK];
+#line 418
+    size_t edge[MAX_RANK];
+#line 418
+    size_t index[MAX_RANK];
+#line 418
+    size_t mid[MAX_RANK];
+#line 418
+    int canConvert;     /* Both text or both numeric */
+#line 418
+    int value[MAX_NELS];
+#line 418
+    double expect[MAX_NELS];
+#line 418
+
+#line 418
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 418
+    IF (err)
+#line 418
+	error("nc_open: %s", nc_strerror(err));
+#line 418
+    for (i = 0; i < numVars; i++) {
+#line 418
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_INT == NCT_TEXT);
+#line 418
+        assert(var_rank[i] <= MAX_RANK);
+#line 418
+        assert(var_nels[i] <= MAX_NELS);
+#line 418
+	for (j = 0; j < var_rank[i]; j++) {
+#line 418
+	    start[j] = 0;
+#line 418
+	    edge[j] = 1;
+#line 418
+	}
+#line 418
+        err = nc_get_vara_int(BAD_ID, i, start, edge, value);
+#line 418
+        IF (err != NC_EBADID)
+#line 418
+	    error("bad ncid: status = %d", err);
+#line 418
+        err = nc_get_vara_int(ncid, BAD_VARID, start, edge, value);
+#line 418
+        IF (err != NC_ENOTVAR)
+#line 418
+	    error("bad var id: status = %d", err);
+#line 418
+	for (j = 0; j < var_rank[i]; j++) {
+#line 418
+	    start[j] = var_shape[i][j];
+#line 418
+	    err = nc_get_vara_int(ncid, i, start, edge, value);
+#line 418
+            IF (canConvert && err != NC_EINVALCOORDS)
+#line 418
+                error("bad index: status = %d", err);
+#line 418
+	    start[j] = 0;
+#line 418
+	    edge[j] = var_shape[i][j] + 1;
+#line 418
+	    err = nc_get_vara_int(ncid, i, start, edge, value);
+#line 418
+            IF (canConvert && err != NC_EEDGE)
+#line 418
+		error("bad edge: status = %d", err);
+#line 418
+	    edge[j] = 1;
+#line 418
+	}
+#line 418
+            /* Check non-scalars for correct error returned even when */
+#line 418
+            /* there is nothing to get (edge[j]==0) */
+#line 418
+	if(var_rank[i] > 0) {
+#line 418
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 418
+		edge[j] = 0;
+#line 418
+	    }
+#line 418
+	    err = nc_get_vara_int(BAD_ID, i, start, edge, value);
+#line 418
+	    IF (err != NC_EBADID) 
+#line 418
+		error("bad ncid: status = %d", err);
+#line 418
+	    err = nc_get_vara_int(ncid, BAD_VARID, start, edge, value);
+#line 418
+	    IF (err != NC_ENOTVAR) 
+#line 418
+		error("bad var id: status = %d", err);
+#line 418
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 418
+		if (var_dimid[i][j] > 0) {		/* skip record dim */
+#line 418
+		    start[j] = var_shape[i][j];
+#line 418
+		    err = nc_get_vara_int(ncid, i, start, edge, value);
+#line 418
+		    IF (canConvert && err != NC_EINVALCOORDS)
+#line 418
+			error("bad start: status = %d", err);
+#line 418
+		    start[j] = 0;
+#line 418
+		}
+#line 418
+	    }
+#line 418
+	    err = nc_get_vara_int(ncid, i, start, edge, value);
+#line 418
+	    if (canConvert) {
+#line 418
+		IF (err) 
+#line 418
+		    error("%s", nc_strerror(err));
+#line 418
+	    } else {
+#line 418
+		IF (err != NC_ECHAR)
+#line 418
+		    error("wrong type: status = %d", err);
+#line 418
+	    }
+#line 418
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 418
+		edge[j] = 1;
+#line 418
+	    }
+#line 418
+	}            /* Choose a random point dividing each dim into 2 parts */
+#line 418
+            /* get 2^rank (nslabs) slabs so defined */
+#line 418
+        nslabs = 1;
+#line 418
+        for (j = 0; j < var_rank[i]; j++) {
+#line 418
+            mid[j] = roll( var_shape[i][j] );
+#line 418
+            nslabs *= 2;
+#line 418
+        }
+#line 418
+            /* bits of k determine whether to get lower or upper part of dim */
+#line 418
+        for (k = 0; k < nslabs; k++) {
+#line 418
+            nels = 1;
+#line 418
+            for (j = 0; j < var_rank[i]; j++) {
+#line 418
+                if ((k >> j) & 1) {
+#line 418
+                    start[j] = 0;
+#line 418
+                    edge[j] = mid[j];
+#line 418
+                }else{
+#line 418
+                    start[j] = mid[j];
+#line 418
+                    edge[j] = var_shape[i][j] - mid[j];
+#line 418
+                }
+#line 418
+                nels *= edge[j];
+#line 418
+            }
+#line 418
+	    allInExtRange = allInIntRange = 1;
+#line 418
+            for (j = 0; j < nels; j++) {
+#line 418
+                err = toMixedBase(j, var_rank[i], edge, index);
+#line 418
+                IF (err)
+#line 418
+                    error("error in toMixedBase 1");
+#line 418
+                for (d = 0; d < var_rank[i]; d++)
+#line 418
+                    index[d] += start[d];
+#line 418
+                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_INT);
+#line 418
+		if (inRange3(expect[j],var_type[i], NCT_INT)) {
+#line 418
+		    allInIntRange = allInIntRange && expect[j] >= int_min
+#line 418
+				&& expect[j] <= int_max;
+#line 418
+		} else {
+#line 418
+		    allInExtRange = 0;
+#line 418
+		}
+#line 418
+	    }
+#line 418
+            if (var_rank[i] == 0 && i%2)
+#line 418
+		err = nc_get_vara_int(ncid, i, NULL, NULL, value);
+#line 418
+	    else
+#line 418
+		err = nc_get_vara_int(ncid, i, start, edge, value);
+#line 418
+            if (canConvert) {
+#line 418
+		if (allInExtRange) {
+#line 418
+		    if (allInIntRange) {
+#line 418
+			IF (err)
+#line 418
+			    error("%s", nc_strerror(err));
+#line 418
+		    } else {
+#line 418
+			IF (err != NC_ERANGE)
+#line 418
+			    error("Range error: status = %d", err);
+#line 418
+		    }
+#line 418
+		} else {
+#line 418
+		    IF (err != 0 && err != NC_ERANGE)
+#line 418
+			error("OK or Range error: status = %d", err);
+#line 418
+		}
+#line 418
+		for (j = 0; j < nels; j++) {
+#line 418
+		    if (inRange3(expect[j],var_type[i],NCT_INT)
+#line 418
+			    && expect[j] >= int_min && expect[j] <= int_max) {
+#line 418
+			IF (!equal(value[j],expect[j],var_type[i],NCT_INT)){
+#line 418
+			    error("value read not that expected");
+#line 418
+			    if (verbose) {
+#line 418
+				error("\n");
+#line 418
+				error("varid: %d, ", i);
+#line 418
+				error("var_name: %s, ", var_name[i]);
+#line 418
+				error("element number: %d ", j);
+#line 418
+				error("expect: %g", expect[j]);
+#line 418
+				error("got: %g", (double) value[j]);
+#line 418
+			    }
+#line 418
+			} else {
+#line 418
+			    nok++;
+#line 418
+			}
+#line 418
+		    }
+#line 418
+		}
+#line 418
+            } else {
+#line 418
+                IF (nels > 0 && err != NC_ECHAR)
+#line 418
+                    error("wrong type: status = %d", err);
+#line 418
+            }
+#line 418
+        }
+#line 418
+    }
+#line 418
+    err = nc_close(ncid);
+#line 418
+    IF (err)
+#line 418
+	error("nc_close: %s", nc_strerror(err));
+#line 418
+    print_nok(nok);
+#line 418
+}
+#line 418
+
+void
+#line 419
+test_nc_get_vara_long(void)
+#line 419
+{
+#line 419
+    int ncid;
+#line 419
+    int d;
+#line 419
+    int i;
+#line 419
+    int j;
+#line 419
+    int k;
+#line 419
+    int err;
+#line 419
+    int allInExtRange;	/* all values within external range? */
+#line 419
+    int allInIntRange;	/* all values within internal range? */
+#line 419
+    int nels;
+#line 419
+    int nslabs;
+#line 419
+    int nok = 0;      /* count of valid comparisons */
+#line 419
+    size_t start[MAX_RANK];
+#line 419
+    size_t edge[MAX_RANK];
+#line 419
+    size_t index[MAX_RANK];
+#line 419
+    size_t mid[MAX_RANK];
+#line 419
+    int canConvert;     /* Both text or both numeric */
+#line 419
+    long value[MAX_NELS];
+#line 419
+    double expect[MAX_NELS];
+#line 419
+
+#line 419
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 419
+    IF (err)
+#line 419
+	error("nc_open: %s", nc_strerror(err));
+#line 419
+    for (i = 0; i < numVars; i++) {
+#line 419
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_LONG == NCT_TEXT);
+#line 419
+        assert(var_rank[i] <= MAX_RANK);
+#line 419
+        assert(var_nels[i] <= MAX_NELS);
+#line 419
+	for (j = 0; j < var_rank[i]; j++) {
+#line 419
+	    start[j] = 0;
+#line 419
+	    edge[j] = 1;
+#line 419
+	}
+#line 419
+        err = nc_get_vara_long(BAD_ID, i, start, edge, value);
+#line 419
+        IF (err != NC_EBADID)
+#line 419
+	    error("bad ncid: status = %d", err);
+#line 419
+        err = nc_get_vara_long(ncid, BAD_VARID, start, edge, value);
+#line 419
+        IF (err != NC_ENOTVAR)
+#line 419
+	    error("bad var id: status = %d", err);
+#line 419
+	for (j = 0; j < var_rank[i]; j++) {
+#line 419
+	    start[j] = var_shape[i][j];
+#line 419
+	    err = nc_get_vara_long(ncid, i, start, edge, value);
+#line 419
+            IF (canConvert && err != NC_EINVALCOORDS)
+#line 419
+                error("bad index: status = %d", err);
+#line 419
+	    start[j] = 0;
+#line 419
+	    edge[j] = var_shape[i][j] + 1;
+#line 419
+	    err = nc_get_vara_long(ncid, i, start, edge, value);
+#line 419
+            IF (canConvert && err != NC_EEDGE)
+#line 419
+		error("bad edge: status = %d", err);
+#line 419
+	    edge[j] = 1;
+#line 419
+	}
+#line 419
+            /* Check non-scalars for correct error returned even when */
+#line 419
+            /* there is nothing to get (edge[j]==0) */
+#line 419
+	if(var_rank[i] > 0) {
+#line 419
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 419
+		edge[j] = 0;
+#line 419
+	    }
+#line 419
+	    err = nc_get_vara_long(BAD_ID, i, start, edge, value);
+#line 419
+	    IF (err != NC_EBADID) 
+#line 419
+		error("bad ncid: status = %d", err);
+#line 419
+	    err = nc_get_vara_long(ncid, BAD_VARID, start, edge, value);
+#line 419
+	    IF (err != NC_ENOTVAR) 
+#line 419
+		error("bad var id: status = %d", err);
+#line 419
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 419
+		if (var_dimid[i][j] > 0) {		/* skip record dim */
+#line 419
+		    start[j] = var_shape[i][j];
+#line 419
+		    err = nc_get_vara_long(ncid, i, start, edge, value);
+#line 419
+		    IF (canConvert && err != NC_EINVALCOORDS)
+#line 419
+			error("bad start: status = %d", err);
+#line 419
+		    start[j] = 0;
+#line 419
+		}
+#line 419
+	    }
+#line 419
+	    err = nc_get_vara_long(ncid, i, start, edge, value);
+#line 419
+	    if (canConvert) {
+#line 419
+		IF (err) 
+#line 419
+		    error("%s", nc_strerror(err));
+#line 419
+	    } else {
+#line 419
+		IF (err != NC_ECHAR)
+#line 419
+		    error("wrong type: status = %d", err);
+#line 419
+	    }
+#line 419
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 419
+		edge[j] = 1;
+#line 419
+	    }
+#line 419
+	}            /* Choose a random point dividing each dim into 2 parts */
+#line 419
+            /* get 2^rank (nslabs) slabs so defined */
+#line 419
+        nslabs = 1;
+#line 419
+        for (j = 0; j < var_rank[i]; j++) {
+#line 419
+            mid[j] = roll( var_shape[i][j] );
+#line 419
+            nslabs *= 2;
+#line 419
+        }
+#line 419
+            /* bits of k determine whether to get lower or upper part of dim */
+#line 419
+        for (k = 0; k < nslabs; k++) {
+#line 419
+            nels = 1;
+#line 419
+            for (j = 0; j < var_rank[i]; j++) {
+#line 419
+                if ((k >> j) & 1) {
+#line 419
+                    start[j] = 0;
+#line 419
+                    edge[j] = mid[j];
+#line 419
+                }else{
+#line 419
+                    start[j] = mid[j];
+#line 419
+                    edge[j] = var_shape[i][j] - mid[j];
+#line 419
+                }
+#line 419
+                nels *= edge[j];
+#line 419
+            }
+#line 419
+	    allInExtRange = allInIntRange = 1;
+#line 419
+            for (j = 0; j < nels; j++) {
+#line 419
+                err = toMixedBase(j, var_rank[i], edge, index);
+#line 419
+                IF (err)
+#line 419
+                    error("error in toMixedBase 1");
+#line 419
+                for (d = 0; d < var_rank[i]; d++)
+#line 419
+                    index[d] += start[d];
+#line 419
+                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_LONG);
+#line 419
+		if (inRange3(expect[j],var_type[i], NCT_LONG)) {
+#line 419
+		    allInIntRange = allInIntRange && expect[j] >= long_min
+#line 419
+				&& expect[j] <= long_max;
+#line 419
+		} else {
+#line 419
+		    allInExtRange = 0;
+#line 419
+		}
+#line 419
+	    }
+#line 419
+            if (var_rank[i] == 0 && i%2)
+#line 419
+		err = nc_get_vara_long(ncid, i, NULL, NULL, value);
+#line 419
+	    else
+#line 419
+		err = nc_get_vara_long(ncid, i, start, edge, value);
+#line 419
+            if (canConvert) {
+#line 419
+		if (allInExtRange) {
+#line 419
+		    if (allInIntRange) {
+#line 419
+			IF (err)
+#line 419
+			    error("%s", nc_strerror(err));
+#line 419
+		    } else {
+#line 419
+			IF (err != NC_ERANGE)
+#line 419
+			    error("Range error: status = %d", err);
+#line 419
+		    }
+#line 419
+		} else {
+#line 419
+		    IF (err != 0 && err != NC_ERANGE)
+#line 419
+			error("OK or Range error: status = %d", err);
+#line 419
+		}
+#line 419
+		for (j = 0; j < nels; j++) {
+#line 419
+		    if (inRange3(expect[j],var_type[i],NCT_LONG)
+#line 419
+			    && expect[j] >= long_min && expect[j] <= long_max) {
+#line 419
+			IF (!equal(value[j],expect[j],var_type[i],NCT_LONG)){
+#line 419
+			    error("value read not that expected");
+#line 419
+			    if (verbose) {
+#line 419
+				error("\n");
+#line 419
+				error("varid: %d, ", i);
+#line 419
+				error("var_name: %s, ", var_name[i]);
+#line 419
+				error("element number: %d ", j);
+#line 419
+				error("expect: %g", expect[j]);
+#line 419
+				error("got: %g", (double) value[j]);
+#line 419
+			    }
+#line 419
+			} else {
+#line 419
+			    nok++;
+#line 419
+			}
+#line 419
+		    }
+#line 419
+		}
+#line 419
+            } else {
+#line 419
+                IF (nels > 0 && err != NC_ECHAR)
+#line 419
+                    error("wrong type: status = %d", err);
+#line 419
+            }
+#line 419
+        }
+#line 419
+    }
+#line 419
+    err = nc_close(ncid);
+#line 419
+    IF (err)
+#line 419
+	error("nc_close: %s", nc_strerror(err));
+#line 419
+    print_nok(nok);
+#line 419
+}
+#line 419
+
+void
+#line 420
+test_nc_get_vara_float(void)
+#line 420
+{
+#line 420
+    int ncid;
+#line 420
+    int d;
+#line 420
+    int i;
+#line 420
+    int j;
+#line 420
+    int k;
+#line 420
+    int err;
+#line 420
+    int allInExtRange;	/* all values within external range? */
+#line 420
+    int allInIntRange;	/* all values within internal range? */
+#line 420
+    int nels;
+#line 420
+    int nslabs;
+#line 420
+    int nok = 0;      /* count of valid comparisons */
+#line 420
+    size_t start[MAX_RANK];
+#line 420
+    size_t edge[MAX_RANK];
+#line 420
+    size_t index[MAX_RANK];
+#line 420
+    size_t mid[MAX_RANK];
+#line 420
+    int canConvert;     /* Both text or both numeric */
+#line 420
+    float value[MAX_NELS];
+#line 420
+    double expect[MAX_NELS];
+#line 420
+
+#line 420
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 420
+    IF (err)
+#line 420
+	error("nc_open: %s", nc_strerror(err));
+#line 420
+    for (i = 0; i < numVars; i++) {
+#line 420
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_FLOAT == NCT_TEXT);
+#line 420
+        assert(var_rank[i] <= MAX_RANK);
+#line 420
+        assert(var_nels[i] <= MAX_NELS);
+#line 420
+	for (j = 0; j < var_rank[i]; j++) {
+#line 420
+	    start[j] = 0;
+#line 420
+	    edge[j] = 1;
+#line 420
+	}
+#line 420
+        err = nc_get_vara_float(BAD_ID, i, start, edge, value);
+#line 420
+        IF (err != NC_EBADID)
+#line 420
+	    error("bad ncid: status = %d", err);
+#line 420
+        err = nc_get_vara_float(ncid, BAD_VARID, start, edge, value);
+#line 420
+        IF (err != NC_ENOTVAR)
+#line 420
+	    error("bad var id: status = %d", err);
+#line 420
+	for (j = 0; j < var_rank[i]; j++) {
+#line 420
+	    start[j] = var_shape[i][j];
+#line 420
+	    err = nc_get_vara_float(ncid, i, start, edge, value);
+#line 420
+            IF (canConvert && err != NC_EINVALCOORDS)
+#line 420
+                error("bad index: status = %d", err);
+#line 420
+	    start[j] = 0;
+#line 420
+	    edge[j] = var_shape[i][j] + 1;
+#line 420
+	    err = nc_get_vara_float(ncid, i, start, edge, value);
+#line 420
+            IF (canConvert && err != NC_EEDGE)
+#line 420
+		error("bad edge: status = %d", err);
+#line 420
+	    edge[j] = 1;
+#line 420
+	}
+#line 420
+            /* Check non-scalars for correct error returned even when */
+#line 420
+            /* there is nothing to get (edge[j]==0) */
+#line 420
+	if(var_rank[i] > 0) {
+#line 420
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 420
+		edge[j] = 0;
+#line 420
+	    }
+#line 420
+	    err = nc_get_vara_float(BAD_ID, i, start, edge, value);
+#line 420
+	    IF (err != NC_EBADID) 
+#line 420
+		error("bad ncid: status = %d", err);
+#line 420
+	    err = nc_get_vara_float(ncid, BAD_VARID, start, edge, value);
+#line 420
+	    IF (err != NC_ENOTVAR) 
+#line 420
+		error("bad var id: status = %d", err);
+#line 420
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 420
+		if (var_dimid[i][j] > 0) {		/* skip record dim */
+#line 420
+		    start[j] = var_shape[i][j];
+#line 420
+		    err = nc_get_vara_float(ncid, i, start, edge, value);
+#line 420
+		    IF (canConvert && err != NC_EINVALCOORDS)
+#line 420
+			error("bad start: status = %d", err);
+#line 420
+		    start[j] = 0;
+#line 420
+		}
+#line 420
+	    }
+#line 420
+	    err = nc_get_vara_float(ncid, i, start, edge, value);
+#line 420
+	    if (canConvert) {
+#line 420
+		IF (err) 
+#line 420
+		    error("%s", nc_strerror(err));
+#line 420
+	    } else {
+#line 420
+		IF (err != NC_ECHAR)
+#line 420
+		    error("wrong type: status = %d", err);
+#line 420
+	    }
+#line 420
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 420
+		edge[j] = 1;
+#line 420
+	    }
+#line 420
+	}            /* Choose a random point dividing each dim into 2 parts */
+#line 420
+            /* get 2^rank (nslabs) slabs so defined */
+#line 420
+        nslabs = 1;
+#line 420
+        for (j = 0; j < var_rank[i]; j++) {
+#line 420
+            mid[j] = roll( var_shape[i][j] );
+#line 420
+            nslabs *= 2;
+#line 420
+        }
+#line 420
+            /* bits of k determine whether to get lower or upper part of dim */
+#line 420
+        for (k = 0; k < nslabs; k++) {
+#line 420
+            nels = 1;
+#line 420
+            for (j = 0; j < var_rank[i]; j++) {
+#line 420
+                if ((k >> j) & 1) {
+#line 420
+                    start[j] = 0;
+#line 420
+                    edge[j] = mid[j];
+#line 420
+                }else{
+#line 420
+                    start[j] = mid[j];
+#line 420
+                    edge[j] = var_shape[i][j] - mid[j];
+#line 420
+                }
+#line 420
+                nels *= edge[j];
+#line 420
+            }
+#line 420
+	    allInExtRange = allInIntRange = 1;
+#line 420
+            for (j = 0; j < nels; j++) {
+#line 420
+                err = toMixedBase(j, var_rank[i], edge, index);
+#line 420
+                IF (err)
+#line 420
+                    error("error in toMixedBase 1");
+#line 420
+                for (d = 0; d < var_rank[i]; d++)
+#line 420
+                    index[d] += start[d];
+#line 420
+                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_FLOAT);
+#line 420
+		if (inRange3(expect[j],var_type[i], NCT_FLOAT)) {
+#line 420
+		    allInIntRange = allInIntRange && expect[j] >= float_min
+#line 420
+				&& expect[j] <= float_max;
+#line 420
+		} else {
+#line 420
+		    allInExtRange = 0;
+#line 420
+		}
+#line 420
+	    }
+#line 420
+            if (var_rank[i] == 0 && i%2)
+#line 420
+		err = nc_get_vara_float(ncid, i, NULL, NULL, value);
+#line 420
+	    else
+#line 420
+		err = nc_get_vara_float(ncid, i, start, edge, value);
+#line 420
+            if (canConvert) {
+#line 420
+		if (allInExtRange) {
+#line 420
+		    if (allInIntRange) {
+#line 420
+			IF (err)
+#line 420
+			    error("%s", nc_strerror(err));
+#line 420
+		    } else {
+#line 420
+			IF (err != NC_ERANGE)
+#line 420
+			    error("Range error: status = %d", err);
+#line 420
+		    }
+#line 420
+		} else {
+#line 420
+		    IF (err != 0 && err != NC_ERANGE)
+#line 420
+			error("OK or Range error: status = %d", err);
+#line 420
+		}
+#line 420
+		for (j = 0; j < nels; j++) {
+#line 420
+		    if (inRange3(expect[j],var_type[i],NCT_FLOAT)
+#line 420
+			    && expect[j] >= float_min && expect[j] <= float_max) {
+#line 420
+			IF (!equal(value[j],expect[j],var_type[i],NCT_FLOAT)){
+#line 420
+			    error("value read not that expected");
+#line 420
+			    if (verbose) {
+#line 420
+				error("\n");
+#line 420
+				error("varid: %d, ", i);
+#line 420
+				error("var_name: %s, ", var_name[i]);
+#line 420
+				error("element number: %d ", j);
+#line 420
+				error("expect: %g", expect[j]);
+#line 420
+				error("got: %g", (double) value[j]);
+#line 420
+			    }
+#line 420
+			} else {
+#line 420
+			    nok++;
+#line 420
+			}
+#line 420
+		    }
+#line 420
+		}
+#line 420
+            } else {
+#line 420
+                IF (nels > 0 && err != NC_ECHAR)
+#line 420
+                    error("wrong type: status = %d", err);
+#line 420
+            }
+#line 420
+        }
+#line 420
+    }
+#line 420
+    err = nc_close(ncid);
+#line 420
+    IF (err)
+#line 420
+	error("nc_close: %s", nc_strerror(err));
+#line 420
+    print_nok(nok);
+#line 420
+}
+#line 420
+
+void
+#line 421
+test_nc_get_vara_double(void)
+#line 421
+{
+#line 421
+    int ncid;
+#line 421
+    int d;
+#line 421
+    int i;
+#line 421
+    int j;
+#line 421
+    int k;
+#line 421
+    int err;
+#line 421
+    int allInExtRange;	/* all values within external range? */
+#line 421
+    int allInIntRange;	/* all values within internal range? */
+#line 421
+    int nels;
+#line 421
+    int nslabs;
+#line 421
+    int nok = 0;      /* count of valid comparisons */
+#line 421
+    size_t start[MAX_RANK];
+#line 421
+    size_t edge[MAX_RANK];
+#line 421
+    size_t index[MAX_RANK];
+#line 421
+    size_t mid[MAX_RANK];
+#line 421
+    int canConvert;     /* Both text or both numeric */
+#line 421
+    double value[MAX_NELS];
+#line 421
+    double expect[MAX_NELS];
+#line 421
+
+#line 421
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 421
+    IF (err)
+#line 421
+	error("nc_open: %s", nc_strerror(err));
+#line 421
+    for (i = 0; i < numVars; i++) {
+#line 421
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_DOUBLE == NCT_TEXT);
+#line 421
+        assert(var_rank[i] <= MAX_RANK);
+#line 421
+        assert(var_nels[i] <= MAX_NELS);
+#line 421
+	for (j = 0; j < var_rank[i]; j++) {
+#line 421
+	    start[j] = 0;
+#line 421
+	    edge[j] = 1;
+#line 421
+	}
+#line 421
+        err = nc_get_vara_double(BAD_ID, i, start, edge, value);
+#line 421
+        IF (err != NC_EBADID)
+#line 421
+	    error("bad ncid: status = %d", err);
+#line 421
+        err = nc_get_vara_double(ncid, BAD_VARID, start, edge, value);
+#line 421
+        IF (err != NC_ENOTVAR)
+#line 421
+	    error("bad var id: status = %d", err);
+#line 421
+	for (j = 0; j < var_rank[i]; j++) {
+#line 421
+	    start[j] = var_shape[i][j];
+#line 421
+	    err = nc_get_vara_double(ncid, i, start, edge, value);
+#line 421
+            IF (canConvert && err != NC_EINVALCOORDS)
+#line 421
+                error("bad index: status = %d", err);
+#line 421
+	    start[j] = 0;
+#line 421
+	    edge[j] = var_shape[i][j] + 1;
+#line 421
+	    err = nc_get_vara_double(ncid, i, start, edge, value);
+#line 421
+            IF (canConvert && err != NC_EEDGE)
+#line 421
+		error("bad edge: status = %d", err);
+#line 421
+	    edge[j] = 1;
+#line 421
+	}
+#line 421
+            /* Check non-scalars for correct error returned even when */
+#line 421
+            /* there is nothing to get (edge[j]==0) */
+#line 421
+	if(var_rank[i] > 0) {
+#line 421
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 421
+		edge[j] = 0;
+#line 421
+	    }
+#line 421
+	    err = nc_get_vara_double(BAD_ID, i, start, edge, value);
+#line 421
+	    IF (err != NC_EBADID) 
+#line 421
+		error("bad ncid: status = %d", err);
+#line 421
+	    err = nc_get_vara_double(ncid, BAD_VARID, start, edge, value);
+#line 421
+	    IF (err != NC_ENOTVAR) 
+#line 421
+		error("bad var id: status = %d", err);
+#line 421
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 421
+		if (var_dimid[i][j] > 0) {		/* skip record dim */
+#line 421
+		    start[j] = var_shape[i][j];
+#line 421
+		    err = nc_get_vara_double(ncid, i, start, edge, value);
+#line 421
+		    IF (canConvert && err != NC_EINVALCOORDS)
+#line 421
+			error("bad start: status = %d", err);
+#line 421
+		    start[j] = 0;
+#line 421
+		}
+#line 421
+	    }
+#line 421
+	    err = nc_get_vara_double(ncid, i, start, edge, value);
+#line 421
+	    if (canConvert) {
+#line 421
+		IF (err) 
+#line 421
+		    error("%s", nc_strerror(err));
+#line 421
+	    } else {
+#line 421
+		IF (err != NC_ECHAR)
+#line 421
+		    error("wrong type: status = %d", err);
+#line 421
+	    }
+#line 421
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 421
+		edge[j] = 1;
+#line 421
+	    }
+#line 421
+	}            /* Choose a random point dividing each dim into 2 parts */
+#line 421
+            /* get 2^rank (nslabs) slabs so defined */
+#line 421
+        nslabs = 1;
+#line 421
+        for (j = 0; j < var_rank[i]; j++) {
+#line 421
+            mid[j] = roll( var_shape[i][j] );
+#line 421
+            nslabs *= 2;
+#line 421
+        }
+#line 421
+            /* bits of k determine whether to get lower or upper part of dim */
+#line 421
+        for (k = 0; k < nslabs; k++) {
+#line 421
+            nels = 1;
+#line 421
+            for (j = 0; j < var_rank[i]; j++) {
+#line 421
+                if ((k >> j) & 1) {
+#line 421
+                    start[j] = 0;
+#line 421
+                    edge[j] = mid[j];
+#line 421
+                }else{
+#line 421
+                    start[j] = mid[j];
+#line 421
+                    edge[j] = var_shape[i][j] - mid[j];
+#line 421
+                }
+#line 421
+                nels *= edge[j];
+#line 421
+            }
+#line 421
+	    allInExtRange = allInIntRange = 1;
+#line 421
+            for (j = 0; j < nels; j++) {
+#line 421
+                err = toMixedBase(j, var_rank[i], edge, index);
+#line 421
+                IF (err)
+#line 421
+                    error("error in toMixedBase 1");
+#line 421
+                for (d = 0; d < var_rank[i]; d++)
+#line 421
+                    index[d] += start[d];
+#line 421
+                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_DOUBLE);
+#line 421
+		if (inRange3(expect[j],var_type[i], NCT_DOUBLE)) {
+#line 421
+		    allInIntRange = allInIntRange && expect[j] >= double_min
+#line 421
+				&& expect[j] <= double_max;
+#line 421
+		} else {
+#line 421
+		    allInExtRange = 0;
+#line 421
+		}
+#line 421
+	    }
+#line 421
+            if (var_rank[i] == 0 && i%2)
+#line 421
+		err = nc_get_vara_double(ncid, i, NULL, NULL, value);
+#line 421
+	    else
+#line 421
+		err = nc_get_vara_double(ncid, i, start, edge, value);
+#line 421
+            if (canConvert) {
+#line 421
+		if (allInExtRange) {
+#line 421
+		    if (allInIntRange) {
+#line 421
+			IF (err)
+#line 421
+			    error("%s", nc_strerror(err));
+#line 421
+		    } else {
+#line 421
+			IF (err != NC_ERANGE)
+#line 421
+			    error("Range error: status = %d", err);
+#line 421
+		    }
+#line 421
+		} else {
+#line 421
+		    IF (err != 0 && err != NC_ERANGE)
+#line 421
+			error("OK or Range error: status = %d", err);
+#line 421
+		}
+#line 421
+		for (j = 0; j < nels; j++) {
+#line 421
+		    if (inRange3(expect[j],var_type[i],NCT_DOUBLE)
+#line 421
+			    && expect[j] >= double_min && expect[j] <= double_max) {
+#line 421
+			IF (!equal(value[j],expect[j],var_type[i],NCT_DOUBLE)){
+#line 421
+			    error("value read not that expected");
+#line 421
+			    if (verbose) {
+#line 421
+				error("\n");
+#line 421
+				error("varid: %d, ", i);
+#line 421
+				error("var_name: %s, ", var_name[i]);
+#line 421
+				error("element number: %d ", j);
+#line 421
+				error("expect: %g", expect[j]);
+#line 421
+				error("got: %g", (double) value[j]);
+#line 421
+			    }
+#line 421
+			} else {
+#line 421
+			    nok++;
+#line 421
+			}
+#line 421
+		    }
+#line 421
+		}
+#line 421
+            } else {
+#line 421
+                IF (nels > 0 && err != NC_ECHAR)
+#line 421
+                    error("wrong type: status = %d", err);
+#line 421
+            }
+#line 421
+        }
+#line 421
+    }
+#line 421
+    err = nc_close(ncid);
+#line 421
+    IF (err)
+#line 421
+	error("nc_close: %s", nc_strerror(err));
+#line 421
+    print_nok(nok);
+#line 421
+}
+#line 421
+
+void
+#line 422
+test_nc_get_vara_ushort(void)
+#line 422
+{
+#line 422
+    int ncid;
+#line 422
+    int d;
+#line 422
+    int i;
+#line 422
+    int j;
+#line 422
+    int k;
+#line 422
+    int err;
+#line 422
+    int allInExtRange;	/* all values within external range? */
+#line 422
+    int allInIntRange;	/* all values within internal range? */
+#line 422
+    int nels;
+#line 422
+    int nslabs;
+#line 422
+    int nok = 0;      /* count of valid comparisons */
+#line 422
+    size_t start[MAX_RANK];
+#line 422
+    size_t edge[MAX_RANK];
+#line 422
+    size_t index[MAX_RANK];
+#line 422
+    size_t mid[MAX_RANK];
+#line 422
+    int canConvert;     /* Both text or both numeric */
+#line 422
+    ushort value[MAX_NELS];
+#line 422
+    double expect[MAX_NELS];
+#line 422
+
+#line 422
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 422
+    IF (err)
+#line 422
+	error("nc_open: %s", nc_strerror(err));
+#line 422
+    for (i = 0; i < numVars; i++) {
+#line 422
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_USHORT == NCT_TEXT);
+#line 422
+        assert(var_rank[i] <= MAX_RANK);
+#line 422
+        assert(var_nels[i] <= MAX_NELS);
+#line 422
+	for (j = 0; j < var_rank[i]; j++) {
+#line 422
+	    start[j] = 0;
+#line 422
+	    edge[j] = 1;
+#line 422
+	}
+#line 422
+        err = nc_get_vara_ushort(BAD_ID, i, start, edge, value);
+#line 422
+        IF (err != NC_EBADID)
+#line 422
+	    error("bad ncid: status = %d", err);
+#line 422
+        err = nc_get_vara_ushort(ncid, BAD_VARID, start, edge, value);
+#line 422
+        IF (err != NC_ENOTVAR)
+#line 422
+	    error("bad var id: status = %d", err);
+#line 422
+	for (j = 0; j < var_rank[i]; j++) {
+#line 422
+	    start[j] = var_shape[i][j];
+#line 422
+	    err = nc_get_vara_ushort(ncid, i, start, edge, value);
+#line 422
+            IF (canConvert && err != NC_EINVALCOORDS)
+#line 422
+                error("bad index: status = %d", err);
+#line 422
+	    start[j] = 0;
+#line 422
+	    edge[j] = var_shape[i][j] + 1;
+#line 422
+	    err = nc_get_vara_ushort(ncid, i, start, edge, value);
+#line 422
+            IF (canConvert && err != NC_EEDGE)
+#line 422
+		error("bad edge: status = %d", err);
+#line 422
+	    edge[j] = 1;
+#line 422
+	}
+#line 422
+            /* Check non-scalars for correct error returned even when */
+#line 422
+            /* there is nothing to get (edge[j]==0) */
+#line 422
+	if(var_rank[i] > 0) {
+#line 422
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 422
+		edge[j] = 0;
+#line 422
+	    }
+#line 422
+	    err = nc_get_vara_ushort(BAD_ID, i, start, edge, value);
+#line 422
+	    IF (err != NC_EBADID) 
+#line 422
+		error("bad ncid: status = %d", err);
+#line 422
+	    err = nc_get_vara_ushort(ncid, BAD_VARID, start, edge, value);
+#line 422
+	    IF (err != NC_ENOTVAR) 
+#line 422
+		error("bad var id: status = %d", err);
+#line 422
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 422
+		if (var_dimid[i][j] > 0) {		/* skip record dim */
+#line 422
+		    start[j] = var_shape[i][j];
+#line 422
+		    err = nc_get_vara_ushort(ncid, i, start, edge, value);
+#line 422
+		    IF (canConvert && err != NC_EINVALCOORDS)
+#line 422
+			error("bad start: status = %d", err);
+#line 422
+		    start[j] = 0;
+#line 422
+		}
+#line 422
+	    }
+#line 422
+	    err = nc_get_vara_ushort(ncid, i, start, edge, value);
+#line 422
+	    if (canConvert) {
+#line 422
+		IF (err) 
+#line 422
+		    error("%s", nc_strerror(err));
+#line 422
+	    } else {
+#line 422
+		IF (err != NC_ECHAR)
+#line 422
+		    error("wrong type: status = %d", err);
+#line 422
+	    }
+#line 422
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 422
+		edge[j] = 1;
+#line 422
+	    }
+#line 422
+	}            /* Choose a random point dividing each dim into 2 parts */
+#line 422
+            /* get 2^rank (nslabs) slabs so defined */
+#line 422
+        nslabs = 1;
+#line 422
+        for (j = 0; j < var_rank[i]; j++) {
+#line 422
+            mid[j] = roll( var_shape[i][j] );
+#line 422
+            nslabs *= 2;
+#line 422
+        }
+#line 422
+            /* bits of k determine whether to get lower or upper part of dim */
+#line 422
+        for (k = 0; k < nslabs; k++) {
+#line 422
+            nels = 1;
+#line 422
+            for (j = 0; j < var_rank[i]; j++) {
+#line 422
+                if ((k >> j) & 1) {
+#line 422
+                    start[j] = 0;
+#line 422
+                    edge[j] = mid[j];
+#line 422
+                }else{
+#line 422
+                    start[j] = mid[j];
+#line 422
+                    edge[j] = var_shape[i][j] - mid[j];
+#line 422
+                }
+#line 422
+                nels *= edge[j];
+#line 422
+            }
+#line 422
+	    allInExtRange = allInIntRange = 1;
+#line 422
+            for (j = 0; j < nels; j++) {
+#line 422
+                err = toMixedBase(j, var_rank[i], edge, index);
+#line 422
+                IF (err)
+#line 422
+                    error("error in toMixedBase 1");
+#line 422
+                for (d = 0; d < var_rank[i]; d++)
+#line 422
+                    index[d] += start[d];
+#line 422
+                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_USHORT);
+#line 422
+		if (inRange3(expect[j],var_type[i], NCT_USHORT)) {
+#line 422
+		    allInIntRange = allInIntRange && expect[j] >= ushort_min
+#line 422
+				&& expect[j] <= ushort_max;
+#line 422
+		} else {
+#line 422
+		    allInExtRange = 0;
+#line 422
+		}
+#line 422
+	    }
+#line 422
+            if (var_rank[i] == 0 && i%2)
+#line 422
+		err = nc_get_vara_ushort(ncid, i, NULL, NULL, value);
+#line 422
+	    else
+#line 422
+		err = nc_get_vara_ushort(ncid, i, start, edge, value);
+#line 422
+            if (canConvert) {
+#line 422
+		if (allInExtRange) {
+#line 422
+		    if (allInIntRange) {
+#line 422
+			IF (err)
+#line 422
+			    error("%s", nc_strerror(err));
+#line 422
+		    } else {
+#line 422
+			IF (err != NC_ERANGE)
+#line 422
+			    error("Range error: status = %d", err);
+#line 422
+		    }
+#line 422
+		} else {
+#line 422
+		    IF (err != 0 && err != NC_ERANGE)
+#line 422
+			error("OK or Range error: status = %d", err);
+#line 422
+		}
+#line 422
+		for (j = 0; j < nels; j++) {
+#line 422
+		    if (inRange3(expect[j],var_type[i],NCT_USHORT)
+#line 422
+			    && expect[j] >= ushort_min && expect[j] <= ushort_max) {
+#line 422
+			IF (!equal(value[j],expect[j],var_type[i],NCT_USHORT)){
+#line 422
+			    error("value read not that expected");
+#line 422
+			    if (verbose) {
+#line 422
+				error("\n");
+#line 422
+				error("varid: %d, ", i);
+#line 422
+				error("var_name: %s, ", var_name[i]);
+#line 422
+				error("element number: %d ", j);
+#line 422
+				error("expect: %g", expect[j]);
+#line 422
+				error("got: %g", (double) value[j]);
+#line 422
+			    }
+#line 422
+			} else {
+#line 422
+			    nok++;
+#line 422
+			}
+#line 422
+		    }
+#line 422
+		}
+#line 422
+            } else {
+#line 422
+                IF (nels > 0 && err != NC_ECHAR)
+#line 422
+                    error("wrong type: status = %d", err);
+#line 422
+            }
+#line 422
+        }
+#line 422
+    }
+#line 422
+    err = nc_close(ncid);
+#line 422
+    IF (err)
+#line 422
+	error("nc_close: %s", nc_strerror(err));
+#line 422
+    print_nok(nok);
+#line 422
+}
+#line 422
+
+void
+#line 423
+test_nc_get_vara_uint(void)
+#line 423
+{
+#line 423
+    int ncid;
+#line 423
+    int d;
+#line 423
+    int i;
+#line 423
+    int j;
+#line 423
+    int k;
+#line 423
+    int err;
+#line 423
+    int allInExtRange;	/* all values within external range? */
+#line 423
+    int allInIntRange;	/* all values within internal range? */
+#line 423
+    int nels;
+#line 423
+    int nslabs;
+#line 423
+    int nok = 0;      /* count of valid comparisons */
+#line 423
+    size_t start[MAX_RANK];
+#line 423
+    size_t edge[MAX_RANK];
+#line 423
+    size_t index[MAX_RANK];
+#line 423
+    size_t mid[MAX_RANK];
+#line 423
+    int canConvert;     /* Both text or both numeric */
+#line 423
+    uint value[MAX_NELS];
+#line 423
+    double expect[MAX_NELS];
+#line 423
+
+#line 423
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 423
+    IF (err)
+#line 423
+	error("nc_open: %s", nc_strerror(err));
+#line 423
+    for (i = 0; i < numVars; i++) {
+#line 423
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_UINT == NCT_TEXT);
+#line 423
+        assert(var_rank[i] <= MAX_RANK);
+#line 423
+        assert(var_nels[i] <= MAX_NELS);
+#line 423
+	for (j = 0; j < var_rank[i]; j++) {
+#line 423
+	    start[j] = 0;
+#line 423
+	    edge[j] = 1;
+#line 423
+	}
+#line 423
+        err = nc_get_vara_uint(BAD_ID, i, start, edge, value);
+#line 423
+        IF (err != NC_EBADID)
+#line 423
+	    error("bad ncid: status = %d", err);
+#line 423
+        err = nc_get_vara_uint(ncid, BAD_VARID, start, edge, value);
+#line 423
+        IF (err != NC_ENOTVAR)
+#line 423
+	    error("bad var id: status = %d", err);
+#line 423
+	for (j = 0; j < var_rank[i]; j++) {
+#line 423
+	    start[j] = var_shape[i][j];
+#line 423
+	    err = nc_get_vara_uint(ncid, i, start, edge, value);
+#line 423
+            IF (canConvert && err != NC_EINVALCOORDS)
+#line 423
+                error("bad index: status = %d", err);
+#line 423
+	    start[j] = 0;
+#line 423
+	    edge[j] = var_shape[i][j] + 1;
+#line 423
+	    err = nc_get_vara_uint(ncid, i, start, edge, value);
+#line 423
+            IF (canConvert && err != NC_EEDGE)
+#line 423
+		error("bad edge: status = %d", err);
+#line 423
+	    edge[j] = 1;
+#line 423
+	}
+#line 423
+            /* Check non-scalars for correct error returned even when */
+#line 423
+            /* there is nothing to get (edge[j]==0) */
+#line 423
+	if(var_rank[i] > 0) {
+#line 423
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 423
+		edge[j] = 0;
+#line 423
+	    }
+#line 423
+	    err = nc_get_vara_uint(BAD_ID, i, start, edge, value);
+#line 423
+	    IF (err != NC_EBADID) 
+#line 423
+		error("bad ncid: status = %d", err);
+#line 423
+	    err = nc_get_vara_uint(ncid, BAD_VARID, start, edge, value);
+#line 423
+	    IF (err != NC_ENOTVAR) 
+#line 423
+		error("bad var id: status = %d", err);
+#line 423
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 423
+		if (var_dimid[i][j] > 0) {		/* skip record dim */
+#line 423
+		    start[j] = var_shape[i][j];
+#line 423
+		    err = nc_get_vara_uint(ncid, i, start, edge, value);
+#line 423
+		    IF (canConvert && err != NC_EINVALCOORDS)
+#line 423
+			error("bad start: status = %d", err);
+#line 423
+		    start[j] = 0;
+#line 423
+		}
+#line 423
+	    }
+#line 423
+	    err = nc_get_vara_uint(ncid, i, start, edge, value);
+#line 423
+	    if (canConvert) {
+#line 423
+		IF (err) 
+#line 423
+		    error("%s", nc_strerror(err));
+#line 423
+	    } else {
+#line 423
+		IF (err != NC_ECHAR)
+#line 423
+		    error("wrong type: status = %d", err);
+#line 423
+	    }
+#line 423
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 423
+		edge[j] = 1;
+#line 423
+	    }
+#line 423
+	}            /* Choose a random point dividing each dim into 2 parts */
+#line 423
+            /* get 2^rank (nslabs) slabs so defined */
+#line 423
+        nslabs = 1;
+#line 423
+        for (j = 0; j < var_rank[i]; j++) {
+#line 423
+            mid[j] = roll( var_shape[i][j] );
+#line 423
+            nslabs *= 2;
+#line 423
+        }
+#line 423
+            /* bits of k determine whether to get lower or upper part of dim */
+#line 423
+        for (k = 0; k < nslabs; k++) {
+#line 423
+            nels = 1;
+#line 423
+            for (j = 0; j < var_rank[i]; j++) {
+#line 423
+                if ((k >> j) & 1) {
+#line 423
+                    start[j] = 0;
+#line 423
+                    edge[j] = mid[j];
+#line 423
+                }else{
+#line 423
+                    start[j] = mid[j];
+#line 423
+                    edge[j] = var_shape[i][j] - mid[j];
+#line 423
+                }
+#line 423
+                nels *= edge[j];
+#line 423
+            }
+#line 423
+	    allInExtRange = allInIntRange = 1;
+#line 423
+            for (j = 0; j < nels; j++) {
+#line 423
+                err = toMixedBase(j, var_rank[i], edge, index);
+#line 423
+                IF (err)
+#line 423
+                    error("error in toMixedBase 1");
+#line 423
+                for (d = 0; d < var_rank[i]; d++)
+#line 423
+                    index[d] += start[d];
+#line 423
+                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_UINT);
+#line 423
+		if (inRange3(expect[j],var_type[i], NCT_UINT)) {
+#line 423
+		    allInIntRange = allInIntRange && expect[j] >= uint_min
+#line 423
+				&& expect[j] <= uint_max;
+#line 423
+		} else {
+#line 423
+		    allInExtRange = 0;
+#line 423
+		}
+#line 423
+	    }
+#line 423
+            if (var_rank[i] == 0 && i%2)
+#line 423
+		err = nc_get_vara_uint(ncid, i, NULL, NULL, value);
+#line 423
+	    else
+#line 423
+		err = nc_get_vara_uint(ncid, i, start, edge, value);
+#line 423
+            if (canConvert) {
+#line 423
+		if (allInExtRange) {
+#line 423
+		    if (allInIntRange) {
+#line 423
+			IF (err)
+#line 423
+			    error("%s", nc_strerror(err));
+#line 423
+		    } else {
+#line 423
+			IF (err != NC_ERANGE)
+#line 423
+			    error("Range error: status = %d", err);
+#line 423
+		    }
+#line 423
+		} else {
+#line 423
+		    IF (err != 0 && err != NC_ERANGE)
+#line 423
+			error("OK or Range error: status = %d", err);
+#line 423
+		}
+#line 423
+		for (j = 0; j < nels; j++) {
+#line 423
+		    if (inRange3(expect[j],var_type[i],NCT_UINT)
+#line 423
+			    && expect[j] >= uint_min && expect[j] <= uint_max) {
+#line 423
+			IF (!equal(value[j],expect[j],var_type[i],NCT_UINT)){
+#line 423
+			    error("value read not that expected");
+#line 423
+			    if (verbose) {
+#line 423
+				error("\n");
+#line 423
+				error("varid: %d, ", i);
+#line 423
+				error("var_name: %s, ", var_name[i]);
+#line 423
+				error("element number: %d ", j);
+#line 423
+				error("expect: %g", expect[j]);
+#line 423
+				error("got: %g", (double) value[j]);
+#line 423
+			    }
+#line 423
+			} else {
+#line 423
+			    nok++;
+#line 423
+			}
+#line 423
+		    }
+#line 423
+		}
+#line 423
+            } else {
+#line 423
+                IF (nels > 0 && err != NC_ECHAR)
+#line 423
+                    error("wrong type: status = %d", err);
+#line 423
+            }
+#line 423
+        }
+#line 423
+    }
+#line 423
+    err = nc_close(ncid);
+#line 423
+    IF (err)
+#line 423
+	error("nc_close: %s", nc_strerror(err));
+#line 423
+    print_nok(nok);
+#line 423
+}
+#line 423
+
+void
+#line 424
+test_nc_get_vara_longlong(void)
+#line 424
+{
+#line 424
+    int ncid;
+#line 424
+    int d;
+#line 424
+    int i;
+#line 424
+    int j;
+#line 424
+    int k;
+#line 424
+    int err;
+#line 424
+    int allInExtRange;	/* all values within external range? */
+#line 424
+    int allInIntRange;	/* all values within internal range? */
+#line 424
+    int nels;
+#line 424
+    int nslabs;
+#line 424
+    int nok = 0;      /* count of valid comparisons */
+#line 424
+    size_t start[MAX_RANK];
+#line 424
+    size_t edge[MAX_RANK];
+#line 424
+    size_t index[MAX_RANK];
+#line 424
+    size_t mid[MAX_RANK];
+#line 424
+    int canConvert;     /* Both text or both numeric */
+#line 424
+    longlong value[MAX_NELS];
+#line 424
+    double expect[MAX_NELS];
+#line 424
+
+#line 424
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 424
+    IF (err)
+#line 424
+	error("nc_open: %s", nc_strerror(err));
+#line 424
+    for (i = 0; i < numVars; i++) {
+#line 424
+        canConvert = (var_type[i] == NC_CHAR) == (NCT_LONGLONG == NCT_TEXT);
+#line 424
+        assert(var_rank[i] <= MAX_RANK);
+#line 424
+        assert(var_nels[i] <= MAX_NELS);
+#line 424
+	for (j = 0; j < var_rank[i]; j++) {
+#line 424
+	    start[j] = 0;
+#line 424
+	    edge[j] = 1;
+#line 424
+	}
+#line 424
+        err = nc_get_vara_longlong(BAD_ID, i, start, edge, value);
+#line 424
+        IF (err != NC_EBADID)
+#line 424
+	    error("bad ncid: status = %d", err);
+#line 424
+        err = nc_get_vara_longlong(ncid, BAD_VARID, start, edge, value);
+#line 424
+        IF (err != NC_ENOTVAR)
+#line 424
+	    error("bad var id: status = %d", err);
+#line 424
+	for (j = 0; j < var_rank[i]; j++) {
+#line 424
+	    start[j] = var_shape[i][j];
+#line 424
+	    err = nc_get_vara_longlong(ncid, i, start, edge, value);
+#line 424
+            IF (canConvert && err != NC_EINVALCOORDS)
+#line 424
+                error("bad index: status = %d", err);
+#line 424
+	    start[j] = 0;
+#line 424
+	    edge[j] = var_shape[i][j] + 1;
+#line 424
+	    err = nc_get_vara_longlong(ncid, i, start, edge, value);
+#line 424
+            IF (canConvert && err != NC_EEDGE)
+#line 424
+		error("bad edge: status = %d", err);
+#line 424
+	    edge[j] = 1;
+#line 424
+	}
+#line 424
+            /* Check non-scalars for correct error returned even when */
+#line 424
+            /* there is nothing to get (edge[j]==0) */
+#line 424
+	if(var_rank[i] > 0) {
+#line 424
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 424
+		edge[j] = 0;
+#line 424
+	    }
+#line 424
+	    err = nc_get_vara_longlong(BAD_ID, i, start, edge, value);
+#line 424
+	    IF (err != NC_EBADID) 
+#line 424
+		error("bad ncid: status = %d", err);
+#line 424
+	    err = nc_get_vara_longlong(ncid, BAD_VARID, start, edge, value);
+#line 424
+	    IF (err != NC_ENOTVAR) 
+#line 424
+		error("bad var id: status = %d", err);
+#line 424
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 424
+		if (var_dimid[i][j] > 0) {		/* skip record dim */
+#line 424
+		    start[j] = var_shape[i][j];
+#line 424
+		    err = nc_get_vara_longlong(ncid, i, start, edge, value);
+#line 424
+		    IF (canConvert && err != NC_EINVALCOORDS)
+#line 424
+			error("bad start: status = %d", err);
+#line 424
+		    start[j] = 0;
+#line 424
+		}
+#line 424
+	    }
+#line 424
+	    err = nc_get_vara_longlong(ncid, i, start, edge, value);
+#line 424
+	    if (canConvert) {
+#line 424
+		IF (err) 
+#line 424
+		    error("%s", nc_strerror(err));
+#line 424
+	    } else {
+#line 424
+		IF (err != NC_ECHAR)
+#line 424
+		    error("wrong type: status = %d", err);
+#line 424
+	    }
+#line 424
+	    for (j = 0; j < var_rank[i]; j++) {
+#line 424
+		edge[j] = 1;
+#line 424
+	    }
+#line 424
+	}            /* Choose a random point dividing each dim into 2 parts */
+#line 424
+            /* get 2^rank (nslabs) slabs so defined */
+#line 424
+        nslabs = 1;
+#line 424
+        for (j = 0; j < var_rank[i]; j++) {
+#line 424
+            mid[j] = roll( var_shape[i][j] );
+#line 424
+            nslabs *= 2;
+#line 424
+        }
+#line 424
+            /* bits of k determine whether to get lower or upper part of dim */
+#line 424
+        for (k = 0; k < nslabs; k++) {
+#line 424
+            nels = 1;
+#line 424
+            for (j = 0; j < var_rank[i]; j++) {
+#line 424
+                if ((k >> j) & 1) {
+#line 424
+                    start[j] = 0;
+#line 424
+                    edge[j] = mid[j];
+#line 424
+                }else{
+#line 424
+                    start[j] = mid[j];
+#line 424
+                    edge[j] = var_shape[i][j] - mid[j];
+#line 424
+                }
+#line 424
+                nels *= edge[j];
+#line 424
+            }
+#line 424
+	    allInExtRange = allInIntRange = 1;
+#line 424
+            for (j = 0; j < nels; j++) {
+#line 424
+                err = toMixedBase(j, var_rank[i], edge, index);
+#line 424
+                IF (err)
+#line 424
+                    error("error in toMixedBase 1");
+#line 424
+                for (d = 0; d < var_rank[i]; d++)
+#line 424
+                    index[d] += start[d];
+#line 424
+                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_LONGLONG);
+#line 424
+		if (inRange3(expect[j],var_type[i], NCT_LONGLONG)) {
+#line 424
+		    allInIntRange = allInIntRange && expect[j] >= longlong_min
+#line 424
+				&& expect[j] <= longlong_max;
+#line 424
+		} else {
+#line 424
+		    allInExtRange = 0;
+#line 424
+		}
+#line 424
+	    }
+#line 424
+            if (var_rank[i] == 0 && i%2)
+#line 424
+		err = nc_get_vara_longlong(ncid, i, NULL, NULL, value);
+#line 424
+	    else
+#line 424
+		err = nc_get_vara_longlong(ncid, i, start, edge, value);
+#line 424
+            if (canConvert) {
+#line 424
+		if (allInExtRange) {
+#line 424
+		    if (allInIntRange) {
+#line 424
+			IF (err)
+#line 424
+			    error("%s", nc_strerror(err));
+#line 424
+		    } else {
+#line 424
+			IF (err != NC_ERANGE)
+#line 424
+			    error("Range error: status = %d", err);
+#line 424
+		    }
+#line 424
+		} else {
+#line 424
+		    IF (err != 0 && err != NC_ERANGE)
+#line 424
+			error("OK or Range error: status = %d", err);
+#line 424
+		}
+#line 424
+		for (j = 0; j < nels; j++) {
+#line 424
+		    if (inRange3(expect[j],var_type[i],NCT_LONGLONG)
+#line 424
+			    && expect[j] >= longlong_min && expect[j] <= longlong_max) {
+#line 424
+			IF (!equal(value[j],expect[j],var_type[i],NCT_LONGLONG)){
+#line 424
+			    error("value read not that expected");
+#line 424
+			    if (verbose) {
+#line 424
+				error("\n");
+#line 424
+				error("varid: %d, ", i);
+#line 424
+				error("var_name: %s, ", var_name[i]);
+#line 424
+				error("element number: %d ", j);
+#line 424
+				error("expect: %g", expect[j]);
+#line 424
+				error("got: %g", (double) value[j]);
+#line 424
+			    }
+#line 424
+			} else {
+#line 424
+			    nok++;
+#line 424
+			}
+#line 424
+		    }
+#line 424
+		}
+#line 424
+            } else {
+#line 424
+                IF (nels > 0 && err != NC_ECHAR)
+#line 424
+                    error("wrong type: status = %d", err);
+#line 424
+            }
+#line 424
+        }
+#line 424
+    }
+#line 424
+    err = nc_close(ncid);
+#line 424
+    IF (err)
+#line 424
+	error("nc_close: %s", nc_strerror(err));
+#line 424
+    print_nok(nok);
+#line 424
+}
+#line 424
+
+void
+#line 425
+test_nc_get_vara_ulonglong(void)
+#line 425
+{
+#line 425
+    int ncid;
+#line 425
+    int d;
+#line 425
+    int i;
+#line 425
+    int j;
+#line 425
+    int k;
+#line 425
+    int err;
+#line 425
+    int allInExtRange;	/* all values within external range? */
+#line 425
+    int allInIntRange;	/* all values within internal range? */
+#line 425
+    int nels;
+#line 425
+    int nslabs;
+#line 425
+    int nok = 0;      /* count of valid comparisons */
+#line 425
+    size_t start[MAX_RANK];
+#line 425
+    size_t edge[MAX_RANK];
+#line 425
+    size_t index[MAX_RANK];
+#line 425
+    size_t mid[MAX_RANK];
+#line 425
+    int canConvert;     /* Both text or both numeric */
+#line 425
+    ulonglong value[MAX_NELS];
+#line 425
+    double expect[MAX_NELS];
 #line 425
 
-void
-#line 426
-test_nc_get_vara_text(void)
-#line 426
-{
-#line 426
-    int ncid;
-#line 426
-    int d;
-#line 426
-    int i;
-#line 426
-    int j;
-#line 426
-    int k;
-#line 426
-    int err;
-#line 426
-    int allInExtRange;	/* all values within external range? */
-#line 426
-    int allInIntRange;	/* all values within internal range? */
-#line 426
-    int nels;
-#line 426
-    int nslabs;
-#line 426
-    int nok = 0;      /* count of valid comparisons */
-#line 426
-    size_t start[MAX_RANK];
-#line 426
-    size_t edge[MAX_RANK];
-#line 426
-    size_t index[MAX_RANK];
-#line 426
-    size_t mid[MAX_RANK];
-#line 426
-    int canConvert;     /* Both text or both numeric */
-#line 426
-    text value[MAX_NELS];
-#line 426
-    double expect[MAX_NELS];
-#line 426
-
-#line 426
-#ifdef USE_PNETCDF
-#line 426
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 426
-#else
-#line 426
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 426
-#endif
-#line 426
+#line 425
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 425
     IF (err)
-#line 426
+#line 425
 	error("nc_open: %s", nc_strerror(err));
-#line 426
+#line 425
     for (i = 0; i < numVars; i++) {
-#line 426
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_TEXT == NCT_TEXT);
-#line 426
-        assert(var_rank[i] <= MAX_RANK);
-#line 426
-        assert(var_nels[i] <= MAX_NELS);
-#line 426
-	for (j = 0; j < var_rank[i]; j++) {
-#line 426
-	    start[j] = 0;
-#line 426
-	    edge[j] = 1;
-#line 426
-	}
-#line 426
-        err = nc_get_vara_text(BAD_ID, i, start, edge, value);
-#line 426
-        IF (err != NC_EBADID)
-#line 426
-	    error("bad ncid: status = %d", err);
-#line 426
-        err = nc_get_vara_text(ncid, BAD_VARID, start, edge, value);
-#line 426
-        IF (err != NC_ENOTVAR)
-#line 426
-	    error("bad var id: status = %d", err);
-#line 426
-	for (j = 0; j < var_rank[i]; j++) {
-#line 426
-	    start[j] = var_shape[i][j];
-#line 426
-	    err = nc_get_vara_text(ncid, i, start, edge, value);
-#line 426
-            IF (canConvert && err != NC_EINVALCOORDS)
-#line 426
-                error("bad index: status = %d", err);
-#line 426
-	    start[j] = 0;
-#line 426
-	    edge[j] = var_shape[i][j] + 1;
-#line 426
-	    err = nc_get_vara_text(ncid, i, start, edge, value);
-#line 426
-            IF (canConvert && err != NC_EEDGE)
-#line 426
-		error("bad edge: status = %d", err);
-#line 426
-	    edge[j] = 1;
-#line 426
-	}
-#line 426
-            /* Check non-scalars for correct error returned even when */
-#line 426
-            /* there is nothing to get (edge[j]==0) */
-#line 426
-	if(var_rank[i] > 0) {
-#line 426
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 426
-		edge[j] = 0;
-#line 426
-	    }
-#line 426
-	    err = nc_get_vara_text(BAD_ID, i, start, edge, value);
-#line 426
-	    IF (err != NC_EBADID) 
-#line 426
-		error("bad ncid: status = %d", err);
-#line 426
-	    err = nc_get_vara_text(ncid, BAD_VARID, start, edge, value);
-#line 426
-	    IF (err != NC_ENOTVAR) 
-#line 426
-		error("bad var id: status = %d", err);
-#line 426
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 426
-		if (var_dimid[i][j] > 0) {		/* skip record dim */
-#line 426
-		    start[j] = var_shape[i][j];
-#line 426
-		    err = nc_get_vara_text(ncid, i, start, edge, value);
-#line 426
-		    IF (canConvert && err != NC_EINVALCOORDS)
-#line 426
-			error("bad start: status = %d", err);
-#line 426
-		    start[j] = 0;
-#line 426
-		}
-#line 426
-	    }
-#line 426
-	    err = nc_get_vara_text(ncid, i, start, edge, value);
-#line 426
-	    if (canConvert) {
-#line 426
-		IF (err) 
-#line 426
-		    error("%s", nc_strerror(err));
-#line 426
-	    } else {
-#line 426
-		IF (err != NC_ECHAR)
-#line 426
-		    error("wrong type: status = %d", err);
-#line 426
-	    }
-#line 426
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 426
-		edge[j] = 1;
-#line 426
-	    }
-#line 426
-	}            /* Choose a random point dividing each dim into 2 parts */
-#line 426
-            /* get 2^rank (nslabs) slabs so defined */
-#line 426
-        nslabs = 1;
-#line 426
-        for (j = 0; j < var_rank[i]; j++) {
-#line 426
-            mid[j] = roll( var_shape[i][j] );
-#line 426
-            nslabs *= 2;
-#line 426
-        }
-#line 426
-            /* bits of k determine whether to get lower or upper part of dim */
-#line 426
-        for (k = 0; k < nslabs; k++) {
-#line 426
-            nels = 1;
-#line 426
-            for (j = 0; j < var_rank[i]; j++) {
-#line 426
-                if ((k >> j) & 1) {
-#line 426
-                    start[j] = 0;
-#line 426
-                    edge[j] = mid[j];
-#line 426
-                }else{
-#line 426
-                    start[j] = mid[j];
-#line 426
-                    edge[j] = var_shape[i][j] - mid[j];
-#line 426
-                }
-#line 426
-                nels *= edge[j];
-#line 426
-            }
-#line 426
-	    allInExtRange = allInIntRange = 1;
-#line 426
-            for (j = 0; j < nels; j++) {
-#line 426
-                err = toMixedBase(j, var_rank[i], edge, index);
-#line 426
-                IF (err)
-#line 426
-                    error("error in toMixedBase 1");
-#line 426
-                for (d = 0; d < var_rank[i]; d++)
-#line 426
-                    index[d] += start[d];
-#line 426
-                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_TEXT);
-#line 426
-		if (inRange3(expect[j],var_type[i], NCT_TEXT)) {
-#line 426
-		    allInIntRange = allInIntRange && expect[j] >= text_min
-#line 426
-				&& expect[j] <= text_max;
-#line 426
-		} else {
-#line 426
-		    allInExtRange = 0;
-#line 426
-		}
-#line 426
-	    }
-#line 426
-            if (var_rank[i] == 0 && i%2)
-#line 426
-		err = nc_get_vara_text(ncid, i, NULL, NULL, value);
-#line 426
-	    else
-#line 426
-		err = nc_get_vara_text(ncid, i, start, edge, value);
-#line 426
-            if (canConvert) {
-#line 426
-		if (allInExtRange) {
-#line 426
-		    if (allInIntRange) {
-#line 426
-			IF (err)
-#line 426
-			    error("%s", nc_strerror(err));
-#line 426
-		    } else {
-#line 426
-			IF (err != NC_ERANGE)
-#line 426
-			    error("Range error: status = %d", err);
-#line 426
-		    }
-#line 426
-		} else {
-#line 426
-		    IF (err != 0 && err != NC_ERANGE)
-#line 426
-			error("OK or Range error: status = %d", err);
-#line 426
-		}
-#line 426
-		for (j = 0; j < nels; j++) {
-#line 426
-		    if (inRange3(expect[j],var_type[i],NCT_TEXT)
-#line 426
-			    && expect[j] >= text_min && expect[j] <= text_max) {
-#line 426
-			IF (!equal(value[j],expect[j],var_type[i],NCT_TEXT)){
-#line 426
-			    error("value read not that expected");
-#line 426
-			    if (verbose) {
-#line 426
-				error("\n");
-#line 426
-				error("varid: %d, ", i);
-#line 426
-				error("var_name: %s, ", var_name[i]);
-#line 426
-				error("element number: %d ", j);
-#line 426
-				error("expect: %g", expect[j]);
-#line 426
-				error("got: %g", (double) value[j]);
-#line 426
-			    }
-#line 426
-			} else {
-#line 426
-			    nok++;
-#line 426
-			}
-#line 426
-		    }
-#line 426
-		}
-#line 426
-            } else {
-#line 426
-                IF (nels > 0 && err != NC_ECHAR)
-#line 426
-                    error("wrong type: status = %d", err);
-#line 426
-            }
-#line 426
-        }
-#line 426
-    }
-#line 426
-    err = nc_close(ncid);
-#line 426
-    IF (err)
-#line 426
-	error("nc_close: %s", nc_strerror(err));
-#line 426
-    print_nok(nok);
-#line 426
-}
-#line 426
-
-void
-#line 427
-test_nc_get_vara_uchar(void)
-#line 427
-{
-#line 427
-    int ncid;
-#line 427
-    int d;
-#line 427
-    int i;
-#line 427
-    int j;
-#line 427
-    int k;
-#line 427
-    int err;
-#line 427
-    int allInExtRange;	/* all values within external range? */
-#line 427
-    int allInIntRange;	/* all values within internal range? */
-#line 427
-    int nels;
-#line 427
-    int nslabs;
-#line 427
-    int nok = 0;      /* count of valid comparisons */
-#line 427
-    size_t start[MAX_RANK];
-#line 427
-    size_t edge[MAX_RANK];
-#line 427
-    size_t index[MAX_RANK];
-#line 427
-    size_t mid[MAX_RANK];
-#line 427
-    int canConvert;     /* Both text or both numeric */
-#line 427
-    uchar value[MAX_NELS];
-#line 427
-    double expect[MAX_NELS];
-#line 427
-
-#line 427
-#ifdef USE_PNETCDF
-#line 427
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 427
-#else
-#line 427
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 427
-#endif
-#line 427
-    IF (err)
-#line 427
-	error("nc_open: %s", nc_strerror(err));
-#line 427
-    for (i = 0; i < numVars; i++) {
-#line 427
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_UCHAR == NCT_TEXT);
-#line 427
-        assert(var_rank[i] <= MAX_RANK);
-#line 427
-        assert(var_nels[i] <= MAX_NELS);
-#line 427
-	for (j = 0; j < var_rank[i]; j++) {
-#line 427
-	    start[j] = 0;
-#line 427
-	    edge[j] = 1;
-#line 427
-	}
-#line 427
-        err = nc_get_vara_uchar(BAD_ID, i, start, edge, value);
-#line 427
-        IF (err != NC_EBADID)
-#line 427
-	    error("bad ncid: status = %d", err);
-#line 427
-        err = nc_get_vara_uchar(ncid, BAD_VARID, start, edge, value);
-#line 427
-        IF (err != NC_ENOTVAR)
-#line 427
-	    error("bad var id: status = %d", err);
-#line 427
-	for (j = 0; j < var_rank[i]; j++) {
-#line 427
-	    start[j] = var_shape[i][j];
-#line 427
-	    err = nc_get_vara_uchar(ncid, i, start, edge, value);
-#line 427
-            IF (canConvert && err != NC_EINVALCOORDS)
-#line 427
-                error("bad index: status = %d", err);
-#line 427
-	    start[j] = 0;
-#line 427
-	    edge[j] = var_shape[i][j] + 1;
-#line 427
-	    err = nc_get_vara_uchar(ncid, i, start, edge, value);
-#line 427
-            IF (canConvert && err != NC_EEDGE)
-#line 427
-		error("bad edge: status = %d", err);
-#line 427
-	    edge[j] = 1;
-#line 427
-	}
-#line 427
-            /* Check non-scalars for correct error returned even when */
-#line 427
-            /* there is nothing to get (edge[j]==0) */
-#line 427
-	if(var_rank[i] > 0) {
-#line 427
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 427
-		edge[j] = 0;
-#line 427
-	    }
-#line 427
-	    err = nc_get_vara_uchar(BAD_ID, i, start, edge, value);
-#line 427
-	    IF (err != NC_EBADID) 
-#line 427
-		error("bad ncid: status = %d", err);
-#line 427
-	    err = nc_get_vara_uchar(ncid, BAD_VARID, start, edge, value);
-#line 427
-	    IF (err != NC_ENOTVAR) 
-#line 427
-		error("bad var id: status = %d", err);
-#line 427
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 427
-		if (var_dimid[i][j] > 0) {		/* skip record dim */
-#line 427
-		    start[j] = var_shape[i][j];
-#line 427
-		    err = nc_get_vara_uchar(ncid, i, start, edge, value);
-#line 427
-		    IF (canConvert && err != NC_EINVALCOORDS)
-#line 427
-			error("bad start: status = %d", err);
-#line 427
-		    start[j] = 0;
-#line 427
-		}
-#line 427
-	    }
-#line 427
-	    err = nc_get_vara_uchar(ncid, i, start, edge, value);
-#line 427
-	    if (canConvert) {
-#line 427
-		IF (err) 
-#line 427
-		    error("%s", nc_strerror(err));
-#line 427
-	    } else {
-#line 427
-		IF (err != NC_ECHAR)
-#line 427
-		    error("wrong type: status = %d", err);
-#line 427
-	    }
-#line 427
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 427
-		edge[j] = 1;
-#line 427
-	    }
-#line 427
-	}            /* Choose a random point dividing each dim into 2 parts */
-#line 427
-            /* get 2^rank (nslabs) slabs so defined */
-#line 427
-        nslabs = 1;
-#line 427
-        for (j = 0; j < var_rank[i]; j++) {
-#line 427
-            mid[j] = roll( var_shape[i][j] );
-#line 427
-            nslabs *= 2;
-#line 427
-        }
-#line 427
-            /* bits of k determine whether to get lower or upper part of dim */
-#line 427
-        for (k = 0; k < nslabs; k++) {
-#line 427
-            nels = 1;
-#line 427
-            for (j = 0; j < var_rank[i]; j++) {
-#line 427
-                if ((k >> j) & 1) {
-#line 427
-                    start[j] = 0;
-#line 427
-                    edge[j] = mid[j];
-#line 427
-                }else{
-#line 427
-                    start[j] = mid[j];
-#line 427
-                    edge[j] = var_shape[i][j] - mid[j];
-#line 427
-                }
-#line 427
-                nels *= edge[j];
-#line 427
-            }
-#line 427
-	    allInExtRange = allInIntRange = 1;
-#line 427
-            for (j = 0; j < nels; j++) {
-#line 427
-                err = toMixedBase(j, var_rank[i], edge, index);
-#line 427
-                IF (err)
-#line 427
-                    error("error in toMixedBase 1");
-#line 427
-                for (d = 0; d < var_rank[i]; d++)
-#line 427
-                    index[d] += start[d];
-#line 427
-                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_UCHAR);
-#line 427
-		if (inRange3(expect[j],var_type[i], NCT_UCHAR)) {
-#line 427
-		    allInIntRange = allInIntRange && expect[j] >= uchar_min
-#line 427
-				&& expect[j] <= uchar_max;
-#line 427
-		} else {
-#line 427
-		    allInExtRange = 0;
-#line 427
-		}
-#line 427
-	    }
-#line 427
-            if (var_rank[i] == 0 && i%2)
-#line 427
-		err = nc_get_vara_uchar(ncid, i, NULL, NULL, value);
-#line 427
-	    else
-#line 427
-		err = nc_get_vara_uchar(ncid, i, start, edge, value);
-#line 427
-            if (canConvert) {
-#line 427
-		if (allInExtRange) {
-#line 427
-		    if (allInIntRange) {
-#line 427
-			IF (err)
-#line 427
-			    error("%s", nc_strerror(err));
-#line 427
-		    } else {
-#line 427
-			IF (err != NC_ERANGE)
-#line 427
-			    error("Range error: status = %d", err);
-#line 427
-		    }
-#line 427
-		} else {
-#line 427
-		    IF (err != 0 && err != NC_ERANGE)
-#line 427
-			error("OK or Range error: status = %d", err);
-#line 427
-		}
-#line 427
-		for (j = 0; j < nels; j++) {
-#line 427
-		    if (inRange3(expect[j],var_type[i],NCT_UCHAR)
-#line 427
-			    && expect[j] >= uchar_min && expect[j] <= uchar_max) {
-#line 427
-			IF (!equal(value[j],expect[j],var_type[i],NCT_UCHAR)){
-#line 427
-			    error("value read not that expected");
-#line 427
-			    if (verbose) {
-#line 427
-				error("\n");
-#line 427
-				error("varid: %d, ", i);
-#line 427
-				error("var_name: %s, ", var_name[i]);
-#line 427
-				error("element number: %d ", j);
-#line 427
-				error("expect: %g", expect[j]);
-#line 427
-				error("got: %g", (double) value[j]);
-#line 427
-			    }
-#line 427
-			} else {
-#line 427
-			    nok++;
-#line 427
-			}
-#line 427
-		    }
-#line 427
-		}
-#line 427
-            } else {
-#line 427
-                IF (nels > 0 && err != NC_ECHAR)
-#line 427
-                    error("wrong type: status = %d", err);
-#line 427
-            }
-#line 427
-        }
-#line 427
-    }
-#line 427
-    err = nc_close(ncid);
-#line 427
-    IF (err)
-#line 427
-	error("nc_close: %s", nc_strerror(err));
-#line 427
-    print_nok(nok);
-#line 427
-}
-#line 427
-
-void
-#line 428
-test_nc_get_vara_schar(void)
-#line 428
-{
-#line 428
-    int ncid;
-#line 428
-    int d;
-#line 428
-    int i;
-#line 428
-    int j;
-#line 428
-    int k;
-#line 428
-    int err;
-#line 428
-    int allInExtRange;	/* all values within external range? */
-#line 428
-    int allInIntRange;	/* all values within internal range? */
-#line 428
-    int nels;
-#line 428
-    int nslabs;
-#line 428
-    int nok = 0;      /* count of valid comparisons */
-#line 428
-    size_t start[MAX_RANK];
-#line 428
-    size_t edge[MAX_RANK];
-#line 428
-    size_t index[MAX_RANK];
-#line 428
-    size_t mid[MAX_RANK];
-#line 428
-    int canConvert;     /* Both text or both numeric */
-#line 428
-    schar value[MAX_NELS];
-#line 428
-    double expect[MAX_NELS];
-#line 428
-
-#line 428
-#ifdef USE_PNETCDF
-#line 428
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 428
-#else
-#line 428
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 428
-#endif
-#line 428
-    IF (err)
-#line 428
-	error("nc_open: %s", nc_strerror(err));
-#line 428
-    for (i = 0; i < numVars; i++) {
-#line 428
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_SCHAR == NCT_TEXT);
-#line 428
-        assert(var_rank[i] <= MAX_RANK);
-#line 428
-        assert(var_nels[i] <= MAX_NELS);
-#line 428
-	for (j = 0; j < var_rank[i]; j++) {
-#line 428
-	    start[j] = 0;
-#line 428
-	    edge[j] = 1;
-#line 428
-	}
-#line 428
-        err = nc_get_vara_schar(BAD_ID, i, start, edge, value);
-#line 428
-        IF (err != NC_EBADID)
-#line 428
-	    error("bad ncid: status = %d", err);
-#line 428
-        err = nc_get_vara_schar(ncid, BAD_VARID, start, edge, value);
-#line 428
-        IF (err != NC_ENOTVAR)
-#line 428
-	    error("bad var id: status = %d", err);
-#line 428
-	for (j = 0; j < var_rank[i]; j++) {
-#line 428
-	    start[j] = var_shape[i][j];
-#line 428
-	    err = nc_get_vara_schar(ncid, i, start, edge, value);
-#line 428
-            IF (canConvert && err != NC_EINVALCOORDS)
-#line 428
-                error("bad index: status = %d", err);
-#line 428
-	    start[j] = 0;
-#line 428
-	    edge[j] = var_shape[i][j] + 1;
-#line 428
-	    err = nc_get_vara_schar(ncid, i, start, edge, value);
-#line 428
-            IF (canConvert && err != NC_EEDGE)
-#line 428
-		error("bad edge: status = %d", err);
-#line 428
-	    edge[j] = 1;
-#line 428
-	}
-#line 428
-            /* Check non-scalars for correct error returned even when */
-#line 428
-            /* there is nothing to get (edge[j]==0) */
-#line 428
-	if(var_rank[i] > 0) {
-#line 428
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 428
-		edge[j] = 0;
-#line 428
-	    }
-#line 428
-	    err = nc_get_vara_schar(BAD_ID, i, start, edge, value);
-#line 428
-	    IF (err != NC_EBADID) 
-#line 428
-		error("bad ncid: status = %d", err);
-#line 428
-	    err = nc_get_vara_schar(ncid, BAD_VARID, start, edge, value);
-#line 428
-	    IF (err != NC_ENOTVAR) 
-#line 428
-		error("bad var id: status = %d", err);
-#line 428
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 428
-		if (var_dimid[i][j] > 0) {		/* skip record dim */
-#line 428
-		    start[j] = var_shape[i][j];
-#line 428
-		    err = nc_get_vara_schar(ncid, i, start, edge, value);
-#line 428
-		    IF (canConvert && err != NC_EINVALCOORDS)
-#line 428
-			error("bad start: status = %d", err);
-#line 428
-		    start[j] = 0;
-#line 428
-		}
-#line 428
-	    }
-#line 428
-	    err = nc_get_vara_schar(ncid, i, start, edge, value);
-#line 428
-	    if (canConvert) {
-#line 428
-		IF (err) 
-#line 428
-		    error("%s", nc_strerror(err));
-#line 428
-	    } else {
-#line 428
-		IF (err != NC_ECHAR)
-#line 428
-		    error("wrong type: status = %d", err);
-#line 428
-	    }
-#line 428
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 428
-		edge[j] = 1;
-#line 428
-	    }
-#line 428
-	}            /* Choose a random point dividing each dim into 2 parts */
-#line 428
-            /* get 2^rank (nslabs) slabs so defined */
-#line 428
-        nslabs = 1;
-#line 428
-        for (j = 0; j < var_rank[i]; j++) {
-#line 428
-            mid[j] = roll( var_shape[i][j] );
-#line 428
-            nslabs *= 2;
-#line 428
-        }
-#line 428
-            /* bits of k determine whether to get lower or upper part of dim */
-#line 428
-        for (k = 0; k < nslabs; k++) {
-#line 428
-            nels = 1;
-#line 428
-            for (j = 0; j < var_rank[i]; j++) {
-#line 428
-                if ((k >> j) & 1) {
-#line 428
-                    start[j] = 0;
-#line 428
-                    edge[j] = mid[j];
-#line 428
-                }else{
-#line 428
-                    start[j] = mid[j];
-#line 428
-                    edge[j] = var_shape[i][j] - mid[j];
-#line 428
-                }
-#line 428
-                nels *= edge[j];
-#line 428
-            }
-#line 428
-	    allInExtRange = allInIntRange = 1;
-#line 428
-            for (j = 0; j < nels; j++) {
-#line 428
-                err = toMixedBase(j, var_rank[i], edge, index);
-#line 428
-                IF (err)
-#line 428
-                    error("error in toMixedBase 1");
-#line 428
-                for (d = 0; d < var_rank[i]; d++)
-#line 428
-                    index[d] += start[d];
-#line 428
-                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_SCHAR);
-#line 428
-		if (inRange3(expect[j],var_type[i], NCT_SCHAR)) {
-#line 428
-		    allInIntRange = allInIntRange && expect[j] >= schar_min
-#line 428
-				&& expect[j] <= schar_max;
-#line 428
-		} else {
-#line 428
-		    allInExtRange = 0;
-#line 428
-		}
-#line 428
-	    }
-#line 428
-            if (var_rank[i] == 0 && i%2)
-#line 428
-		err = nc_get_vara_schar(ncid, i, NULL, NULL, value);
-#line 428
-	    else
-#line 428
-		err = nc_get_vara_schar(ncid, i, start, edge, value);
-#line 428
-            if (canConvert) {
-#line 428
-		if (allInExtRange) {
-#line 428
-		    if (allInIntRange) {
-#line 428
-			IF (err)
-#line 428
-			    error("%s", nc_strerror(err));
-#line 428
-		    } else {
-#line 428
-			IF (err != NC_ERANGE)
-#line 428
-			    error("Range error: status = %d", err);
-#line 428
-		    }
-#line 428
-		} else {
-#line 428
-		    IF (err != 0 && err != NC_ERANGE)
-#line 428
-			error("OK or Range error: status = %d", err);
-#line 428
-		}
-#line 428
-		for (j = 0; j < nels; j++) {
-#line 428
-		    if (inRange3(expect[j],var_type[i],NCT_SCHAR)
-#line 428
-			    && expect[j] >= schar_min && expect[j] <= schar_max) {
-#line 428
-			IF (!equal(value[j],expect[j],var_type[i],NCT_SCHAR)){
-#line 428
-			    error("value read not that expected");
-#line 428
-			    if (verbose) {
-#line 428
-				error("\n");
-#line 428
-				error("varid: %d, ", i);
-#line 428
-				error("var_name: %s, ", var_name[i]);
-#line 428
-				error("element number: %d ", j);
-#line 428
-				error("expect: %g", expect[j]);
-#line 428
-				error("got: %g", (double) value[j]);
-#line 428
-			    }
-#line 428
-			} else {
-#line 428
-			    nok++;
-#line 428
-			}
-#line 428
-		    }
-#line 428
-		}
-#line 428
-            } else {
-#line 428
-                IF (nels > 0 && err != NC_ECHAR)
-#line 428
-                    error("wrong type: status = %d", err);
-#line 428
-            }
-#line 428
-        }
-#line 428
-    }
-#line 428
-    err = nc_close(ncid);
-#line 428
-    IF (err)
-#line 428
-	error("nc_close: %s", nc_strerror(err));
-#line 428
-    print_nok(nok);
-#line 428
-}
-#line 428
-
-void
-#line 429
-test_nc_get_vara_short(void)
-#line 429
-{
-#line 429
-    int ncid;
-#line 429
-    int d;
-#line 429
-    int i;
-#line 429
-    int j;
-#line 429
-    int k;
-#line 429
-    int err;
-#line 429
-    int allInExtRange;	/* all values within external range? */
-#line 429
-    int allInIntRange;	/* all values within internal range? */
-#line 429
-    int nels;
-#line 429
-    int nslabs;
-#line 429
-    int nok = 0;      /* count of valid comparisons */
-#line 429
-    size_t start[MAX_RANK];
-#line 429
-    size_t edge[MAX_RANK];
-#line 429
-    size_t index[MAX_RANK];
-#line 429
-    size_t mid[MAX_RANK];
-#line 429
-    int canConvert;     /* Both text or both numeric */
-#line 429
-    short value[MAX_NELS];
-#line 429
-    double expect[MAX_NELS];
-#line 429
-
-#line 429
-#ifdef USE_PNETCDF
-#line 429
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 429
-#else
-#line 429
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 429
-#endif
-#line 429
-    IF (err)
-#line 429
-	error("nc_open: %s", nc_strerror(err));
-#line 429
-    for (i = 0; i < numVars; i++) {
-#line 429
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_SHORT == NCT_TEXT);
-#line 429
-        assert(var_rank[i] <= MAX_RANK);
-#line 429
-        assert(var_nels[i] <= MAX_NELS);
-#line 429
-	for (j = 0; j < var_rank[i]; j++) {
-#line 429
-	    start[j] = 0;
-#line 429
-	    edge[j] = 1;
-#line 429
-	}
-#line 429
-        err = nc_get_vara_short(BAD_ID, i, start, edge, value);
-#line 429
-        IF (err != NC_EBADID)
-#line 429
-	    error("bad ncid: status = %d", err);
-#line 429
-        err = nc_get_vara_short(ncid, BAD_VARID, start, edge, value);
-#line 429
-        IF (err != NC_ENOTVAR)
-#line 429
-	    error("bad var id: status = %d", err);
-#line 429
-	for (j = 0; j < var_rank[i]; j++) {
-#line 429
-	    start[j] = var_shape[i][j];
-#line 429
-	    err = nc_get_vara_short(ncid, i, start, edge, value);
-#line 429
-            IF (canConvert && err != NC_EINVALCOORDS)
-#line 429
-                error("bad index: status = %d", err);
-#line 429
-	    start[j] = 0;
-#line 429
-	    edge[j] = var_shape[i][j] + 1;
-#line 429
-	    err = nc_get_vara_short(ncid, i, start, edge, value);
-#line 429
-            IF (canConvert && err != NC_EEDGE)
-#line 429
-		error("bad edge: status = %d", err);
-#line 429
-	    edge[j] = 1;
-#line 429
-	}
-#line 429
-            /* Check non-scalars for correct error returned even when */
-#line 429
-            /* there is nothing to get (edge[j]==0) */
-#line 429
-	if(var_rank[i] > 0) {
-#line 429
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 429
-		edge[j] = 0;
-#line 429
-	    }
-#line 429
-	    err = nc_get_vara_short(BAD_ID, i, start, edge, value);
-#line 429
-	    IF (err != NC_EBADID) 
-#line 429
-		error("bad ncid: status = %d", err);
-#line 429
-	    err = nc_get_vara_short(ncid, BAD_VARID, start, edge, value);
-#line 429
-	    IF (err != NC_ENOTVAR) 
-#line 429
-		error("bad var id: status = %d", err);
-#line 429
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 429
-		if (var_dimid[i][j] > 0) {		/* skip record dim */
-#line 429
-		    start[j] = var_shape[i][j];
-#line 429
-		    err = nc_get_vara_short(ncid, i, start, edge, value);
-#line 429
-		    IF (canConvert && err != NC_EINVALCOORDS)
-#line 429
-			error("bad start: status = %d", err);
-#line 429
-		    start[j] = 0;
-#line 429
-		}
-#line 429
-	    }
-#line 429
-	    err = nc_get_vara_short(ncid, i, start, edge, value);
-#line 429
-	    if (canConvert) {
-#line 429
-		IF (err) 
-#line 429
-		    error("%s", nc_strerror(err));
-#line 429
-	    } else {
-#line 429
-		IF (err != NC_ECHAR)
-#line 429
-		    error("wrong type: status = %d", err);
-#line 429
-	    }
-#line 429
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 429
-		edge[j] = 1;
-#line 429
-	    }
-#line 429
-	}            /* Choose a random point dividing each dim into 2 parts */
-#line 429
-            /* get 2^rank (nslabs) slabs so defined */
-#line 429
-        nslabs = 1;
-#line 429
-        for (j = 0; j < var_rank[i]; j++) {
-#line 429
-            mid[j] = roll( var_shape[i][j] );
-#line 429
-            nslabs *= 2;
-#line 429
-        }
-#line 429
-            /* bits of k determine whether to get lower or upper part of dim */
-#line 429
-        for (k = 0; k < nslabs; k++) {
-#line 429
-            nels = 1;
-#line 429
-            for (j = 0; j < var_rank[i]; j++) {
-#line 429
-                if ((k >> j) & 1) {
-#line 429
-                    start[j] = 0;
-#line 429
-                    edge[j] = mid[j];
-#line 429
-                }else{
-#line 429
-                    start[j] = mid[j];
-#line 429
-                    edge[j] = var_shape[i][j] - mid[j];
-#line 429
-                }
-#line 429
-                nels *= edge[j];
-#line 429
-            }
-#line 429
-	    allInExtRange = allInIntRange = 1;
-#line 429
-            for (j = 0; j < nels; j++) {
-#line 429
-                err = toMixedBase(j, var_rank[i], edge, index);
-#line 429
-                IF (err)
-#line 429
-                    error("error in toMixedBase 1");
-#line 429
-                for (d = 0; d < var_rank[i]; d++)
-#line 429
-                    index[d] += start[d];
-#line 429
-                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_SHORT);
-#line 429
-		if (inRange3(expect[j],var_type[i], NCT_SHORT)) {
-#line 429
-		    allInIntRange = allInIntRange && expect[j] >= short_min
-#line 429
-				&& expect[j] <= short_max;
-#line 429
-		} else {
-#line 429
-		    allInExtRange = 0;
-#line 429
-		}
-#line 429
-	    }
-#line 429
-            if (var_rank[i] == 0 && i%2)
-#line 429
-		err = nc_get_vara_short(ncid, i, NULL, NULL, value);
-#line 429
-	    else
-#line 429
-		err = nc_get_vara_short(ncid, i, start, edge, value);
-#line 429
-            if (canConvert) {
-#line 429
-		if (allInExtRange) {
-#line 429
-		    if (allInIntRange) {
-#line 429
-			IF (err)
-#line 429
-			    error("%s", nc_strerror(err));
-#line 429
-		    } else {
-#line 429
-			IF (err != NC_ERANGE)
-#line 429
-			    error("Range error: status = %d", err);
-#line 429
-		    }
-#line 429
-		} else {
-#line 429
-		    IF (err != 0 && err != NC_ERANGE)
-#line 429
-			error("OK or Range error: status = %d", err);
-#line 429
-		}
-#line 429
-		for (j = 0; j < nels; j++) {
-#line 429
-		    if (inRange3(expect[j],var_type[i],NCT_SHORT)
-#line 429
-			    && expect[j] >= short_min && expect[j] <= short_max) {
-#line 429
-			IF (!equal(value[j],expect[j],var_type[i],NCT_SHORT)){
-#line 429
-			    error("value read not that expected");
-#line 429
-			    if (verbose) {
-#line 429
-				error("\n");
-#line 429
-				error("varid: %d, ", i);
-#line 429
-				error("var_name: %s, ", var_name[i]);
-#line 429
-				error("element number: %d ", j);
-#line 429
-				error("expect: %g", expect[j]);
-#line 429
-				error("got: %g", (double) value[j]);
-#line 429
-			    }
-#line 429
-			} else {
-#line 429
-			    nok++;
-#line 429
-			}
-#line 429
-		    }
-#line 429
-		}
-#line 429
-            } else {
-#line 429
-                IF (nels > 0 && err != NC_ECHAR)
-#line 429
-                    error("wrong type: status = %d", err);
-#line 429
-            }
-#line 429
-        }
-#line 429
-    }
-#line 429
-    err = nc_close(ncid);
-#line 429
-    IF (err)
-#line 429
-	error("nc_close: %s", nc_strerror(err));
-#line 429
-    print_nok(nok);
-#line 429
-}
-#line 429
-
-void
-#line 430
-test_nc_get_vara_int(void)
-#line 430
-{
-#line 430
-    int ncid;
-#line 430
-    int d;
-#line 430
-    int i;
-#line 430
-    int j;
-#line 430
-    int k;
-#line 430
-    int err;
-#line 430
-    int allInExtRange;	/* all values within external range? */
-#line 430
-    int allInIntRange;	/* all values within internal range? */
-#line 430
-    int nels;
-#line 430
-    int nslabs;
-#line 430
-    int nok = 0;      /* count of valid comparisons */
-#line 430
-    size_t start[MAX_RANK];
-#line 430
-    size_t edge[MAX_RANK];
-#line 430
-    size_t index[MAX_RANK];
-#line 430
-    size_t mid[MAX_RANK];
-#line 430
-    int canConvert;     /* Both text or both numeric */
-#line 430
-    int value[MAX_NELS];
-#line 430
-    double expect[MAX_NELS];
-#line 430
-
-#line 430
-#ifdef USE_PNETCDF
-#line 430
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 430
-#else
-#line 430
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 430
-#endif
-#line 430
-    IF (err)
-#line 430
-	error("nc_open: %s", nc_strerror(err));
-#line 430
-    for (i = 0; i < numVars; i++) {
-#line 430
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_INT == NCT_TEXT);
-#line 430
-        assert(var_rank[i] <= MAX_RANK);
-#line 430
-        assert(var_nels[i] <= MAX_NELS);
-#line 430
-	for (j = 0; j < var_rank[i]; j++) {
-#line 430
-	    start[j] = 0;
-#line 430
-	    edge[j] = 1;
-#line 430
-	}
-#line 430
-        err = nc_get_vara_int(BAD_ID, i, start, edge, value);
-#line 430
-        IF (err != NC_EBADID)
-#line 430
-	    error("bad ncid: status = %d", err);
-#line 430
-        err = nc_get_vara_int(ncid, BAD_VARID, start, edge, value);
-#line 430
-        IF (err != NC_ENOTVAR)
-#line 430
-	    error("bad var id: status = %d", err);
-#line 430
-	for (j = 0; j < var_rank[i]; j++) {
-#line 430
-	    start[j] = var_shape[i][j];
-#line 430
-	    err = nc_get_vara_int(ncid, i, start, edge, value);
-#line 430
-            IF (canConvert && err != NC_EINVALCOORDS)
-#line 430
-                error("bad index: status = %d", err);
-#line 430
-	    start[j] = 0;
-#line 430
-	    edge[j] = var_shape[i][j] + 1;
-#line 430
-	    err = nc_get_vara_int(ncid, i, start, edge, value);
-#line 430
-            IF (canConvert && err != NC_EEDGE)
-#line 430
-		error("bad edge: status = %d", err);
-#line 430
-	    edge[j] = 1;
-#line 430
-	}
-#line 430
-            /* Check non-scalars for correct error returned even when */
-#line 430
-            /* there is nothing to get (edge[j]==0) */
-#line 430
-	if(var_rank[i] > 0) {
-#line 430
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 430
-		edge[j] = 0;
-#line 430
-	    }
-#line 430
-	    err = nc_get_vara_int(BAD_ID, i, start, edge, value);
-#line 430
-	    IF (err != NC_EBADID) 
-#line 430
-		error("bad ncid: status = %d", err);
-#line 430
-	    err = nc_get_vara_int(ncid, BAD_VARID, start, edge, value);
-#line 430
-	    IF (err != NC_ENOTVAR) 
-#line 430
-		error("bad var id: status = %d", err);
-#line 430
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 430
-		if (var_dimid[i][j] > 0) {		/* skip record dim */
-#line 430
-		    start[j] = var_shape[i][j];
-#line 430
-		    err = nc_get_vara_int(ncid, i, start, edge, value);
-#line 430
-		    IF (canConvert && err != NC_EINVALCOORDS)
-#line 430
-			error("bad start: status = %d", err);
-#line 430
-		    start[j] = 0;
-#line 430
-		}
-#line 430
-	    }
-#line 430
-	    err = nc_get_vara_int(ncid, i, start, edge, value);
-#line 430
-	    if (canConvert) {
-#line 430
-		IF (err) 
-#line 430
-		    error("%s", nc_strerror(err));
-#line 430
-	    } else {
-#line 430
-		IF (err != NC_ECHAR)
-#line 430
-		    error("wrong type: status = %d", err);
-#line 430
-	    }
-#line 430
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 430
-		edge[j] = 1;
-#line 430
-	    }
-#line 430
-	}            /* Choose a random point dividing each dim into 2 parts */
-#line 430
-            /* get 2^rank (nslabs) slabs so defined */
-#line 430
-        nslabs = 1;
-#line 430
-        for (j = 0; j < var_rank[i]; j++) {
-#line 430
-            mid[j] = roll( var_shape[i][j] );
-#line 430
-            nslabs *= 2;
-#line 430
-        }
-#line 430
-            /* bits of k determine whether to get lower or upper part of dim */
-#line 430
-        for (k = 0; k < nslabs; k++) {
-#line 430
-            nels = 1;
-#line 430
-            for (j = 0; j < var_rank[i]; j++) {
-#line 430
-                if ((k >> j) & 1) {
-#line 430
-                    start[j] = 0;
-#line 430
-                    edge[j] = mid[j];
-#line 430
-                }else{
-#line 430
-                    start[j] = mid[j];
-#line 430
-                    edge[j] = var_shape[i][j] - mid[j];
-#line 430
-                }
-#line 430
-                nels *= edge[j];
-#line 430
-            }
-#line 430
-	    allInExtRange = allInIntRange = 1;
-#line 430
-            for (j = 0; j < nels; j++) {
-#line 430
-                err = toMixedBase(j, var_rank[i], edge, index);
-#line 430
-                IF (err)
-#line 430
-                    error("error in toMixedBase 1");
-#line 430
-                for (d = 0; d < var_rank[i]; d++)
-#line 430
-                    index[d] += start[d];
-#line 430
-                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_INT);
-#line 430
-		if (inRange3(expect[j],var_type[i], NCT_INT)) {
-#line 430
-		    allInIntRange = allInIntRange && expect[j] >= int_min
-#line 430
-				&& expect[j] <= int_max;
-#line 430
-		} else {
-#line 430
-		    allInExtRange = 0;
-#line 430
-		}
-#line 430
-	    }
-#line 430
-            if (var_rank[i] == 0 && i%2)
-#line 430
-		err = nc_get_vara_int(ncid, i, NULL, NULL, value);
-#line 430
-	    else
-#line 430
-		err = nc_get_vara_int(ncid, i, start, edge, value);
-#line 430
-            if (canConvert) {
-#line 430
-		if (allInExtRange) {
-#line 430
-		    if (allInIntRange) {
-#line 430
-			IF (err)
-#line 430
-			    error("%s", nc_strerror(err));
-#line 430
-		    } else {
-#line 430
-			IF (err != NC_ERANGE)
-#line 430
-			    error("Range error: status = %d", err);
-#line 430
-		    }
-#line 430
-		} else {
-#line 430
-		    IF (err != 0 && err != NC_ERANGE)
-#line 430
-			error("OK or Range error: status = %d", err);
-#line 430
-		}
-#line 430
-		for (j = 0; j < nels; j++) {
-#line 430
-		    if (inRange3(expect[j],var_type[i],NCT_INT)
-#line 430
-			    && expect[j] >= int_min && expect[j] <= int_max) {
-#line 430
-			IF (!equal(value[j],expect[j],var_type[i],NCT_INT)){
-#line 430
-			    error("value read not that expected");
-#line 430
-			    if (verbose) {
-#line 430
-				error("\n");
-#line 430
-				error("varid: %d, ", i);
-#line 430
-				error("var_name: %s, ", var_name[i]);
-#line 430
-				error("element number: %d ", j);
-#line 430
-				error("expect: %g", expect[j]);
-#line 430
-				error("got: %g", (double) value[j]);
-#line 430
-			    }
-#line 430
-			} else {
-#line 430
-			    nok++;
-#line 430
-			}
-#line 430
-		    }
-#line 430
-		}
-#line 430
-            } else {
-#line 430
-                IF (nels > 0 && err != NC_ECHAR)
-#line 430
-                    error("wrong type: status = %d", err);
-#line 430
-            }
-#line 430
-        }
-#line 430
-    }
-#line 430
-    err = nc_close(ncid);
-#line 430
-    IF (err)
-#line 430
-	error("nc_close: %s", nc_strerror(err));
-#line 430
-    print_nok(nok);
-#line 430
-}
-#line 430
-
-void
-#line 431
-test_nc_get_vara_long(void)
-#line 431
-{
-#line 431
-    int ncid;
-#line 431
-    int d;
-#line 431
-    int i;
-#line 431
-    int j;
-#line 431
-    int k;
-#line 431
-    int err;
-#line 431
-    int allInExtRange;	/* all values within external range? */
-#line 431
-    int allInIntRange;	/* all values within internal range? */
-#line 431
-    int nels;
-#line 431
-    int nslabs;
-#line 431
-    int nok = 0;      /* count of valid comparisons */
-#line 431
-    size_t start[MAX_RANK];
-#line 431
-    size_t edge[MAX_RANK];
-#line 431
-    size_t index[MAX_RANK];
-#line 431
-    size_t mid[MAX_RANK];
-#line 431
-    int canConvert;     /* Both text or both numeric */
-#line 431
-    long value[MAX_NELS];
-#line 431
-    double expect[MAX_NELS];
-#line 431
-
-#line 431
-#ifdef USE_PNETCDF
-#line 431
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 431
-#else
-#line 431
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 431
-#endif
-#line 431
-    IF (err)
-#line 431
-	error("nc_open: %s", nc_strerror(err));
-#line 431
-    for (i = 0; i < numVars; i++) {
-#line 431
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_LONG == NCT_TEXT);
-#line 431
-        assert(var_rank[i] <= MAX_RANK);
-#line 431
-        assert(var_nels[i] <= MAX_NELS);
-#line 431
-	for (j = 0; j < var_rank[i]; j++) {
-#line 431
-	    start[j] = 0;
-#line 431
-	    edge[j] = 1;
-#line 431
-	}
-#line 431
-        err = nc_get_vara_long(BAD_ID, i, start, edge, value);
-#line 431
-        IF (err != NC_EBADID)
-#line 431
-	    error("bad ncid: status = %d", err);
-#line 431
-        err = nc_get_vara_long(ncid, BAD_VARID, start, edge, value);
-#line 431
-        IF (err != NC_ENOTVAR)
-#line 431
-	    error("bad var id: status = %d", err);
-#line 431
-	for (j = 0; j < var_rank[i]; j++) {
-#line 431
-	    start[j] = var_shape[i][j];
-#line 431
-	    err = nc_get_vara_long(ncid, i, start, edge, value);
-#line 431
-            IF (canConvert && err != NC_EINVALCOORDS)
-#line 431
-                error("bad index: status = %d", err);
-#line 431
-	    start[j] = 0;
-#line 431
-	    edge[j] = var_shape[i][j] + 1;
-#line 431
-	    err = nc_get_vara_long(ncid, i, start, edge, value);
-#line 431
-            IF (canConvert && err != NC_EEDGE)
-#line 431
-		error("bad edge: status = %d", err);
-#line 431
-	    edge[j] = 1;
-#line 431
-	}
-#line 431
-            /* Check non-scalars for correct error returned even when */
-#line 431
-            /* there is nothing to get (edge[j]==0) */
-#line 431
-	if(var_rank[i] > 0) {
-#line 431
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 431
-		edge[j] = 0;
-#line 431
-	    }
-#line 431
-	    err = nc_get_vara_long(BAD_ID, i, start, edge, value);
-#line 431
-	    IF (err != NC_EBADID) 
-#line 431
-		error("bad ncid: status = %d", err);
-#line 431
-	    err = nc_get_vara_long(ncid, BAD_VARID, start, edge, value);
-#line 431
-	    IF (err != NC_ENOTVAR) 
-#line 431
-		error("bad var id: status = %d", err);
-#line 431
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 431
-		if (var_dimid[i][j] > 0) {		/* skip record dim */
-#line 431
-		    start[j] = var_shape[i][j];
-#line 431
-		    err = nc_get_vara_long(ncid, i, start, edge, value);
-#line 431
-		    IF (canConvert && err != NC_EINVALCOORDS)
-#line 431
-			error("bad start: status = %d", err);
-#line 431
-		    start[j] = 0;
-#line 431
-		}
-#line 431
-	    }
-#line 431
-	    err = nc_get_vara_long(ncid, i, start, edge, value);
-#line 431
-	    if (canConvert) {
-#line 431
-		IF (err) 
-#line 431
-		    error("%s", nc_strerror(err));
-#line 431
-	    } else {
-#line 431
-		IF (err != NC_ECHAR)
-#line 431
-		    error("wrong type: status = %d", err);
-#line 431
-	    }
-#line 431
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 431
-		edge[j] = 1;
-#line 431
-	    }
-#line 431
-	}            /* Choose a random point dividing each dim into 2 parts */
-#line 431
-            /* get 2^rank (nslabs) slabs so defined */
-#line 431
-        nslabs = 1;
-#line 431
-        for (j = 0; j < var_rank[i]; j++) {
-#line 431
-            mid[j] = roll( var_shape[i][j] );
-#line 431
-            nslabs *= 2;
-#line 431
-        }
-#line 431
-            /* bits of k determine whether to get lower or upper part of dim */
-#line 431
-        for (k = 0; k < nslabs; k++) {
-#line 431
-            nels = 1;
-#line 431
-            for (j = 0; j < var_rank[i]; j++) {
-#line 431
-                if ((k >> j) & 1) {
-#line 431
-                    start[j] = 0;
-#line 431
-                    edge[j] = mid[j];
-#line 431
-                }else{
-#line 431
-                    start[j] = mid[j];
-#line 431
-                    edge[j] = var_shape[i][j] - mid[j];
-#line 431
-                }
-#line 431
-                nels *= edge[j];
-#line 431
-            }
-#line 431
-	    allInExtRange = allInIntRange = 1;
-#line 431
-            for (j = 0; j < nels; j++) {
-#line 431
-                err = toMixedBase(j, var_rank[i], edge, index);
-#line 431
-                IF (err)
-#line 431
-                    error("error in toMixedBase 1");
-#line 431
-                for (d = 0; d < var_rank[i]; d++)
-#line 431
-                    index[d] += start[d];
-#line 431
-                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_LONG);
-#line 431
-		if (inRange3(expect[j],var_type[i], NCT_LONG)) {
-#line 431
-		    allInIntRange = allInIntRange && expect[j] >= long_min
-#line 431
-				&& expect[j] <= long_max;
-#line 431
-		} else {
-#line 431
-		    allInExtRange = 0;
-#line 431
-		}
-#line 431
-	    }
-#line 431
-            if (var_rank[i] == 0 && i%2)
-#line 431
-		err = nc_get_vara_long(ncid, i, NULL, NULL, value);
-#line 431
-	    else
-#line 431
-		err = nc_get_vara_long(ncid, i, start, edge, value);
-#line 431
-            if (canConvert) {
-#line 431
-		if (allInExtRange) {
-#line 431
-		    if (allInIntRange) {
-#line 431
-			IF (err)
-#line 431
-			    error("%s", nc_strerror(err));
-#line 431
-		    } else {
-#line 431
-			IF (err != NC_ERANGE)
-#line 431
-			    error("Range error: status = %d", err);
-#line 431
-		    }
-#line 431
-		} else {
-#line 431
-		    IF (err != 0 && err != NC_ERANGE)
-#line 431
-			error("OK or Range error: status = %d", err);
-#line 431
-		}
-#line 431
-		for (j = 0; j < nels; j++) {
-#line 431
-		    if (inRange3(expect[j],var_type[i],NCT_LONG)
-#line 431
-			    && expect[j] >= long_min && expect[j] <= long_max) {
-#line 431
-			IF (!equal(value[j],expect[j],var_type[i],NCT_LONG)){
-#line 431
-			    error("value read not that expected");
-#line 431
-			    if (verbose) {
-#line 431
-				error("\n");
-#line 431
-				error("varid: %d, ", i);
-#line 431
-				error("var_name: %s, ", var_name[i]);
-#line 431
-				error("element number: %d ", j);
-#line 431
-				error("expect: %g", expect[j]);
-#line 431
-				error("got: %g", (double) value[j]);
-#line 431
-			    }
-#line 431
-			} else {
-#line 431
-			    nok++;
-#line 431
-			}
-#line 431
-		    }
-#line 431
-		}
-#line 431
-            } else {
-#line 431
-                IF (nels > 0 && err != NC_ECHAR)
-#line 431
-                    error("wrong type: status = %d", err);
-#line 431
-            }
-#line 431
-        }
-#line 431
-    }
-#line 431
-    err = nc_close(ncid);
-#line 431
-    IF (err)
-#line 431
-	error("nc_close: %s", nc_strerror(err));
-#line 431
-    print_nok(nok);
-#line 431
-}
-#line 431
-
-void
-#line 432
-test_nc_get_vara_float(void)
-#line 432
-{
-#line 432
-    int ncid;
-#line 432
-    int d;
-#line 432
-    int i;
-#line 432
-    int j;
-#line 432
-    int k;
-#line 432
-    int err;
-#line 432
-    int allInExtRange;	/* all values within external range? */
-#line 432
-    int allInIntRange;	/* all values within internal range? */
-#line 432
-    int nels;
-#line 432
-    int nslabs;
-#line 432
-    int nok = 0;      /* count of valid comparisons */
-#line 432
-    size_t start[MAX_RANK];
-#line 432
-    size_t edge[MAX_RANK];
-#line 432
-    size_t index[MAX_RANK];
-#line 432
-    size_t mid[MAX_RANK];
-#line 432
-    int canConvert;     /* Both text or both numeric */
-#line 432
-    float value[MAX_NELS];
-#line 432
-    double expect[MAX_NELS];
-#line 432
-
-#line 432
-#ifdef USE_PNETCDF
-#line 432
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 432
-#else
-#line 432
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 432
-#endif
-#line 432
-    IF (err)
-#line 432
-	error("nc_open: %s", nc_strerror(err));
-#line 432
-    for (i = 0; i < numVars; i++) {
-#line 432
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_FLOAT == NCT_TEXT);
-#line 432
-        assert(var_rank[i] <= MAX_RANK);
-#line 432
-        assert(var_nels[i] <= MAX_NELS);
-#line 432
-	for (j = 0; j < var_rank[i]; j++) {
-#line 432
-	    start[j] = 0;
-#line 432
-	    edge[j] = 1;
-#line 432
-	}
-#line 432
-        err = nc_get_vara_float(BAD_ID, i, start, edge, value);
-#line 432
-        IF (err != NC_EBADID)
-#line 432
-	    error("bad ncid: status = %d", err);
-#line 432
-        err = nc_get_vara_float(ncid, BAD_VARID, start, edge, value);
-#line 432
-        IF (err != NC_ENOTVAR)
-#line 432
-	    error("bad var id: status = %d", err);
-#line 432
-	for (j = 0; j < var_rank[i]; j++) {
-#line 432
-	    start[j] = var_shape[i][j];
-#line 432
-	    err = nc_get_vara_float(ncid, i, start, edge, value);
-#line 432
-            IF (canConvert && err != NC_EINVALCOORDS)
-#line 432
-                error("bad index: status = %d", err);
-#line 432
-	    start[j] = 0;
-#line 432
-	    edge[j] = var_shape[i][j] + 1;
-#line 432
-	    err = nc_get_vara_float(ncid, i, start, edge, value);
-#line 432
-            IF (canConvert && err != NC_EEDGE)
-#line 432
-		error("bad edge: status = %d", err);
-#line 432
-	    edge[j] = 1;
-#line 432
-	}
-#line 432
-            /* Check non-scalars for correct error returned even when */
-#line 432
-            /* there is nothing to get (edge[j]==0) */
-#line 432
-	if(var_rank[i] > 0) {
-#line 432
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 432
-		edge[j] = 0;
-#line 432
-	    }
-#line 432
-	    err = nc_get_vara_float(BAD_ID, i, start, edge, value);
-#line 432
-	    IF (err != NC_EBADID) 
-#line 432
-		error("bad ncid: status = %d", err);
-#line 432
-	    err = nc_get_vara_float(ncid, BAD_VARID, start, edge, value);
-#line 432
-	    IF (err != NC_ENOTVAR) 
-#line 432
-		error("bad var id: status = %d", err);
-#line 432
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 432
-		if (var_dimid[i][j] > 0) {		/* skip record dim */
-#line 432
-		    start[j] = var_shape[i][j];
-#line 432
-		    err = nc_get_vara_float(ncid, i, start, edge, value);
-#line 432
-		    IF (canConvert && err != NC_EINVALCOORDS)
-#line 432
-			error("bad start: status = %d", err);
-#line 432
-		    start[j] = 0;
-#line 432
-		}
-#line 432
-	    }
-#line 432
-	    err = nc_get_vara_float(ncid, i, start, edge, value);
-#line 432
-	    if (canConvert) {
-#line 432
-		IF (err) 
-#line 432
-		    error("%s", nc_strerror(err));
-#line 432
-	    } else {
-#line 432
-		IF (err != NC_ECHAR)
-#line 432
-		    error("wrong type: status = %d", err);
-#line 432
-	    }
-#line 432
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 432
-		edge[j] = 1;
-#line 432
-	    }
-#line 432
-	}            /* Choose a random point dividing each dim into 2 parts */
-#line 432
-            /* get 2^rank (nslabs) slabs so defined */
-#line 432
-        nslabs = 1;
-#line 432
-        for (j = 0; j < var_rank[i]; j++) {
-#line 432
-            mid[j] = roll( var_shape[i][j] );
-#line 432
-            nslabs *= 2;
-#line 432
-        }
-#line 432
-            /* bits of k determine whether to get lower or upper part of dim */
-#line 432
-        for (k = 0; k < nslabs; k++) {
-#line 432
-            nels = 1;
-#line 432
-            for (j = 0; j < var_rank[i]; j++) {
-#line 432
-                if ((k >> j) & 1) {
-#line 432
-                    start[j] = 0;
-#line 432
-                    edge[j] = mid[j];
-#line 432
-                }else{
-#line 432
-                    start[j] = mid[j];
-#line 432
-                    edge[j] = var_shape[i][j] - mid[j];
-#line 432
-                }
-#line 432
-                nels *= edge[j];
-#line 432
-            }
-#line 432
-	    allInExtRange = allInIntRange = 1;
-#line 432
-            for (j = 0; j < nels; j++) {
-#line 432
-                err = toMixedBase(j, var_rank[i], edge, index);
-#line 432
-                IF (err)
-#line 432
-                    error("error in toMixedBase 1");
-#line 432
-                for (d = 0; d < var_rank[i]; d++)
-#line 432
-                    index[d] += start[d];
-#line 432
-                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_FLOAT);
-#line 432
-		if (inRange3(expect[j],var_type[i], NCT_FLOAT)) {
-#line 432
-		    allInIntRange = allInIntRange && expect[j] >= float_min
-#line 432
-				&& expect[j] <= float_max;
-#line 432
-		} else {
-#line 432
-		    allInExtRange = 0;
-#line 432
-		}
-#line 432
-	    }
-#line 432
-            if (var_rank[i] == 0 && i%2)
-#line 432
-		err = nc_get_vara_float(ncid, i, NULL, NULL, value);
-#line 432
-	    else
-#line 432
-		err = nc_get_vara_float(ncid, i, start, edge, value);
-#line 432
-            if (canConvert) {
-#line 432
-		if (allInExtRange) {
-#line 432
-		    if (allInIntRange) {
-#line 432
-			IF (err)
-#line 432
-			    error("%s", nc_strerror(err));
-#line 432
-		    } else {
-#line 432
-			IF (err != NC_ERANGE)
-#line 432
-			    error("Range error: status = %d", err);
-#line 432
-		    }
-#line 432
-		} else {
-#line 432
-		    IF (err != 0 && err != NC_ERANGE)
-#line 432
-			error("OK or Range error: status = %d", err);
-#line 432
-		}
-#line 432
-		for (j = 0; j < nels; j++) {
-#line 432
-		    if (inRange3(expect[j],var_type[i],NCT_FLOAT)
-#line 432
-			    && expect[j] >= float_min && expect[j] <= float_max) {
-#line 432
-			IF (!equal(value[j],expect[j],var_type[i],NCT_FLOAT)){
-#line 432
-			    error("value read not that expected");
-#line 432
-			    if (verbose) {
-#line 432
-				error("\n");
-#line 432
-				error("varid: %d, ", i);
-#line 432
-				error("var_name: %s, ", var_name[i]);
-#line 432
-				error("element number: %d ", j);
-#line 432
-				error("expect: %g", expect[j]);
-#line 432
-				error("got: %g", (double) value[j]);
-#line 432
-			    }
-#line 432
-			} else {
-#line 432
-			    nok++;
-#line 432
-			}
-#line 432
-		    }
-#line 432
-		}
-#line 432
-            } else {
-#line 432
-                IF (nels > 0 && err != NC_ECHAR)
-#line 432
-                    error("wrong type: status = %d", err);
-#line 432
-            }
-#line 432
-        }
-#line 432
-    }
-#line 432
-    err = nc_close(ncid);
-#line 432
-    IF (err)
-#line 432
-	error("nc_close: %s", nc_strerror(err));
-#line 432
-    print_nok(nok);
-#line 432
-}
-#line 432
-
-void
-#line 433
-test_nc_get_vara_double(void)
-#line 433
-{
-#line 433
-    int ncid;
-#line 433
-    int d;
-#line 433
-    int i;
-#line 433
-    int j;
-#line 433
-    int k;
-#line 433
-    int err;
-#line 433
-    int allInExtRange;	/* all values within external range? */
-#line 433
-    int allInIntRange;	/* all values within internal range? */
-#line 433
-    int nels;
-#line 433
-    int nslabs;
-#line 433
-    int nok = 0;      /* count of valid comparisons */
-#line 433
-    size_t start[MAX_RANK];
-#line 433
-    size_t edge[MAX_RANK];
-#line 433
-    size_t index[MAX_RANK];
-#line 433
-    size_t mid[MAX_RANK];
-#line 433
-    int canConvert;     /* Both text or both numeric */
-#line 433
-    double value[MAX_NELS];
-#line 433
-    double expect[MAX_NELS];
-#line 433
-
-#line 433
-#ifdef USE_PNETCDF
-#line 433
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 433
-#else
-#line 433
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 433
-#endif
-#line 433
-    IF (err)
-#line 433
-	error("nc_open: %s", nc_strerror(err));
-#line 433
-    for (i = 0; i < numVars; i++) {
-#line 433
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_DOUBLE == NCT_TEXT);
-#line 433
-        assert(var_rank[i] <= MAX_RANK);
-#line 433
-        assert(var_nels[i] <= MAX_NELS);
-#line 433
-	for (j = 0; j < var_rank[i]; j++) {
-#line 433
-	    start[j] = 0;
-#line 433
-	    edge[j] = 1;
-#line 433
-	}
-#line 433
-        err = nc_get_vara_double(BAD_ID, i, start, edge, value);
-#line 433
-        IF (err != NC_EBADID)
-#line 433
-	    error("bad ncid: status = %d", err);
-#line 433
-        err = nc_get_vara_double(ncid, BAD_VARID, start, edge, value);
-#line 433
-        IF (err != NC_ENOTVAR)
-#line 433
-	    error("bad var id: status = %d", err);
-#line 433
-	for (j = 0; j < var_rank[i]; j++) {
-#line 433
-	    start[j] = var_shape[i][j];
-#line 433
-	    err = nc_get_vara_double(ncid, i, start, edge, value);
-#line 433
-            IF (canConvert && err != NC_EINVALCOORDS)
-#line 433
-                error("bad index: status = %d", err);
-#line 433
-	    start[j] = 0;
-#line 433
-	    edge[j] = var_shape[i][j] + 1;
-#line 433
-	    err = nc_get_vara_double(ncid, i, start, edge, value);
-#line 433
-            IF (canConvert && err != NC_EEDGE)
-#line 433
-		error("bad edge: status = %d", err);
-#line 433
-	    edge[j] = 1;
-#line 433
-	}
-#line 433
-            /* Check non-scalars for correct error returned even when */
-#line 433
-            /* there is nothing to get (edge[j]==0) */
-#line 433
-	if(var_rank[i] > 0) {
-#line 433
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 433
-		edge[j] = 0;
-#line 433
-	    }
-#line 433
-	    err = nc_get_vara_double(BAD_ID, i, start, edge, value);
-#line 433
-	    IF (err != NC_EBADID) 
-#line 433
-		error("bad ncid: status = %d", err);
-#line 433
-	    err = nc_get_vara_double(ncid, BAD_VARID, start, edge, value);
-#line 433
-	    IF (err != NC_ENOTVAR) 
-#line 433
-		error("bad var id: status = %d", err);
-#line 433
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 433
-		if (var_dimid[i][j] > 0) {		/* skip record dim */
-#line 433
-		    start[j] = var_shape[i][j];
-#line 433
-		    err = nc_get_vara_double(ncid, i, start, edge, value);
-#line 433
-		    IF (canConvert && err != NC_EINVALCOORDS)
-#line 433
-			error("bad start: status = %d", err);
-#line 433
-		    start[j] = 0;
-#line 433
-		}
-#line 433
-	    }
-#line 433
-	    err = nc_get_vara_double(ncid, i, start, edge, value);
-#line 433
-	    if (canConvert) {
-#line 433
-		IF (err) 
-#line 433
-		    error("%s", nc_strerror(err));
-#line 433
-	    } else {
-#line 433
-		IF (err != NC_ECHAR)
-#line 433
-		    error("wrong type: status = %d", err);
-#line 433
-	    }
-#line 433
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 433
-		edge[j] = 1;
-#line 433
-	    }
-#line 433
-	}            /* Choose a random point dividing each dim into 2 parts */
-#line 433
-            /* get 2^rank (nslabs) slabs so defined */
-#line 433
-        nslabs = 1;
-#line 433
-        for (j = 0; j < var_rank[i]; j++) {
-#line 433
-            mid[j] = roll( var_shape[i][j] );
-#line 433
-            nslabs *= 2;
-#line 433
-        }
-#line 433
-            /* bits of k determine whether to get lower or upper part of dim */
-#line 433
-        for (k = 0; k < nslabs; k++) {
-#line 433
-            nels = 1;
-#line 433
-            for (j = 0; j < var_rank[i]; j++) {
-#line 433
-                if ((k >> j) & 1) {
-#line 433
-                    start[j] = 0;
-#line 433
-                    edge[j] = mid[j];
-#line 433
-                }else{
-#line 433
-                    start[j] = mid[j];
-#line 433
-                    edge[j] = var_shape[i][j] - mid[j];
-#line 433
-                }
-#line 433
-                nels *= edge[j];
-#line 433
-            }
-#line 433
-	    allInExtRange = allInIntRange = 1;
-#line 433
-            for (j = 0; j < nels; j++) {
-#line 433
-                err = toMixedBase(j, var_rank[i], edge, index);
-#line 433
-                IF (err)
-#line 433
-                    error("error in toMixedBase 1");
-#line 433
-                for (d = 0; d < var_rank[i]; d++)
-#line 433
-                    index[d] += start[d];
-#line 433
-                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_DOUBLE);
-#line 433
-		if (inRange3(expect[j],var_type[i], NCT_DOUBLE)) {
-#line 433
-		    allInIntRange = allInIntRange && expect[j] >= double_min
-#line 433
-				&& expect[j] <= double_max;
-#line 433
-		} else {
-#line 433
-		    allInExtRange = 0;
-#line 433
-		}
-#line 433
-	    }
-#line 433
-            if (var_rank[i] == 0 && i%2)
-#line 433
-		err = nc_get_vara_double(ncid, i, NULL, NULL, value);
-#line 433
-	    else
-#line 433
-		err = nc_get_vara_double(ncid, i, start, edge, value);
-#line 433
-            if (canConvert) {
-#line 433
-		if (allInExtRange) {
-#line 433
-		    if (allInIntRange) {
-#line 433
-			IF (err)
-#line 433
-			    error("%s", nc_strerror(err));
-#line 433
-		    } else {
-#line 433
-			IF (err != NC_ERANGE)
-#line 433
-			    error("Range error: status = %d", err);
-#line 433
-		    }
-#line 433
-		} else {
-#line 433
-		    IF (err != 0 && err != NC_ERANGE)
-#line 433
-			error("OK or Range error: status = %d", err);
-#line 433
-		}
-#line 433
-		for (j = 0; j < nels; j++) {
-#line 433
-		    if (inRange3(expect[j],var_type[i],NCT_DOUBLE)
-#line 433
-			    && expect[j] >= double_min && expect[j] <= double_max) {
-#line 433
-			IF (!equal(value[j],expect[j],var_type[i],NCT_DOUBLE)){
-#line 433
-			    error("value read not that expected");
-#line 433
-			    if (verbose) {
-#line 433
-				error("\n");
-#line 433
-				error("varid: %d, ", i);
-#line 433
-				error("var_name: %s, ", var_name[i]);
-#line 433
-				error("element number: %d ", j);
-#line 433
-				error("expect: %g", expect[j]);
-#line 433
-				error("got: %g", (double) value[j]);
-#line 433
-			    }
-#line 433
-			} else {
-#line 433
-			    nok++;
-#line 433
-			}
-#line 433
-		    }
-#line 433
-		}
-#line 433
-            } else {
-#line 433
-                IF (nels > 0 && err != NC_ECHAR)
-#line 433
-                    error("wrong type: status = %d", err);
-#line 433
-            }
-#line 433
-        }
-#line 433
-    }
-#line 433
-    err = nc_close(ncid);
-#line 433
-    IF (err)
-#line 433
-	error("nc_close: %s", nc_strerror(err));
-#line 433
-    print_nok(nok);
-#line 433
-}
-#line 433
-
-void
-#line 434
-test_nc_get_vara_ushort(void)
-#line 434
-{
-#line 434
-    int ncid;
-#line 434
-    int d;
-#line 434
-    int i;
-#line 434
-    int j;
-#line 434
-    int k;
-#line 434
-    int err;
-#line 434
-    int allInExtRange;	/* all values within external range? */
-#line 434
-    int allInIntRange;	/* all values within internal range? */
-#line 434
-    int nels;
-#line 434
-    int nslabs;
-#line 434
-    int nok = 0;      /* count of valid comparisons */
-#line 434
-    size_t start[MAX_RANK];
-#line 434
-    size_t edge[MAX_RANK];
-#line 434
-    size_t index[MAX_RANK];
-#line 434
-    size_t mid[MAX_RANK];
-#line 434
-    int canConvert;     /* Both text or both numeric */
-#line 434
-    ushort value[MAX_NELS];
-#line 434
-    double expect[MAX_NELS];
-#line 434
-
-#line 434
-#ifdef USE_PNETCDF
-#line 434
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 434
-#else
-#line 434
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 434
-#endif
-#line 434
-    IF (err)
-#line 434
-	error("nc_open: %s", nc_strerror(err));
-#line 434
-    for (i = 0; i < numVars; i++) {
-#line 434
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_USHORT == NCT_TEXT);
-#line 434
-        assert(var_rank[i] <= MAX_RANK);
-#line 434
-        assert(var_nels[i] <= MAX_NELS);
-#line 434
-	for (j = 0; j < var_rank[i]; j++) {
-#line 434
-	    start[j] = 0;
-#line 434
-	    edge[j] = 1;
-#line 434
-	}
-#line 434
-        err = nc_get_vara_ushort(BAD_ID, i, start, edge, value);
-#line 434
-        IF (err != NC_EBADID)
-#line 434
-	    error("bad ncid: status = %d", err);
-#line 434
-        err = nc_get_vara_ushort(ncid, BAD_VARID, start, edge, value);
-#line 434
-        IF (err != NC_ENOTVAR)
-#line 434
-	    error("bad var id: status = %d", err);
-#line 434
-	for (j = 0; j < var_rank[i]; j++) {
-#line 434
-	    start[j] = var_shape[i][j];
-#line 434
-	    err = nc_get_vara_ushort(ncid, i, start, edge, value);
-#line 434
-            IF (canConvert && err != NC_EINVALCOORDS)
-#line 434
-                error("bad index: status = %d", err);
-#line 434
-	    start[j] = 0;
-#line 434
-	    edge[j] = var_shape[i][j] + 1;
-#line 434
-	    err = nc_get_vara_ushort(ncid, i, start, edge, value);
-#line 434
-            IF (canConvert && err != NC_EEDGE)
-#line 434
-		error("bad edge: status = %d", err);
-#line 434
-	    edge[j] = 1;
-#line 434
-	}
-#line 434
-            /* Check non-scalars for correct error returned even when */
-#line 434
-            /* there is nothing to get (edge[j]==0) */
-#line 434
-	if(var_rank[i] > 0) {
-#line 434
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 434
-		edge[j] = 0;
-#line 434
-	    }
-#line 434
-	    err = nc_get_vara_ushort(BAD_ID, i, start, edge, value);
-#line 434
-	    IF (err != NC_EBADID) 
-#line 434
-		error("bad ncid: status = %d", err);
-#line 434
-	    err = nc_get_vara_ushort(ncid, BAD_VARID, start, edge, value);
-#line 434
-	    IF (err != NC_ENOTVAR) 
-#line 434
-		error("bad var id: status = %d", err);
-#line 434
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 434
-		if (var_dimid[i][j] > 0) {		/* skip record dim */
-#line 434
-		    start[j] = var_shape[i][j];
-#line 434
-		    err = nc_get_vara_ushort(ncid, i, start, edge, value);
-#line 434
-		    IF (canConvert && err != NC_EINVALCOORDS)
-#line 434
-			error("bad start: status = %d", err);
-#line 434
-		    start[j] = 0;
-#line 434
-		}
-#line 434
-	    }
-#line 434
-	    err = nc_get_vara_ushort(ncid, i, start, edge, value);
-#line 434
-	    if (canConvert) {
-#line 434
-		IF (err) 
-#line 434
-		    error("%s", nc_strerror(err));
-#line 434
-	    } else {
-#line 434
-		IF (err != NC_ECHAR)
-#line 434
-		    error("wrong type: status = %d", err);
-#line 434
-	    }
-#line 434
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 434
-		edge[j] = 1;
-#line 434
-	    }
-#line 434
-	}            /* Choose a random point dividing each dim into 2 parts */
-#line 434
-            /* get 2^rank (nslabs) slabs so defined */
-#line 434
-        nslabs = 1;
-#line 434
-        for (j = 0; j < var_rank[i]; j++) {
-#line 434
-            mid[j] = roll( var_shape[i][j] );
-#line 434
-            nslabs *= 2;
-#line 434
-        }
-#line 434
-            /* bits of k determine whether to get lower or upper part of dim */
-#line 434
-        for (k = 0; k < nslabs; k++) {
-#line 434
-            nels = 1;
-#line 434
-            for (j = 0; j < var_rank[i]; j++) {
-#line 434
-                if ((k >> j) & 1) {
-#line 434
-                    start[j] = 0;
-#line 434
-                    edge[j] = mid[j];
-#line 434
-                }else{
-#line 434
-                    start[j] = mid[j];
-#line 434
-                    edge[j] = var_shape[i][j] - mid[j];
-#line 434
-                }
-#line 434
-                nels *= edge[j];
-#line 434
-            }
-#line 434
-	    allInExtRange = allInIntRange = 1;
-#line 434
-            for (j = 0; j < nels; j++) {
-#line 434
-                err = toMixedBase(j, var_rank[i], edge, index);
-#line 434
-                IF (err)
-#line 434
-                    error("error in toMixedBase 1");
-#line 434
-                for (d = 0; d < var_rank[i]; d++)
-#line 434
-                    index[d] += start[d];
-#line 434
-                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_USHORT);
-#line 434
-		if (inRange3(expect[j],var_type[i], NCT_USHORT)) {
-#line 434
-		    allInIntRange = allInIntRange && expect[j] >= ushort_min
-#line 434
-				&& expect[j] <= ushort_max;
-#line 434
-		} else {
-#line 434
-		    allInExtRange = 0;
-#line 434
-		}
-#line 434
-	    }
-#line 434
-            if (var_rank[i] == 0 && i%2)
-#line 434
-		err = nc_get_vara_ushort(ncid, i, NULL, NULL, value);
-#line 434
-	    else
-#line 434
-		err = nc_get_vara_ushort(ncid, i, start, edge, value);
-#line 434
-            if (canConvert) {
-#line 434
-		if (allInExtRange) {
-#line 434
-		    if (allInIntRange) {
-#line 434
-			IF (err)
-#line 434
-			    error("%s", nc_strerror(err));
-#line 434
-		    } else {
-#line 434
-			IF (err != NC_ERANGE)
-#line 434
-			    error("Range error: status = %d", err);
-#line 434
-		    }
-#line 434
-		} else {
-#line 434
-		    IF (err != 0 && err != NC_ERANGE)
-#line 434
-			error("OK or Range error: status = %d", err);
-#line 434
-		}
-#line 434
-		for (j = 0; j < nels; j++) {
-#line 434
-		    if (inRange3(expect[j],var_type[i],NCT_USHORT)
-#line 434
-			    && expect[j] >= ushort_min && expect[j] <= ushort_max) {
-#line 434
-			IF (!equal(value[j],expect[j],var_type[i],NCT_USHORT)){
-#line 434
-			    error("value read not that expected");
-#line 434
-			    if (verbose) {
-#line 434
-				error("\n");
-#line 434
-				error("varid: %d, ", i);
-#line 434
-				error("var_name: %s, ", var_name[i]);
-#line 434
-				error("element number: %d ", j);
-#line 434
-				error("expect: %g", expect[j]);
-#line 434
-				error("got: %g", (double) value[j]);
-#line 434
-			    }
-#line 434
-			} else {
-#line 434
-			    nok++;
-#line 434
-			}
-#line 434
-		    }
-#line 434
-		}
-#line 434
-            } else {
-#line 434
-                IF (nels > 0 && err != NC_ECHAR)
-#line 434
-                    error("wrong type: status = %d", err);
-#line 434
-            }
-#line 434
-        }
-#line 434
-    }
-#line 434
-    err = nc_close(ncid);
-#line 434
-    IF (err)
-#line 434
-	error("nc_close: %s", nc_strerror(err));
-#line 434
-    print_nok(nok);
-#line 434
-}
-#line 434
-
-void
-#line 435
-test_nc_get_vara_uint(void)
-#line 435
-{
-#line 435
-    int ncid;
-#line 435
-    int d;
-#line 435
-    int i;
-#line 435
-    int j;
-#line 435
-    int k;
-#line 435
-    int err;
-#line 435
-    int allInExtRange;	/* all values within external range? */
-#line 435
-    int allInIntRange;	/* all values within internal range? */
-#line 435
-    int nels;
-#line 435
-    int nslabs;
-#line 435
-    int nok = 0;      /* count of valid comparisons */
-#line 435
-    size_t start[MAX_RANK];
-#line 435
-    size_t edge[MAX_RANK];
-#line 435
-    size_t index[MAX_RANK];
-#line 435
-    size_t mid[MAX_RANK];
-#line 435
-    int canConvert;     /* Both text or both numeric */
-#line 435
-    uint value[MAX_NELS];
-#line 435
-    double expect[MAX_NELS];
-#line 435
-
-#line 435
-#ifdef USE_PNETCDF
-#line 435
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 435
-#else
-#line 435
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 435
-#endif
-#line 435
-    IF (err)
-#line 435
-	error("nc_open: %s", nc_strerror(err));
-#line 435
-    for (i = 0; i < numVars; i++) {
-#line 435
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_UINT == NCT_TEXT);
-#line 435
-        assert(var_rank[i] <= MAX_RANK);
-#line 435
-        assert(var_nels[i] <= MAX_NELS);
-#line 435
-	for (j = 0; j < var_rank[i]; j++) {
-#line 435
-	    start[j] = 0;
-#line 435
-	    edge[j] = 1;
-#line 435
-	}
-#line 435
-        err = nc_get_vara_uint(BAD_ID, i, start, edge, value);
-#line 435
-        IF (err != NC_EBADID)
-#line 435
-	    error("bad ncid: status = %d", err);
-#line 435
-        err = nc_get_vara_uint(ncid, BAD_VARID, start, edge, value);
-#line 435
-        IF (err != NC_ENOTVAR)
-#line 435
-	    error("bad var id: status = %d", err);
-#line 435
-	for (j = 0; j < var_rank[i]; j++) {
-#line 435
-	    start[j] = var_shape[i][j];
-#line 435
-	    err = nc_get_vara_uint(ncid, i, start, edge, value);
-#line 435
-            IF (canConvert && err != NC_EINVALCOORDS)
-#line 435
-                error("bad index: status = %d", err);
-#line 435
-	    start[j] = 0;
-#line 435
-	    edge[j] = var_shape[i][j] + 1;
-#line 435
-	    err = nc_get_vara_uint(ncid, i, start, edge, value);
-#line 435
-            IF (canConvert && err != NC_EEDGE)
-#line 435
-		error("bad edge: status = %d", err);
-#line 435
-	    edge[j] = 1;
-#line 435
-	}
-#line 435
-            /* Check non-scalars for correct error returned even when */
-#line 435
-            /* there is nothing to get (edge[j]==0) */
-#line 435
-	if(var_rank[i] > 0) {
-#line 435
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 435
-		edge[j] = 0;
-#line 435
-	    }
-#line 435
-	    err = nc_get_vara_uint(BAD_ID, i, start, edge, value);
-#line 435
-	    IF (err != NC_EBADID) 
-#line 435
-		error("bad ncid: status = %d", err);
-#line 435
-	    err = nc_get_vara_uint(ncid, BAD_VARID, start, edge, value);
-#line 435
-	    IF (err != NC_ENOTVAR) 
-#line 435
-		error("bad var id: status = %d", err);
-#line 435
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 435
-		if (var_dimid[i][j] > 0) {		/* skip record dim */
-#line 435
-		    start[j] = var_shape[i][j];
-#line 435
-		    err = nc_get_vara_uint(ncid, i, start, edge, value);
-#line 435
-		    IF (canConvert && err != NC_EINVALCOORDS)
-#line 435
-			error("bad start: status = %d", err);
-#line 435
-		    start[j] = 0;
-#line 435
-		}
-#line 435
-	    }
-#line 435
-	    err = nc_get_vara_uint(ncid, i, start, edge, value);
-#line 435
-	    if (canConvert) {
-#line 435
-		IF (err) 
-#line 435
-		    error("%s", nc_strerror(err));
-#line 435
-	    } else {
-#line 435
-		IF (err != NC_ECHAR)
-#line 435
-		    error("wrong type: status = %d", err);
-#line 435
-	    }
-#line 435
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 435
-		edge[j] = 1;
-#line 435
-	    }
-#line 435
-	}            /* Choose a random point dividing each dim into 2 parts */
-#line 435
-            /* get 2^rank (nslabs) slabs so defined */
-#line 435
-        nslabs = 1;
-#line 435
-        for (j = 0; j < var_rank[i]; j++) {
-#line 435
-            mid[j] = roll( var_shape[i][j] );
-#line 435
-            nslabs *= 2;
-#line 435
-        }
-#line 435
-            /* bits of k determine whether to get lower or upper part of dim */
-#line 435
-        for (k = 0; k < nslabs; k++) {
-#line 435
-            nels = 1;
-#line 435
-            for (j = 0; j < var_rank[i]; j++) {
-#line 435
-                if ((k >> j) & 1) {
-#line 435
-                    start[j] = 0;
-#line 435
-                    edge[j] = mid[j];
-#line 435
-                }else{
-#line 435
-                    start[j] = mid[j];
-#line 435
-                    edge[j] = var_shape[i][j] - mid[j];
-#line 435
-                }
-#line 435
-                nels *= edge[j];
-#line 435
-            }
-#line 435
-	    allInExtRange = allInIntRange = 1;
-#line 435
-            for (j = 0; j < nels; j++) {
-#line 435
-                err = toMixedBase(j, var_rank[i], edge, index);
-#line 435
-                IF (err)
-#line 435
-                    error("error in toMixedBase 1");
-#line 435
-                for (d = 0; d < var_rank[i]; d++)
-#line 435
-                    index[d] += start[d];
-#line 435
-                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_UINT);
-#line 435
-		if (inRange3(expect[j],var_type[i], NCT_UINT)) {
-#line 435
-		    allInIntRange = allInIntRange && expect[j] >= uint_min
-#line 435
-				&& expect[j] <= uint_max;
-#line 435
-		} else {
-#line 435
-		    allInExtRange = 0;
-#line 435
-		}
-#line 435
-	    }
-#line 435
-            if (var_rank[i] == 0 && i%2)
-#line 435
-		err = nc_get_vara_uint(ncid, i, NULL, NULL, value);
-#line 435
-	    else
-#line 435
-		err = nc_get_vara_uint(ncid, i, start, edge, value);
-#line 435
-            if (canConvert) {
-#line 435
-		if (allInExtRange) {
-#line 435
-		    if (allInIntRange) {
-#line 435
-			IF (err)
-#line 435
-			    error("%s", nc_strerror(err));
-#line 435
-		    } else {
-#line 435
-			IF (err != NC_ERANGE)
-#line 435
-			    error("Range error: status = %d", err);
-#line 435
-		    }
-#line 435
-		} else {
-#line 435
-		    IF (err != 0 && err != NC_ERANGE)
-#line 435
-			error("OK or Range error: status = %d", err);
-#line 435
-		}
-#line 435
-		for (j = 0; j < nels; j++) {
-#line 435
-		    if (inRange3(expect[j],var_type[i],NCT_UINT)
-#line 435
-			    && expect[j] >= uint_min && expect[j] <= uint_max) {
-#line 435
-			IF (!equal(value[j],expect[j],var_type[i],NCT_UINT)){
-#line 435
-			    error("value read not that expected");
-#line 435
-			    if (verbose) {
-#line 435
-				error("\n");
-#line 435
-				error("varid: %d, ", i);
-#line 435
-				error("var_name: %s, ", var_name[i]);
-#line 435
-				error("element number: %d ", j);
-#line 435
-				error("expect: %g", expect[j]);
-#line 435
-				error("got: %g", (double) value[j]);
-#line 435
-			    }
-#line 435
-			} else {
-#line 435
-			    nok++;
-#line 435
-			}
-#line 435
-		    }
-#line 435
-		}
-#line 435
-            } else {
-#line 435
-                IF (nels > 0 && err != NC_ECHAR)
-#line 435
-                    error("wrong type: status = %d", err);
-#line 435
-            }
-#line 435
-        }
-#line 435
-    }
-#line 435
-    err = nc_close(ncid);
-#line 435
-    IF (err)
-#line 435
-	error("nc_close: %s", nc_strerror(err));
-#line 435
-    print_nok(nok);
-#line 435
-}
-#line 435
-
-void
-#line 436
-test_nc_get_vara_longlong(void)
-#line 436
-{
-#line 436
-    int ncid;
-#line 436
-    int d;
-#line 436
-    int i;
-#line 436
-    int j;
-#line 436
-    int k;
-#line 436
-    int err;
-#line 436
-    int allInExtRange;	/* all values within external range? */
-#line 436
-    int allInIntRange;	/* all values within internal range? */
-#line 436
-    int nels;
-#line 436
-    int nslabs;
-#line 436
-    int nok = 0;      /* count of valid comparisons */
-#line 436
-    size_t start[MAX_RANK];
-#line 436
-    size_t edge[MAX_RANK];
-#line 436
-    size_t index[MAX_RANK];
-#line 436
-    size_t mid[MAX_RANK];
-#line 436
-    int canConvert;     /* Both text or both numeric */
-#line 436
-    longlong value[MAX_NELS];
-#line 436
-    double expect[MAX_NELS];
-#line 436
-
-#line 436
-#ifdef USE_PNETCDF
-#line 436
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 436
-#else
-#line 436
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 436
-#endif
-#line 436
-    IF (err)
-#line 436
-	error("nc_open: %s", nc_strerror(err));
-#line 436
-    for (i = 0; i < numVars; i++) {
-#line 436
-        canConvert = (var_type[i] == NC_CHAR) == (NCT_LONGLONG == NCT_TEXT);
-#line 436
-        assert(var_rank[i] <= MAX_RANK);
-#line 436
-        assert(var_nels[i] <= MAX_NELS);
-#line 436
-	for (j = 0; j < var_rank[i]; j++) {
-#line 436
-	    start[j] = 0;
-#line 436
-	    edge[j] = 1;
-#line 436
-	}
-#line 436
-        err = nc_get_vara_longlong(BAD_ID, i, start, edge, value);
-#line 436
-        IF (err != NC_EBADID)
-#line 436
-	    error("bad ncid: status = %d", err);
-#line 436
-        err = nc_get_vara_longlong(ncid, BAD_VARID, start, edge, value);
-#line 436
-        IF (err != NC_ENOTVAR)
-#line 436
-	    error("bad var id: status = %d", err);
-#line 436
-	for (j = 0; j < var_rank[i]; j++) {
-#line 436
-	    start[j] = var_shape[i][j];
-#line 436
-	    err = nc_get_vara_longlong(ncid, i, start, edge, value);
-#line 436
-            IF (canConvert && err != NC_EINVALCOORDS)
-#line 436
-                error("bad index: status = %d", err);
-#line 436
-	    start[j] = 0;
-#line 436
-	    edge[j] = var_shape[i][j] + 1;
-#line 436
-	    err = nc_get_vara_longlong(ncid, i, start, edge, value);
-#line 436
-            IF (canConvert && err != NC_EEDGE)
-#line 436
-		error("bad edge: status = %d", err);
-#line 436
-	    edge[j] = 1;
-#line 436
-	}
-#line 436
-            /* Check non-scalars for correct error returned even when */
-#line 436
-            /* there is nothing to get (edge[j]==0) */
-#line 436
-	if(var_rank[i] > 0) {
-#line 436
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 436
-		edge[j] = 0;
-#line 436
-	    }
-#line 436
-	    err = nc_get_vara_longlong(BAD_ID, i, start, edge, value);
-#line 436
-	    IF (err != NC_EBADID) 
-#line 436
-		error("bad ncid: status = %d", err);
-#line 436
-	    err = nc_get_vara_longlong(ncid, BAD_VARID, start, edge, value);
-#line 436
-	    IF (err != NC_ENOTVAR) 
-#line 436
-		error("bad var id: status = %d", err);
-#line 436
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 436
-		if (var_dimid[i][j] > 0) {		/* skip record dim */
-#line 436
-		    start[j] = var_shape[i][j];
-#line 436
-		    err = nc_get_vara_longlong(ncid, i, start, edge, value);
-#line 436
-		    IF (canConvert && err != NC_EINVALCOORDS)
-#line 436
-			error("bad start: status = %d", err);
-#line 436
-		    start[j] = 0;
-#line 436
-		}
-#line 436
-	    }
-#line 436
-	    err = nc_get_vara_longlong(ncid, i, start, edge, value);
-#line 436
-	    if (canConvert) {
-#line 436
-		IF (err) 
-#line 436
-		    error("%s", nc_strerror(err));
-#line 436
-	    } else {
-#line 436
-		IF (err != NC_ECHAR)
-#line 436
-		    error("wrong type: status = %d", err);
-#line 436
-	    }
-#line 436
-	    for (j = 0; j < var_rank[i]; j++) {
-#line 436
-		edge[j] = 1;
-#line 436
-	    }
-#line 436
-	}            /* Choose a random point dividing each dim into 2 parts */
-#line 436
-            /* get 2^rank (nslabs) slabs so defined */
-#line 436
-        nslabs = 1;
-#line 436
-        for (j = 0; j < var_rank[i]; j++) {
-#line 436
-            mid[j] = roll( var_shape[i][j] );
-#line 436
-            nslabs *= 2;
-#line 436
-        }
-#line 436
-            /* bits of k determine whether to get lower or upper part of dim */
-#line 436
-        for (k = 0; k < nslabs; k++) {
-#line 436
-            nels = 1;
-#line 436
-            for (j = 0; j < var_rank[i]; j++) {
-#line 436
-                if ((k >> j) & 1) {
-#line 436
-                    start[j] = 0;
-#line 436
-                    edge[j] = mid[j];
-#line 436
-                }else{
-#line 436
-                    start[j] = mid[j];
-#line 436
-                    edge[j] = var_shape[i][j] - mid[j];
-#line 436
-                }
-#line 436
-                nels *= edge[j];
-#line 436
-            }
-#line 436
-	    allInExtRange = allInIntRange = 1;
-#line 436
-            for (j = 0; j < nels; j++) {
-#line 436
-                err = toMixedBase(j, var_rank[i], edge, index);
-#line 436
-                IF (err)
-#line 436
-                    error("error in toMixedBase 1");
-#line 436
-                for (d = 0; d < var_rank[i]; d++)
-#line 436
-                    index[d] += start[d];
-#line 436
-                expect[j] = hash4(var_type[i], var_rank[i], index, NCT_LONGLONG);
-#line 436
-		if (inRange3(expect[j],var_type[i], NCT_LONGLONG)) {
-#line 436
-		    allInIntRange = allInIntRange && expect[j] >= longlong_min
-#line 436
-				&& expect[j] <= longlong_max;
-#line 436
-		} else {
-#line 436
-		    allInExtRange = 0;
-#line 436
-		}
-#line 436
-	    }
-#line 436
-            if (var_rank[i] == 0 && i%2)
-#line 436
-		err = nc_get_vara_longlong(ncid, i, NULL, NULL, value);
-#line 436
-	    else
-#line 436
-		err = nc_get_vara_longlong(ncid, i, start, edge, value);
-#line 436
-            if (canConvert) {
-#line 436
-		if (allInExtRange) {
-#line 436
-		    if (allInIntRange) {
-#line 436
-			IF (err)
-#line 436
-			    error("%s", nc_strerror(err));
-#line 436
-		    } else {
-#line 436
-			IF (err != NC_ERANGE)
-#line 436
-			    error("Range error: status = %d", err);
-#line 436
-		    }
-#line 436
-		} else {
-#line 436
-		    IF (err != 0 && err != NC_ERANGE)
-#line 436
-			error("OK or Range error: status = %d", err);
-#line 436
-		}
-#line 436
-		for (j = 0; j < nels; j++) {
-#line 436
-		    if (inRange3(expect[j],var_type[i],NCT_LONGLONG)
-#line 436
-			    && expect[j] >= longlong_min && expect[j] <= longlong_max) {
-#line 436
-			IF (!equal(value[j],expect[j],var_type[i],NCT_LONGLONG)){
-#line 436
-			    error("value read not that expected");
-#line 436
-			    if (verbose) {
-#line 436
-				error("\n");
-#line 436
-				error("varid: %d, ", i);
-#line 436
-				error("var_name: %s, ", var_name[i]);
-#line 436
-				error("element number: %d ", j);
-#line 436
-				error("expect: %g", expect[j]);
-#line 436
-				error("got: %g", (double) value[j]);
-#line 436
-			    }
-#line 436
-			} else {
-#line 436
-			    nok++;
-#line 436
-			}
-#line 436
-		    }
-#line 436
-		}
-#line 436
-            } else {
-#line 436
-                IF (nels > 0 && err != NC_ECHAR)
-#line 436
-                    error("wrong type: status = %d", err);
-#line 436
-            }
-#line 436
-        }
-#line 436
-    }
-#line 436
-    err = nc_close(ncid);
-#line 436
-    IF (err)
-#line 436
-	error("nc_close: %s", nc_strerror(err));
-#line 436
-    print_nok(nok);
-#line 436
-}
-#line 436
-
-void
-#line 437
-test_nc_get_vara_ulonglong(void)
-#line 437
-{
-#line 437
-    int ncid;
-#line 437
-    int d;
-#line 437
-    int i;
-#line 437
-    int j;
-#line 437
-    int k;
-#line 437
-    int err;
-#line 437
-    int allInExtRange;	/* all values within external range? */
-#line 437
-    int allInIntRange;	/* all values within internal range? */
-#line 437
-    int nels;
-#line 437
-    int nslabs;
-#line 437
-    int nok = 0;      /* count of valid comparisons */
-#line 437
-    size_t start[MAX_RANK];
-#line 437
-    size_t edge[MAX_RANK];
-#line 437
-    size_t index[MAX_RANK];
-#line 437
-    size_t mid[MAX_RANK];
-#line 437
-    int canConvert;     /* Both text or both numeric */
-#line 437
-    ulonglong value[MAX_NELS];
-#line 437
-    double expect[MAX_NELS];
-#line 437
-
-#line 437
-#ifdef USE_PNETCDF
-#line 437
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 437
-#else
-#line 437
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 437
-#endif
-#line 437
-    IF (err)
-#line 437
-	error("nc_open: %s", nc_strerror(err));
-#line 437
-    for (i = 0; i < numVars; i++) {
-#line 437
+#line 425
         canConvert = (var_type[i] == NC_CHAR) == (NCT_ULONGLONG == NCT_TEXT);
-#line 437
+#line 425
         assert(var_rank[i] <= MAX_RANK);
-#line 437
+#line 425
         assert(var_nels[i] <= MAX_NELS);
-#line 437
+#line 425
 	for (j = 0; j < var_rank[i]; j++) {
-#line 437
+#line 425
 	    start[j] = 0;
-#line 437
+#line 425
 	    edge[j] = 1;
-#line 437
+#line 425
 	}
-#line 437
+#line 425
         err = nc_get_vara_ulonglong(BAD_ID, i, start, edge, value);
-#line 437
+#line 425
         IF (err != NC_EBADID)
-#line 437
+#line 425
 	    error("bad ncid: status = %d", err);
-#line 437
+#line 425
         err = nc_get_vara_ulonglong(ncid, BAD_VARID, start, edge, value);
-#line 437
+#line 425
         IF (err != NC_ENOTVAR)
-#line 437
+#line 425
 	    error("bad var id: status = %d", err);
-#line 437
+#line 425
 	for (j = 0; j < var_rank[i]; j++) {
-#line 437
+#line 425
 	    start[j] = var_shape[i][j];
-#line 437
+#line 425
 	    err = nc_get_vara_ulonglong(ncid, i, start, edge, value);
-#line 437
+#line 425
             IF (canConvert && err != NC_EINVALCOORDS)
-#line 437
+#line 425
                 error("bad index: status = %d", err);
-#line 437
+#line 425
 	    start[j] = 0;
-#line 437
+#line 425
 	    edge[j] = var_shape[i][j] + 1;
-#line 437
+#line 425
 	    err = nc_get_vara_ulonglong(ncid, i, start, edge, value);
-#line 437
+#line 425
             IF (canConvert && err != NC_EEDGE)
-#line 437
+#line 425
 		error("bad edge: status = %d", err);
-#line 437
+#line 425
 	    edge[j] = 1;
-#line 437
+#line 425
 	}
-#line 437
+#line 425
             /* Check non-scalars for correct error returned even when */
-#line 437
+#line 425
             /* there is nothing to get (edge[j]==0) */
-#line 437
+#line 425
 	if(var_rank[i] > 0) {
-#line 437
+#line 425
 	    for (j = 0; j < var_rank[i]; j++) {
-#line 437
+#line 425
 		edge[j] = 0;
-#line 437
+#line 425
 	    }
-#line 437
+#line 425
 	    err = nc_get_vara_ulonglong(BAD_ID, i, start, edge, value);
-#line 437
+#line 425
 	    IF (err != NC_EBADID) 
-#line 437
+#line 425
 		error("bad ncid: status = %d", err);
-#line 437
+#line 425
 	    err = nc_get_vara_ulonglong(ncid, BAD_VARID, start, edge, value);
-#line 437
+#line 425
 	    IF (err != NC_ENOTVAR) 
-#line 437
+#line 425
 		error("bad var id: status = %d", err);
-#line 437
+#line 425
 	    for (j = 0; j < var_rank[i]; j++) {
-#line 437
+#line 425
 		if (var_dimid[i][j] > 0) {		/* skip record dim */
-#line 437
+#line 425
 		    start[j] = var_shape[i][j];
-#line 437
+#line 425
 		    err = nc_get_vara_ulonglong(ncid, i, start, edge, value);
-#line 437
+#line 425
 		    IF (canConvert && err != NC_EINVALCOORDS)
-#line 437
+#line 425
 			error("bad start: status = %d", err);
-#line 437
+#line 425
 		    start[j] = 0;
-#line 437
+#line 425
 		}
-#line 437
+#line 425
 	    }
-#line 437
+#line 425
 	    err = nc_get_vara_ulonglong(ncid, i, start, edge, value);
-#line 437
+#line 425
 	    if (canConvert) {
-#line 437
+#line 425
 		IF (err) 
-#line 437
+#line 425
 		    error("%s", nc_strerror(err));
-#line 437
+#line 425
 	    } else {
-#line 437
+#line 425
 		IF (err != NC_ECHAR)
-#line 437
+#line 425
 		    error("wrong type: status = %d", err);
-#line 437
+#line 425
 	    }
-#line 437
+#line 425
 	    for (j = 0; j < var_rank[i]; j++) {
-#line 437
+#line 425
 		edge[j] = 1;
-#line 437
+#line 425
 	    }
-#line 437
+#line 425
 	}            /* Choose a random point dividing each dim into 2 parts */
-#line 437
+#line 425
             /* get 2^rank (nslabs) slabs so defined */
-#line 437
+#line 425
         nslabs = 1;
-#line 437
+#line 425
         for (j = 0; j < var_rank[i]; j++) {
-#line 437
+#line 425
             mid[j] = roll( var_shape[i][j] );
-#line 437
+#line 425
             nslabs *= 2;
-#line 437
+#line 425
         }
-#line 437
+#line 425
             /* bits of k determine whether to get lower or upper part of dim */
-#line 437
+#line 425
         for (k = 0; k < nslabs; k++) {
-#line 437
+#line 425
             nels = 1;
-#line 437
+#line 425
             for (j = 0; j < var_rank[i]; j++) {
-#line 437
+#line 425
                 if ((k >> j) & 1) {
-#line 437
+#line 425
                     start[j] = 0;
-#line 437
+#line 425
                     edge[j] = mid[j];
-#line 437
+#line 425
                 }else{
-#line 437
+#line 425
                     start[j] = mid[j];
-#line 437
+#line 425
                     edge[j] = var_shape[i][j] - mid[j];
-#line 437
+#line 425
                 }
-#line 437
+#line 425
                 nels *= edge[j];
-#line 437
+#line 425
             }
-#line 437
+#line 425
 	    allInExtRange = allInIntRange = 1;
-#line 437
+#line 425
             for (j = 0; j < nels; j++) {
-#line 437
+#line 425
                 err = toMixedBase(j, var_rank[i], edge, index);
-#line 437
+#line 425
                 IF (err)
-#line 437
+#line 425
                     error("error in toMixedBase 1");
-#line 437
+#line 425
                 for (d = 0; d < var_rank[i]; d++)
-#line 437
+#line 425
                     index[d] += start[d];
-#line 437
+#line 425
                 expect[j] = hash4(var_type[i], var_rank[i], index, NCT_ULONGLONG);
-#line 437
+#line 425
 		if (inRange3(expect[j],var_type[i], NCT_ULONGLONG)) {
-#line 437
+#line 425
 		    allInIntRange = allInIntRange && expect[j] >= ulonglong_min
-#line 437
+#line 425
 				&& expect[j] <= ulonglong_max;
-#line 437
+#line 425
 		} else {
-#line 437
+#line 425
 		    allInExtRange = 0;
-#line 437
+#line 425
 		}
-#line 437
+#line 425
 	    }
-#line 437
+#line 425
             if (var_rank[i] == 0 && i%2)
-#line 437
+#line 425
 		err = nc_get_vara_ulonglong(ncid, i, NULL, NULL, value);
-#line 437
+#line 425
 	    else
-#line 437
+#line 425
 		err = nc_get_vara_ulonglong(ncid, i, start, edge, value);
-#line 437
+#line 425
             if (canConvert) {
-#line 437
+#line 425
 		if (allInExtRange) {
-#line 437
+#line 425
 		    if (allInIntRange) {
-#line 437
+#line 425
 			IF (err)
-#line 437
+#line 425
 			    error("%s", nc_strerror(err));
-#line 437
+#line 425
 		    } else {
-#line 437
+#line 425
 			IF (err != NC_ERANGE)
-#line 437
+#line 425
 			    error("Range error: status = %d", err);
-#line 437
+#line 425
 		    }
-#line 437
+#line 425
 		} else {
-#line 437
+#line 425
 		    IF (err != 0 && err != NC_ERANGE)
-#line 437
+#line 425
 			error("OK or Range error: status = %d", err);
-#line 437
+#line 425
 		}
-#line 437
+#line 425
 		for (j = 0; j < nels; j++) {
-#line 437
+#line 425
 		    if (inRange3(expect[j],var_type[i],NCT_ULONGLONG)
-#line 437
+#line 425
 			    && expect[j] >= ulonglong_min && expect[j] <= ulonglong_max) {
-#line 437
+#line 425
 			IF (!equal(value[j],expect[j],var_type[i],NCT_ULONGLONG)){
-#line 437
+#line 425
 			    error("value read not that expected");
-#line 437
+#line 425
 			    if (verbose) {
-#line 437
+#line 425
 				error("\n");
-#line 437
+#line 425
 				error("varid: %d, ", i);
-#line 437
+#line 425
 				error("var_name: %s, ", var_name[i]);
-#line 437
+#line 425
 				error("element number: %d ", j);
-#line 437
+#line 425
 				error("expect: %g", expect[j]);
-#line 437
+#line 425
 				error("got: %g", (double) value[j]);
-#line 437
+#line 425
 			    }
-#line 437
+#line 425
 			} else {
-#line 437
+#line 425
 			    nok++;
-#line 437
+#line 425
 			}
-#line 437
+#line 425
 		    }
-#line 437
+#line 425
 		}
-#line 437
+#line 425
             } else {
-#line 437
+#line 425
                 IF (nels > 0 && err != NC_ECHAR)
-#line 437
+#line 425
                     error("wrong type: status = %d", err);
-#line 437
+#line 425
             }
-#line 437
+#line 425
         }
-#line 437
+#line 425
     }
-#line 437
+#line 425
     err = nc_close(ncid);
-#line 437
+#line 425
     IF (err)
-#line 437
+#line 425
 	error("nc_close: %s", nc_strerror(err));
-#line 437
+#line 425
     print_nok(nok);
-#line 437
+#line 425
 }
-#line 437
+#line 425
 
 
 
-#line 622
+#line 606
 
 void
-#line 623
+#line 607
 test_nc_get_vars_text(void)
-#line 623
+#line 607
 {
-#line 623
+#line 607
     int ncid;
-#line 623
+#line 607
     int d;
-#line 623
+#line 607
     int i;
-#line 623
+#line 607
     int j;
-#line 623
+#line 607
     int k;
-#line 623
+#line 607
     int m;
-#line 623
+#line 607
     int err;
-#line 623
+#line 607
     int allInExtRange;	/* all values within external range? */
-#line 623
+#line 607
     int allInIntRange;	/* all values within internal range? */
-#line 623
+#line 607
     int nels;
-#line 623
+#line 607
     int nslabs;
-#line 623
+#line 607
     int nstarts;        /* number of different starts */
-#line 623
+#line 607
     int nok = 0;      /* count of valid comparisons */
-#line 623
+#line 607
     size_t start[MAX_RANK];
-#line 623
+#line 607
     size_t edge[MAX_RANK];
-#line 623
+#line 607
     size_t index[MAX_RANK];
-#line 623
+#line 607
     size_t index2[MAX_RANK];
-#line 623
+#line 607
     size_t mid[MAX_RANK];
-#line 623
+#line 607
     size_t count[MAX_RANK];
-#line 623
+#line 607
     size_t sstride[MAX_RANK];
-#line 623
+#line 607
     ptrdiff_t stride[MAX_RANK];
-#line 623
+#line 607
     int canConvert;     /* Both text or both numeric */
-#line 623
+#line 607
     text value[MAX_NELS];
-#line 623
+#line 607
     double expect[MAX_NELS];
-#line 623
+#line 607
 
-#line 623
-#ifdef USE_PNETCDF
-#line 623
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 623
-#else
-#line 623
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 623
-#endif
-#line 623
+#line 607
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 607
     IF (err)
-#line 623
+#line 607
         error("nc_open: %s", nc_strerror(err));
-#line 623
+#line 607
     for (i = 0; i < numVars; i++) {
-#line 623
+#line 607
         canConvert = (var_type[i] == NC_CHAR) == (NCT_TEXT == NCT_TEXT);
-#line 623
+#line 607
         assert(var_rank[i] <= MAX_RANK);
-#line 623
+#line 607
         assert(var_nels[i] <= MAX_NELS);
-#line 623
+#line 607
         for (j = 0; j < var_rank[i]; j++) {
-#line 623
+#line 607
             start[j] = 0;
-#line 623
+#line 607
             edge[j] = 1;
-#line 623
+#line 607
             stride[j] = 1;
-#line 623
+#line 607
         }
-#line 623
+#line 607
         err = nc_get_vars_text(BAD_ID, i, start, edge, stride, value);
-#line 623
+#line 607
         IF (err != NC_EBADID)
-#line 623
+#line 607
             error("bad ncid: status = %d", err);
-#line 623
+#line 607
         err = nc_get_vars_text(ncid, BAD_VARID, start, edge, stride, value);
-#line 623
+#line 607
         IF (err != NC_ENOTVAR)
-#line 623
+#line 607
             error("bad var id: status = %d", err);
-#line 623
+#line 607
         for (j = 0; j < var_rank[i]; j++) {
-#line 623
+#line 607
             start[j] = var_shape[i][j];
-#line 623
+#line 607
             err = nc_get_vars_text(ncid, i, start, edge, stride, value);
-#line 623
+#line 607
 	  if(!canConvert) {
-#line 623
+#line 607
 		IF (err != NC_ECHAR)
-#line 623
+#line 607
                	    error("conversion: status = %d", err);
-#line 623
+#line 607
 	  } else {
-#line 623
+#line 607
             IF (err != NC_EINVALCOORDS)
-#line 623
+#line 607
                 error("bad index: status = %d", err);
-#line 623
+#line 607
             start[j] = 0;
-#line 623
+#line 607
             edge[j] = var_shape[i][j] + 1;
-#line 623
+#line 607
             err = nc_get_vars_text(ncid, i, start, edge, stride, value);
-#line 623
+#line 607
             IF (err != NC_EEDGE)
-#line 623
+#line 607
                 error("bad edge: status = %d", err);
-#line 623
+#line 607
             edge[j] = 1;
-#line 623
+#line 607
             stride[j] = 0;
-#line 623
+#line 607
             err = nc_get_vars_text(ncid, i, start, edge, stride, value);
-#line 623
+#line 607
             IF (err != NC_ESTRIDE)
-#line 623
+#line 607
                 error("bad stride: status = %d", err);
-#line 623
+#line 607
             stride[j] = 1;
-#line 623
+#line 607
 	  }
-#line 623
+#line 607
         }
-#line 623
+#line 607
             /* Choose a random point dividing each dim into 2 parts */
-#line 623
+#line 607
             /* get 2^rank (nslabs) slabs so defined */
-#line 623
+#line 607
         nslabs = 1;
-#line 623
+#line 607
         for (j = 0; j < var_rank[i]; j++) {
-#line 623
+#line 607
             mid[j] = roll( var_shape[i][j] );
-#line 623
+#line 607
             nslabs *= 2;
-#line 623
+#line 607
         }
-#line 623
+#line 607
             /* bits of k determine whether to get lower or upper part of dim */
-#line 623
+#line 607
             /* choose random stride from 1 to edge */
-#line 623
+#line 607
         for (k = 0; k < nslabs; k++) {
-#line 623
+#line 607
             nstarts = 1;
-#line 623
+#line 607
             for (j = 0; j < var_rank[i]; j++) {
-#line 623
+#line 607
                 if ((k >> j) & 1) {
-#line 623
+#line 607
                     start[j] = 0;
-#line 623
+#line 607
                     edge[j] = mid[j];
-#line 623
+#line 607
                 }else{
-#line 623
+#line 607
                     start[j] = mid[j];
-#line 623
+#line 607
                     edge[j] = var_shape[i][j] - mid[j];
-#line 623
+#line 607
                 }
-#line 623
+#line 607
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 623
+#line 607
                 nstarts *= stride[j];
-#line 623
+#line 607
             }
-#line 623
+#line 607
             for (m = 0; m < nstarts; m++) {
-#line 623
+#line 607
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 623
+#line 607
                 IF (err)
-#line 623
+#line 607
                     error("error in toMixedBase");
-#line 623
+#line 607
                 nels = 1;
-#line 623
+#line 607
                 for (j = 0; j < var_rank[i]; j++) {
-#line 623
+#line 607
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 623
+#line 607
                     nels *= count[j];
-#line 623
+#line 607
                     index[j] += start[j];
-#line 623
+#line 607
                 }
-#line 623
+#line 607
                         /* Random choice of forward or backward */
-#line 623
+#line 607
 /* TODO
-#line 623
+#line 607
                 if ( roll(2) ) {
-#line 623
+#line 607
                     for (j = 0; j < var_rank[i]; j++) {
-#line 623
+#line 607
                         index[j] += (count[j] - 1) * stride[j];
-#line 623
+#line 607
                         stride[j] = -stride[j];
-#line 623
+#line 607
                     }
-#line 623
+#line 607
                 }
-#line 623
+#line 607
 */
-#line 623
+#line 607
 		allInExtRange = allInIntRange = 1;
-#line 623
+#line 607
 		for (j = 0; j < nels; j++) {
-#line 623
+#line 607
 		    err = toMixedBase(j, var_rank[i], count, index2);
-#line 623
+#line 607
 		    IF (err)
-#line 623
+#line 607
 			error("error in toMixedBase 1");
-#line 623
+#line 607
 		    for (d = 0; d < var_rank[i]; d++)
-#line 623
+#line 607
 			index2[d] = index[d] + index2[d] * stride[d];
-#line 623
+#line 607
 		    expect[j] = hash4(var_type[i], var_rank[i], index2, 
-#line 623
+#line 607
 			NCT_TEXT);
-#line 623
+#line 607
 		    if (inRange3(expect[j],var_type[i],NCT_TEXT)) {
-#line 623
+#line 607
 			allInIntRange = allInIntRange && expect[j] >= text_min
-#line 623
+#line 607
 			    && expect[j] <= text_max;
-#line 623
+#line 607
 		    } else {
-#line 623
+#line 607
 			allInExtRange = 0;
-#line 623
+#line 607
 		    }
-#line 623
+#line 607
 		}
-#line 623
+#line 607
                 if (var_rank[i] == 0 && i%2 )
-#line 623
+#line 607
                     err = nc_get_vars_text(ncid, i, NULL, NULL, NULL, value);
-#line 623
+#line 607
                 else
-#line 623
+#line 607
                     err = nc_get_vars_text(ncid, i, index, count, stride, value);
-#line 623
+#line 607
 		if (canConvert) {
-#line 623
+#line 607
 		    if (allInExtRange) {
-#line 623
+#line 607
 			if (allInIntRange) {
-#line 623
+#line 607
 			    IF (err)
-#line 623
+#line 607
 				error("%s", nc_strerror(err));
-#line 623
+#line 607
 			} else {
-#line 623
+#line 607
 			    IF (err != NC_ERANGE)
-#line 623
+#line 607
 				error("Range error: status = %d", err);
-#line 623
+#line 607
 			}
-#line 623
+#line 607
 		    } else {
-#line 623
+#line 607
 			IF (err != 0 && err != NC_ERANGE)
-#line 623
+#line 607
 			    error("OK or Range error: status = %d", err);
-#line 623
+#line 607
 		    }
-#line 623
+#line 607
 		    for (j = 0; j < nels; j++) {
-#line 623
+#line 607
 			if (inRange3(expect[j],var_type[i],NCT_TEXT)
-#line 623
+#line 607
 				&& expect[j] >= text_min && expect[j] <= text_max) {
-#line 623
+#line 607
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_TEXT)){
-#line 623
+#line 607
 				error("value read not that expected");
-#line 623
+#line 607
 				if (verbose) {
-#line 623
+#line 607
 				    error("\n");
-#line 623
+#line 607
 				    error("varid: %d, ", i);
-#line 623
+#line 607
 				    error("var_name: %s, ", var_name[i]);
-#line 623
+#line 607
 				    error("element number: %d ", j);
-#line 623
+#line 607
                                     error("expect: %g, ", expect[j]);
-#line 623
+#line 607
 				    error("got: %g", (double) value[j]);
-#line 623
+#line 607
 				}
-#line 623
+#line 607
 			    } else {
-#line 623
+#line 607
 				nok++;
-#line 623
+#line 607
 			    }
-#line 623
+#line 607
 			}
-#line 623
+#line 607
 		    }
-#line 623
+#line 607
 		} else {
-#line 623
+#line 607
 		    IF (nels > 0 && err != NC_ECHAR)
-#line 623
+#line 607
 			error("wrong type: status = %d", err);
-#line 623
+#line 607
 		}
-#line 623
+#line 607
 	    }
-#line 623
+#line 607
 	}
-#line 623
+#line 607
 
-#line 623
+#line 607
     }
-#line 623
+#line 607
     err = nc_close(ncid);
-#line 623
+#line 607
     IF (err)
-#line 623
+#line 607
         error("nc_close: %s", nc_strerror(err));
-#line 623
+#line 607
     print_nok(nok);
-#line 623
+#line 607
 }
-#line 623
+#line 607
 
 void
-#line 624
+#line 608
 test_nc_get_vars_uchar(void)
-#line 624
+#line 608
 {
-#line 624
+#line 608
     int ncid;
-#line 624
+#line 608
     int d;
-#line 624
+#line 608
     int i;
-#line 624
+#line 608
     int j;
-#line 624
+#line 608
     int k;
-#line 624
+#line 608
     int m;
-#line 624
+#line 608
     int err;
-#line 624
+#line 608
     int allInExtRange;	/* all values within external range? */
-#line 624
+#line 608
     int allInIntRange;	/* all values within internal range? */
-#line 624
+#line 608
     int nels;
-#line 624
+#line 608
     int nslabs;
-#line 624
+#line 608
     int nstarts;        /* number of different starts */
-#line 624
+#line 608
     int nok = 0;      /* count of valid comparisons */
-#line 624
+#line 608
     size_t start[MAX_RANK];
-#line 624
+#line 608
     size_t edge[MAX_RANK];
-#line 624
+#line 608
     size_t index[MAX_RANK];
-#line 624
+#line 608
     size_t index2[MAX_RANK];
-#line 624
+#line 608
     size_t mid[MAX_RANK];
-#line 624
+#line 608
     size_t count[MAX_RANK];
-#line 624
+#line 608
     size_t sstride[MAX_RANK];
-#line 624
+#line 608
     ptrdiff_t stride[MAX_RANK];
-#line 624
+#line 608
     int canConvert;     /* Both text or both numeric */
-#line 624
+#line 608
     uchar value[MAX_NELS];
-#line 624
+#line 608
     double expect[MAX_NELS];
-#line 624
+#line 608
 
-#line 624
-#ifdef USE_PNETCDF
-#line 624
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 624
-#else
-#line 624
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 624
-#endif
-#line 624
+#line 608
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 608
     IF (err)
-#line 624
+#line 608
         error("nc_open: %s", nc_strerror(err));
-#line 624
+#line 608
     for (i = 0; i < numVars; i++) {
-#line 624
+#line 608
         canConvert = (var_type[i] == NC_CHAR) == (NCT_UCHAR == NCT_TEXT);
-#line 624
+#line 608
         assert(var_rank[i] <= MAX_RANK);
-#line 624
+#line 608
         assert(var_nels[i] <= MAX_NELS);
-#line 624
+#line 608
         for (j = 0; j < var_rank[i]; j++) {
-#line 624
+#line 608
             start[j] = 0;
-#line 624
+#line 608
             edge[j] = 1;
-#line 624
+#line 608
             stride[j] = 1;
-#line 624
+#line 608
         }
-#line 624
+#line 608
         err = nc_get_vars_uchar(BAD_ID, i, start, edge, stride, value);
-#line 624
+#line 608
         IF (err != NC_EBADID)
-#line 624
+#line 608
             error("bad ncid: status = %d", err);
-#line 624
+#line 608
         err = nc_get_vars_uchar(ncid, BAD_VARID, start, edge, stride, value);
-#line 624
+#line 608
         IF (err != NC_ENOTVAR)
-#line 624
+#line 608
             error("bad var id: status = %d", err);
-#line 624
+#line 608
         for (j = 0; j < var_rank[i]; j++) {
-#line 624
+#line 608
             start[j] = var_shape[i][j];
-#line 624
+#line 608
             err = nc_get_vars_uchar(ncid, i, start, edge, stride, value);
-#line 624
+#line 608
 	  if(!canConvert) {
-#line 624
+#line 608
 		IF (err != NC_ECHAR)
-#line 624
+#line 608
                	    error("conversion: status = %d", err);
-#line 624
+#line 608
 	  } else {
-#line 624
+#line 608
             IF (err != NC_EINVALCOORDS)
-#line 624
+#line 608
                 error("bad index: status = %d", err);
-#line 624
+#line 608
             start[j] = 0;
-#line 624
+#line 608
             edge[j] = var_shape[i][j] + 1;
-#line 624
+#line 608
             err = nc_get_vars_uchar(ncid, i, start, edge, stride, value);
-#line 624
+#line 608
             IF (err != NC_EEDGE)
-#line 624
+#line 608
                 error("bad edge: status = %d", err);
-#line 624
+#line 608
             edge[j] = 1;
-#line 624
+#line 608
             stride[j] = 0;
-#line 624
+#line 608
             err = nc_get_vars_uchar(ncid, i, start, edge, stride, value);
-#line 624
+#line 608
             IF (err != NC_ESTRIDE)
-#line 624
+#line 608
                 error("bad stride: status = %d", err);
-#line 624
+#line 608
             stride[j] = 1;
-#line 624
+#line 608
 	  }
-#line 624
+#line 608
         }
-#line 624
+#line 608
             /* Choose a random point dividing each dim into 2 parts */
-#line 624
+#line 608
             /* get 2^rank (nslabs) slabs so defined */
-#line 624
+#line 608
         nslabs = 1;
-#line 624
+#line 608
         for (j = 0; j < var_rank[i]; j++) {
-#line 624
+#line 608
             mid[j] = roll( var_shape[i][j] );
-#line 624
+#line 608
             nslabs *= 2;
-#line 624
+#line 608
         }
-#line 624
+#line 608
             /* bits of k determine whether to get lower or upper part of dim */
-#line 624
+#line 608
             /* choose random stride from 1 to edge */
-#line 624
+#line 608
         for (k = 0; k < nslabs; k++) {
-#line 624
+#line 608
             nstarts = 1;
-#line 624
+#line 608
             for (j = 0; j < var_rank[i]; j++) {
-#line 624
+#line 608
                 if ((k >> j) & 1) {
-#line 624
+#line 608
                     start[j] = 0;
-#line 624
+#line 608
                     edge[j] = mid[j];
-#line 624
+#line 608
                 }else{
-#line 624
+#line 608
                     start[j] = mid[j];
-#line 624
+#line 608
                     edge[j] = var_shape[i][j] - mid[j];
-#line 624
+#line 608
                 }
-#line 624
+#line 608
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 624
+#line 608
                 nstarts *= stride[j];
-#line 624
+#line 608
             }
-#line 624
+#line 608
             for (m = 0; m < nstarts; m++) {
-#line 624
+#line 608
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 624
+#line 608
                 IF (err)
-#line 624
+#line 608
                     error("error in toMixedBase");
-#line 624
+#line 608
                 nels = 1;
-#line 624
+#line 608
                 for (j = 0; j < var_rank[i]; j++) {
-#line 624
+#line 608
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 624
+#line 608
                     nels *= count[j];
-#line 624
+#line 608
                     index[j] += start[j];
-#line 624
+#line 608
                 }
-#line 624
+#line 608
                         /* Random choice of forward or backward */
-#line 624
+#line 608
 /* TODO
-#line 624
+#line 608
                 if ( roll(2) ) {
-#line 624
+#line 608
                     for (j = 0; j < var_rank[i]; j++) {
-#line 624
+#line 608
                         index[j] += (count[j] - 1) * stride[j];
-#line 624
+#line 608
                         stride[j] = -stride[j];
-#line 624
+#line 608
                     }
-#line 624
+#line 608
                 }
-#line 624
+#line 608
 */
-#line 624
+#line 608
 		allInExtRange = allInIntRange = 1;
-#line 624
+#line 608
 		for (j = 0; j < nels; j++) {
-#line 624
+#line 608
 		    err = toMixedBase(j, var_rank[i], count, index2);
-#line 624
+#line 608
 		    IF (err)
-#line 624
+#line 608
 			error("error in toMixedBase 1");
-#line 624
+#line 608
 		    for (d = 0; d < var_rank[i]; d++)
-#line 624
+#line 608
 			index2[d] = index[d] + index2[d] * stride[d];
-#line 624
+#line 608
 		    expect[j] = hash4(var_type[i], var_rank[i], index2, 
-#line 624
+#line 608
 			NCT_UCHAR);
-#line 624
+#line 608
 		    if (inRange3(expect[j],var_type[i],NCT_UCHAR)) {
-#line 624
+#line 608
 			allInIntRange = allInIntRange && expect[j] >= uchar_min
-#line 624
+#line 608
 			    && expect[j] <= uchar_max;
-#line 624
+#line 608
 		    } else {
-#line 624
+#line 608
 			allInExtRange = 0;
-#line 624
+#line 608
 		    }
-#line 624
+#line 608
 		}
-#line 624
+#line 608
                 if (var_rank[i] == 0 && i%2 )
-#line 624
+#line 608
                     err = nc_get_vars_uchar(ncid, i, NULL, NULL, NULL, value);
-#line 624
+#line 608
                 else
-#line 624
+#line 608
                     err = nc_get_vars_uchar(ncid, i, index, count, stride, value);
-#line 624
+#line 608
 		if (canConvert) {
-#line 624
+#line 608
 		    if (allInExtRange) {
-#line 624
+#line 608
 			if (allInIntRange) {
-#line 624
+#line 608
 			    IF (err)
-#line 624
+#line 608
 				error("%s", nc_strerror(err));
-#line 624
+#line 608
 			} else {
-#line 624
+#line 608
 			    IF (err != NC_ERANGE)
-#line 624
+#line 608
 				error("Range error: status = %d", err);
-#line 624
+#line 608
 			}
-#line 624
+#line 608
 		    } else {
-#line 624
+#line 608
 			IF (err != 0 && err != NC_ERANGE)
-#line 624
+#line 608
 			    error("OK or Range error: status = %d", err);
-#line 624
+#line 608
 		    }
-#line 624
+#line 608
 		    for (j = 0; j < nels; j++) {
-#line 624
+#line 608
 			if (inRange3(expect[j],var_type[i],NCT_UCHAR)
-#line 624
+#line 608
 				&& expect[j] >= uchar_min && expect[j] <= uchar_max) {
-#line 624
+#line 608
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_UCHAR)){
-#line 624
+#line 608
 				error("value read not that expected");
-#line 624
+#line 608
 				if (verbose) {
-#line 624
+#line 608
 				    error("\n");
-#line 624
+#line 608
 				    error("varid: %d, ", i);
-#line 624
+#line 608
 				    error("var_name: %s, ", var_name[i]);
-#line 624
+#line 608
 				    error("element number: %d ", j);
-#line 624
+#line 608
                                     error("expect: %g, ", expect[j]);
-#line 624
+#line 608
 				    error("got: %g", (double) value[j]);
-#line 624
+#line 608
 				}
-#line 624
+#line 608
 			    } else {
-#line 624
+#line 608
 				nok++;
-#line 624
+#line 608
 			    }
-#line 624
+#line 608
 			}
-#line 624
+#line 608
 		    }
-#line 624
+#line 608
 		} else {
-#line 624
+#line 608
 		    IF (nels > 0 && err != NC_ECHAR)
-#line 624
+#line 608
 			error("wrong type: status = %d", err);
-#line 624
+#line 608
 		}
-#line 624
+#line 608
 	    }
-#line 624
+#line 608
 	}
-#line 624
+#line 608
 
-#line 624
+#line 608
     }
-#line 624
+#line 608
     err = nc_close(ncid);
-#line 624
+#line 608
     IF (err)
-#line 624
+#line 608
         error("nc_close: %s", nc_strerror(err));
-#line 624
+#line 608
     print_nok(nok);
-#line 624
+#line 608
 }
-#line 624
+#line 608
 
 void
-#line 625
+#line 609
 test_nc_get_vars_schar(void)
-#line 625
+#line 609
 {
-#line 625
+#line 609
     int ncid;
-#line 625
+#line 609
     int d;
-#line 625
+#line 609
     int i;
-#line 625
+#line 609
     int j;
-#line 625
+#line 609
     int k;
-#line 625
+#line 609
     int m;
-#line 625
+#line 609
     int err;
-#line 625
+#line 609
     int allInExtRange;	/* all values within external range? */
-#line 625
+#line 609
     int allInIntRange;	/* all values within internal range? */
-#line 625
+#line 609
     int nels;
-#line 625
+#line 609
     int nslabs;
-#line 625
+#line 609
     int nstarts;        /* number of different starts */
-#line 625
+#line 609
     int nok = 0;      /* count of valid comparisons */
-#line 625
+#line 609
     size_t start[MAX_RANK];
-#line 625
+#line 609
     size_t edge[MAX_RANK];
-#line 625
+#line 609
     size_t index[MAX_RANK];
-#line 625
+#line 609
     size_t index2[MAX_RANK];
-#line 625
+#line 609
     size_t mid[MAX_RANK];
-#line 625
+#line 609
     size_t count[MAX_RANK];
-#line 625
+#line 609
     size_t sstride[MAX_RANK];
-#line 625
+#line 609
     ptrdiff_t stride[MAX_RANK];
-#line 625
+#line 609
     int canConvert;     /* Both text or both numeric */
-#line 625
+#line 609
     schar value[MAX_NELS];
-#line 625
+#line 609
     double expect[MAX_NELS];
-#line 625
+#line 609
 
-#line 625
-#ifdef USE_PNETCDF
-#line 625
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 625
-#else
-#line 625
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 625
-#endif
-#line 625
+#line 609
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 609
     IF (err)
-#line 625
+#line 609
         error("nc_open: %s", nc_strerror(err));
-#line 625
+#line 609
     for (i = 0; i < numVars; i++) {
-#line 625
+#line 609
         canConvert = (var_type[i] == NC_CHAR) == (NCT_SCHAR == NCT_TEXT);
-#line 625
+#line 609
         assert(var_rank[i] <= MAX_RANK);
-#line 625
+#line 609
         assert(var_nels[i] <= MAX_NELS);
-#line 625
+#line 609
         for (j = 0; j < var_rank[i]; j++) {
-#line 625
+#line 609
             start[j] = 0;
-#line 625
+#line 609
             edge[j] = 1;
-#line 625
+#line 609
             stride[j] = 1;
-#line 625
+#line 609
         }
-#line 625
+#line 609
         err = nc_get_vars_schar(BAD_ID, i, start, edge, stride, value);
-#line 625
+#line 609
         IF (err != NC_EBADID)
-#line 625
+#line 609
             error("bad ncid: status = %d", err);
-#line 625
+#line 609
         err = nc_get_vars_schar(ncid, BAD_VARID, start, edge, stride, value);
-#line 625
+#line 609
         IF (err != NC_ENOTVAR)
-#line 625
+#line 609
             error("bad var id: status = %d", err);
-#line 625
+#line 609
         for (j = 0; j < var_rank[i]; j++) {
-#line 625
+#line 609
             start[j] = var_shape[i][j];
-#line 625
+#line 609
             err = nc_get_vars_schar(ncid, i, start, edge, stride, value);
-#line 625
+#line 609
 	  if(!canConvert) {
-#line 625
+#line 609
 		IF (err != NC_ECHAR)
-#line 625
+#line 609
                	    error("conversion: status = %d", err);
-#line 625
+#line 609
 	  } else {
-#line 625
+#line 609
             IF (err != NC_EINVALCOORDS)
-#line 625
+#line 609
                 error("bad index: status = %d", err);
-#line 625
+#line 609
             start[j] = 0;
-#line 625
+#line 609
             edge[j] = var_shape[i][j] + 1;
-#line 625
+#line 609
             err = nc_get_vars_schar(ncid, i, start, edge, stride, value);
-#line 625
+#line 609
             IF (err != NC_EEDGE)
-#line 625
+#line 609
                 error("bad edge: status = %d", err);
-#line 625
+#line 609
             edge[j] = 1;
-#line 625
+#line 609
             stride[j] = 0;
-#line 625
+#line 609
             err = nc_get_vars_schar(ncid, i, start, edge, stride, value);
-#line 625
+#line 609
             IF (err != NC_ESTRIDE)
-#line 625
+#line 609
                 error("bad stride: status = %d", err);
-#line 625
+#line 609
             stride[j] = 1;
-#line 625
+#line 609
 	  }
-#line 625
+#line 609
         }
-#line 625
+#line 609
             /* Choose a random point dividing each dim into 2 parts */
-#line 625
+#line 609
             /* get 2^rank (nslabs) slabs so defined */
-#line 625
+#line 609
         nslabs = 1;
-#line 625
+#line 609
         for (j = 0; j < var_rank[i]; j++) {
-#line 625
+#line 609
             mid[j] = roll( var_shape[i][j] );
-#line 625
+#line 609
             nslabs *= 2;
-#line 625
+#line 609
         }
-#line 625
+#line 609
             /* bits of k determine whether to get lower or upper part of dim */
-#line 625
+#line 609
             /* choose random stride from 1 to edge */
-#line 625
+#line 609
         for (k = 0; k < nslabs; k++) {
-#line 625
+#line 609
             nstarts = 1;
-#line 625
+#line 609
             for (j = 0; j < var_rank[i]; j++) {
-#line 625
+#line 609
                 if ((k >> j) & 1) {
-#line 625
+#line 609
                     start[j] = 0;
-#line 625
+#line 609
                     edge[j] = mid[j];
-#line 625
+#line 609
                 }else{
-#line 625
+#line 609
                     start[j] = mid[j];
-#line 625
+#line 609
                     edge[j] = var_shape[i][j] - mid[j];
-#line 625
+#line 609
                 }
-#line 625
+#line 609
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 625
+#line 609
                 nstarts *= stride[j];
-#line 625
+#line 609
             }
-#line 625
+#line 609
             for (m = 0; m < nstarts; m++) {
-#line 625
+#line 609
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 625
+#line 609
                 IF (err)
-#line 625
+#line 609
                     error("error in toMixedBase");
-#line 625
+#line 609
                 nels = 1;
-#line 625
+#line 609
                 for (j = 0; j < var_rank[i]; j++) {
-#line 625
+#line 609
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 625
+#line 609
                     nels *= count[j];
-#line 625
+#line 609
                     index[j] += start[j];
-#line 625
+#line 609
                 }
-#line 625
+#line 609
                         /* Random choice of forward or backward */
-#line 625
+#line 609
 /* TODO
-#line 625
+#line 609
                 if ( roll(2) ) {
-#line 625
+#line 609
                     for (j = 0; j < var_rank[i]; j++) {
-#line 625
+#line 609
                         index[j] += (count[j] - 1) * stride[j];
-#line 625
+#line 609
                         stride[j] = -stride[j];
-#line 625
+#line 609
                     }
-#line 625
+#line 609
                 }
-#line 625
+#line 609
 */
-#line 625
+#line 609
 		allInExtRange = allInIntRange = 1;
-#line 625
+#line 609
 		for (j = 0; j < nels; j++) {
-#line 625
+#line 609
 		    err = toMixedBase(j, var_rank[i], count, index2);
-#line 625
+#line 609
 		    IF (err)
-#line 625
+#line 609
 			error("error in toMixedBase 1");
-#line 625
+#line 609
 		    for (d = 0; d < var_rank[i]; d++)
-#line 625
+#line 609
 			index2[d] = index[d] + index2[d] * stride[d];
-#line 625
+#line 609
 		    expect[j] = hash4(var_type[i], var_rank[i], index2, 
-#line 625
+#line 609
 			NCT_SCHAR);
-#line 625
+#line 609
 		    if (inRange3(expect[j],var_type[i],NCT_SCHAR)) {
-#line 625
+#line 609
 			allInIntRange = allInIntRange && expect[j] >= schar_min
-#line 625
+#line 609
 			    && expect[j] <= schar_max;
-#line 625
+#line 609
 		    } else {
-#line 625
+#line 609
 			allInExtRange = 0;
-#line 625
+#line 609
 		    }
-#line 625
+#line 609
 		}
-#line 625
+#line 609
                 if (var_rank[i] == 0 && i%2 )
-#line 625
+#line 609
                     err = nc_get_vars_schar(ncid, i, NULL, NULL, NULL, value);
-#line 625
+#line 609
                 else
-#line 625
+#line 609
                     err = nc_get_vars_schar(ncid, i, index, count, stride, value);
-#line 625
+#line 609
 		if (canConvert) {
-#line 625
+#line 609
 		    if (allInExtRange) {
-#line 625
+#line 609
 			if (allInIntRange) {
-#line 625
+#line 609
 			    IF (err)
-#line 625
+#line 609
 				error("%s", nc_strerror(err));
-#line 625
+#line 609
 			} else {
-#line 625
+#line 609
 			    IF (err != NC_ERANGE)
-#line 625
+#line 609
 				error("Range error: status = %d", err);
-#line 625
+#line 609
 			}
-#line 625
+#line 609
 		    } else {
-#line 625
+#line 609
 			IF (err != 0 && err != NC_ERANGE)
-#line 625
+#line 609
 			    error("OK or Range error: status = %d", err);
-#line 625
+#line 609
 		    }
-#line 625
+#line 609
 		    for (j = 0; j < nels; j++) {
-#line 625
+#line 609
 			if (inRange3(expect[j],var_type[i],NCT_SCHAR)
-#line 625
+#line 609
 				&& expect[j] >= schar_min && expect[j] <= schar_max) {
-#line 625
+#line 609
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_SCHAR)){
-#line 625
+#line 609
 				error("value read not that expected");
-#line 625
+#line 609
 				if (verbose) {
-#line 625
+#line 609
 				    error("\n");
-#line 625
+#line 609
 				    error("varid: %d, ", i);
-#line 625
+#line 609
 				    error("var_name: %s, ", var_name[i]);
-#line 625
+#line 609
 				    error("element number: %d ", j);
-#line 625
+#line 609
                                     error("expect: %g, ", expect[j]);
-#line 625
+#line 609
 				    error("got: %g", (double) value[j]);
-#line 625
+#line 609
 				}
-#line 625
+#line 609
 			    } else {
-#line 625
+#line 609
 				nok++;
-#line 625
+#line 609
 			    }
-#line 625
+#line 609
 			}
-#line 625
+#line 609
 		    }
-#line 625
+#line 609
 		} else {
-#line 625
+#line 609
 		    IF (nels > 0 && err != NC_ECHAR)
-#line 625
+#line 609
 			error("wrong type: status = %d", err);
-#line 625
+#line 609
 		}
-#line 625
+#line 609
 	    }
-#line 625
+#line 609
 	}
-#line 625
+#line 609
 
-#line 625
+#line 609
     }
-#line 625
+#line 609
     err = nc_close(ncid);
-#line 625
+#line 609
     IF (err)
-#line 625
+#line 609
         error("nc_close: %s", nc_strerror(err));
-#line 625
+#line 609
     print_nok(nok);
-#line 625
+#line 609
 }
-#line 625
+#line 609
 
 void
-#line 626
+#line 610
 test_nc_get_vars_short(void)
-#line 626
+#line 610
 {
-#line 626
+#line 610
     int ncid;
-#line 626
+#line 610
     int d;
-#line 626
+#line 610
     int i;
-#line 626
+#line 610
     int j;
-#line 626
+#line 610
     int k;
-#line 626
+#line 610
     int m;
-#line 626
+#line 610
     int err;
-#line 626
+#line 610
     int allInExtRange;	/* all values within external range? */
-#line 626
+#line 610
     int allInIntRange;	/* all values within internal range? */
-#line 626
+#line 610
     int nels;
-#line 626
+#line 610
     int nslabs;
-#line 626
+#line 610
     int nstarts;        /* number of different starts */
-#line 626
+#line 610
     int nok = 0;      /* count of valid comparisons */
-#line 626
+#line 610
     size_t start[MAX_RANK];
-#line 626
+#line 610
     size_t edge[MAX_RANK];
-#line 626
+#line 610
     size_t index[MAX_RANK];
-#line 626
+#line 610
     size_t index2[MAX_RANK];
-#line 626
+#line 610
     size_t mid[MAX_RANK];
-#line 626
+#line 610
     size_t count[MAX_RANK];
-#line 626
+#line 610
     size_t sstride[MAX_RANK];
-#line 626
+#line 610
     ptrdiff_t stride[MAX_RANK];
-#line 626
+#line 610
     int canConvert;     /* Both text or both numeric */
-#line 626
+#line 610
     short value[MAX_NELS];
-#line 626
+#line 610
     double expect[MAX_NELS];
-#line 626
+#line 610
 
-#line 626
-#ifdef USE_PNETCDF
-#line 626
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 626
-#else
-#line 626
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 626
-#endif
-#line 626
+#line 610
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 610
     IF (err)
-#line 626
+#line 610
         error("nc_open: %s", nc_strerror(err));
-#line 626
+#line 610
     for (i = 0; i < numVars; i++) {
-#line 626
+#line 610
         canConvert = (var_type[i] == NC_CHAR) == (NCT_SHORT == NCT_TEXT);
-#line 626
+#line 610
         assert(var_rank[i] <= MAX_RANK);
-#line 626
+#line 610
         assert(var_nels[i] <= MAX_NELS);
-#line 626
+#line 610
         for (j = 0; j < var_rank[i]; j++) {
-#line 626
+#line 610
             start[j] = 0;
-#line 626
+#line 610
             edge[j] = 1;
-#line 626
+#line 610
             stride[j] = 1;
-#line 626
+#line 610
         }
-#line 626
+#line 610
         err = nc_get_vars_short(BAD_ID, i, start, edge, stride, value);
-#line 626
+#line 610
         IF (err != NC_EBADID)
-#line 626
+#line 610
             error("bad ncid: status = %d", err);
-#line 626
+#line 610
         err = nc_get_vars_short(ncid, BAD_VARID, start, edge, stride, value);
-#line 626
+#line 610
         IF (err != NC_ENOTVAR)
-#line 626
+#line 610
             error("bad var id: status = %d", err);
-#line 626
+#line 610
         for (j = 0; j < var_rank[i]; j++) {
-#line 626
+#line 610
             start[j] = var_shape[i][j];
-#line 626
+#line 610
             err = nc_get_vars_short(ncid, i, start, edge, stride, value);
-#line 626
+#line 610
 	  if(!canConvert) {
-#line 626
+#line 610
 		IF (err != NC_ECHAR)
-#line 626
+#line 610
                	    error("conversion: status = %d", err);
-#line 626
+#line 610
 	  } else {
-#line 626
+#line 610
             IF (err != NC_EINVALCOORDS)
-#line 626
+#line 610
                 error("bad index: status = %d", err);
-#line 626
+#line 610
             start[j] = 0;
-#line 626
+#line 610
             edge[j] = var_shape[i][j] + 1;
-#line 626
+#line 610
             err = nc_get_vars_short(ncid, i, start, edge, stride, value);
-#line 626
+#line 610
             IF (err != NC_EEDGE)
-#line 626
+#line 610
                 error("bad edge: status = %d", err);
-#line 626
+#line 610
             edge[j] = 1;
-#line 626
+#line 610
             stride[j] = 0;
-#line 626
+#line 610
             err = nc_get_vars_short(ncid, i, start, edge, stride, value);
-#line 626
+#line 610
             IF (err != NC_ESTRIDE)
-#line 626
+#line 610
                 error("bad stride: status = %d", err);
-#line 626
+#line 610
             stride[j] = 1;
-#line 626
+#line 610
 	  }
-#line 626
+#line 610
         }
-#line 626
+#line 610
             /* Choose a random point dividing each dim into 2 parts */
-#line 626
+#line 610
             /* get 2^rank (nslabs) slabs so defined */
-#line 626
+#line 610
         nslabs = 1;
-#line 626
+#line 610
         for (j = 0; j < var_rank[i]; j++) {
-#line 626
+#line 610
             mid[j] = roll( var_shape[i][j] );
-#line 626
+#line 610
             nslabs *= 2;
-#line 626
+#line 610
         }
-#line 626
+#line 610
             /* bits of k determine whether to get lower or upper part of dim */
-#line 626
+#line 610
             /* choose random stride from 1 to edge */
-#line 626
+#line 610
         for (k = 0; k < nslabs; k++) {
-#line 626
+#line 610
             nstarts = 1;
-#line 626
+#line 610
             for (j = 0; j < var_rank[i]; j++) {
-#line 626
+#line 610
                 if ((k >> j) & 1) {
-#line 626
+#line 610
                     start[j] = 0;
-#line 626
+#line 610
                     edge[j] = mid[j];
-#line 626
+#line 610
                 }else{
-#line 626
+#line 610
                     start[j] = mid[j];
-#line 626
+#line 610
                     edge[j] = var_shape[i][j] - mid[j];
-#line 626
+#line 610
                 }
-#line 626
+#line 610
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 626
+#line 610
                 nstarts *= stride[j];
-#line 626
+#line 610
             }
-#line 626
+#line 610
             for (m = 0; m < nstarts; m++) {
-#line 626
+#line 610
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 626
+#line 610
                 IF (err)
-#line 626
+#line 610
                     error("error in toMixedBase");
-#line 626
+#line 610
                 nels = 1;
-#line 626
+#line 610
                 for (j = 0; j < var_rank[i]; j++) {
-#line 626
+#line 610
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 626
+#line 610
                     nels *= count[j];
-#line 626
+#line 610
                     index[j] += start[j];
-#line 626
+#line 610
                 }
-#line 626
+#line 610
                         /* Random choice of forward or backward */
-#line 626
+#line 610
 /* TODO
-#line 626
+#line 610
                 if ( roll(2) ) {
-#line 626
+#line 610
                     for (j = 0; j < var_rank[i]; j++) {
-#line 626
+#line 610
                         index[j] += (count[j] - 1) * stride[j];
-#line 626
+#line 610
                         stride[j] = -stride[j];
-#line 626
+#line 610
                     }
-#line 626
+#line 610
                 }
-#line 626
+#line 610
 */
-#line 626
+#line 610
 		allInExtRange = allInIntRange = 1;
-#line 626
+#line 610
 		for (j = 0; j < nels; j++) {
-#line 626
+#line 610
 		    err = toMixedBase(j, var_rank[i], count, index2);
-#line 626
+#line 610
 		    IF (err)
-#line 626
+#line 610
 			error("error in toMixedBase 1");
-#line 626
+#line 610
 		    for (d = 0; d < var_rank[i]; d++)
-#line 626
+#line 610
 			index2[d] = index[d] + index2[d] * stride[d];
-#line 626
+#line 610
 		    expect[j] = hash4(var_type[i], var_rank[i], index2, 
-#line 626
+#line 610
 			NCT_SHORT);
-#line 626
+#line 610
 		    if (inRange3(expect[j],var_type[i],NCT_SHORT)) {
-#line 626
+#line 610
 			allInIntRange = allInIntRange && expect[j] >= short_min
-#line 626
+#line 610
 			    && expect[j] <= short_max;
-#line 626
+#line 610
 		    } else {
-#line 626
+#line 610
 			allInExtRange = 0;
-#line 626
+#line 610
 		    }
-#line 626
+#line 610
 		}
-#line 626
+#line 610
                 if (var_rank[i] == 0 && i%2 )
-#line 626
+#line 610
                     err = nc_get_vars_short(ncid, i, NULL, NULL, NULL, value);
-#line 626
+#line 610
                 else
-#line 626
+#line 610
                     err = nc_get_vars_short(ncid, i, index, count, stride, value);
-#line 626
+#line 610
 		if (canConvert) {
-#line 626
+#line 610
 		    if (allInExtRange) {
-#line 626
+#line 610
 			if (allInIntRange) {
-#line 626
+#line 610
 			    IF (err)
-#line 626
+#line 610
 				error("%s", nc_strerror(err));
-#line 626
+#line 610
 			} else {
-#line 626
+#line 610
 			    IF (err != NC_ERANGE)
-#line 626
+#line 610
 				error("Range error: status = %d", err);
-#line 626
+#line 610
 			}
-#line 626
+#line 610
 		    } else {
-#line 626
+#line 610
 			IF (err != 0 && err != NC_ERANGE)
-#line 626
+#line 610
 			    error("OK or Range error: status = %d", err);
-#line 626
+#line 610
 		    }
-#line 626
+#line 610
 		    for (j = 0; j < nels; j++) {
-#line 626
+#line 610
 			if (inRange3(expect[j],var_type[i],NCT_SHORT)
-#line 626
+#line 610
 				&& expect[j] >= short_min && expect[j] <= short_max) {
-#line 626
+#line 610
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_SHORT)){
-#line 626
+#line 610
 				error("value read not that expected");
-#line 626
+#line 610
 				if (verbose) {
-#line 626
+#line 610
 				    error("\n");
-#line 626
+#line 610
 				    error("varid: %d, ", i);
-#line 626
+#line 610
 				    error("var_name: %s, ", var_name[i]);
-#line 626
+#line 610
 				    error("element number: %d ", j);
-#line 626
+#line 610
                                     error("expect: %g, ", expect[j]);
-#line 626
+#line 610
 				    error("got: %g", (double) value[j]);
-#line 626
+#line 610
 				}
-#line 626
+#line 610
 			    } else {
-#line 626
+#line 610
 				nok++;
-#line 626
+#line 610
 			    }
-#line 626
+#line 610
 			}
-#line 626
+#line 610
 		    }
-#line 626
+#line 610
 		} else {
-#line 626
+#line 610
 		    IF (nels > 0 && err != NC_ECHAR)
-#line 626
+#line 610
 			error("wrong type: status = %d", err);
-#line 626
+#line 610
 		}
-#line 626
+#line 610
 	    }
-#line 626
+#line 610
 	}
-#line 626
+#line 610
 
-#line 626
+#line 610
     }
-#line 626
+#line 610
     err = nc_close(ncid);
-#line 626
+#line 610
     IF (err)
-#line 626
+#line 610
         error("nc_close: %s", nc_strerror(err));
-#line 626
+#line 610
     print_nok(nok);
-#line 626
+#line 610
 }
-#line 626
+#line 610
 
 void
-#line 627
+#line 611
 test_nc_get_vars_int(void)
-#line 627
+#line 611
 {
-#line 627
+#line 611
     int ncid;
-#line 627
+#line 611
     int d;
-#line 627
+#line 611
     int i;
-#line 627
+#line 611
     int j;
-#line 627
+#line 611
     int k;
-#line 627
+#line 611
     int m;
-#line 627
+#line 611
     int err;
-#line 627
+#line 611
     int allInExtRange;	/* all values within external range? */
-#line 627
+#line 611
     int allInIntRange;	/* all values within internal range? */
-#line 627
+#line 611
     int nels;
-#line 627
+#line 611
     int nslabs;
-#line 627
+#line 611
     int nstarts;        /* number of different starts */
-#line 627
+#line 611
     int nok = 0;      /* count of valid comparisons */
-#line 627
+#line 611
     size_t start[MAX_RANK];
-#line 627
+#line 611
     size_t edge[MAX_RANK];
-#line 627
+#line 611
     size_t index[MAX_RANK];
-#line 627
+#line 611
     size_t index2[MAX_RANK];
-#line 627
+#line 611
     size_t mid[MAX_RANK];
-#line 627
+#line 611
     size_t count[MAX_RANK];
-#line 627
+#line 611
     size_t sstride[MAX_RANK];
-#line 627
+#line 611
     ptrdiff_t stride[MAX_RANK];
-#line 627
+#line 611
     int canConvert;     /* Both text or both numeric */
-#line 627
+#line 611
     int value[MAX_NELS];
-#line 627
+#line 611
     double expect[MAX_NELS];
-#line 627
+#line 611
 
-#line 627
-#ifdef USE_PNETCDF
-#line 627
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 627
-#else
-#line 627
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 627
-#endif
-#line 627
+#line 611
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 611
     IF (err)
-#line 627
+#line 611
         error("nc_open: %s", nc_strerror(err));
-#line 627
+#line 611
     for (i = 0; i < numVars; i++) {
-#line 627
+#line 611
         canConvert = (var_type[i] == NC_CHAR) == (NCT_INT == NCT_TEXT);
-#line 627
+#line 611
         assert(var_rank[i] <= MAX_RANK);
-#line 627
+#line 611
         assert(var_nels[i] <= MAX_NELS);
-#line 627
+#line 611
         for (j = 0; j < var_rank[i]; j++) {
-#line 627
+#line 611
             start[j] = 0;
-#line 627
+#line 611
             edge[j] = 1;
-#line 627
+#line 611
             stride[j] = 1;
-#line 627
+#line 611
         }
-#line 627
+#line 611
         err = nc_get_vars_int(BAD_ID, i, start, edge, stride, value);
-#line 627
+#line 611
         IF (err != NC_EBADID)
-#line 627
+#line 611
             error("bad ncid: status = %d", err);
-#line 627
+#line 611
         err = nc_get_vars_int(ncid, BAD_VARID, start, edge, stride, value);
-#line 627
+#line 611
         IF (err != NC_ENOTVAR)
-#line 627
+#line 611
             error("bad var id: status = %d", err);
-#line 627
+#line 611
         for (j = 0; j < var_rank[i]; j++) {
-#line 627
+#line 611
             start[j] = var_shape[i][j];
-#line 627
+#line 611
             err = nc_get_vars_int(ncid, i, start, edge, stride, value);
-#line 627
+#line 611
 	  if(!canConvert) {
-#line 627
+#line 611
 		IF (err != NC_ECHAR)
-#line 627
+#line 611
                	    error("conversion: status = %d", err);
-#line 627
+#line 611
 	  } else {
-#line 627
+#line 611
             IF (err != NC_EINVALCOORDS)
-#line 627
+#line 611
                 error("bad index: status = %d", err);
-#line 627
+#line 611
             start[j] = 0;
-#line 627
+#line 611
             edge[j] = var_shape[i][j] + 1;
-#line 627
+#line 611
             err = nc_get_vars_int(ncid, i, start, edge, stride, value);
-#line 627
+#line 611
             IF (err != NC_EEDGE)
-#line 627
+#line 611
                 error("bad edge: status = %d", err);
-#line 627
+#line 611
             edge[j] = 1;
-#line 627
+#line 611
             stride[j] = 0;
-#line 627
+#line 611
             err = nc_get_vars_int(ncid, i, start, edge, stride, value);
-#line 627
+#line 611
             IF (err != NC_ESTRIDE)
-#line 627
+#line 611
                 error("bad stride: status = %d", err);
-#line 627
+#line 611
             stride[j] = 1;
-#line 627
+#line 611
 	  }
-#line 627
+#line 611
         }
-#line 627
+#line 611
             /* Choose a random point dividing each dim into 2 parts */
-#line 627
+#line 611
             /* get 2^rank (nslabs) slabs so defined */
-#line 627
+#line 611
         nslabs = 1;
-#line 627
+#line 611
         for (j = 0; j < var_rank[i]; j++) {
-#line 627
+#line 611
             mid[j] = roll( var_shape[i][j] );
-#line 627
+#line 611
             nslabs *= 2;
-#line 627
+#line 611
         }
-#line 627
+#line 611
             /* bits of k determine whether to get lower or upper part of dim */
-#line 627
+#line 611
             /* choose random stride from 1 to edge */
-#line 627
+#line 611
         for (k = 0; k < nslabs; k++) {
-#line 627
+#line 611
             nstarts = 1;
-#line 627
+#line 611
             for (j = 0; j < var_rank[i]; j++) {
-#line 627
+#line 611
                 if ((k >> j) & 1) {
-#line 627
+#line 611
                     start[j] = 0;
-#line 627
+#line 611
                     edge[j] = mid[j];
-#line 627
+#line 611
                 }else{
-#line 627
+#line 611
                     start[j] = mid[j];
-#line 627
+#line 611
                     edge[j] = var_shape[i][j] - mid[j];
-#line 627
+#line 611
                 }
-#line 627
+#line 611
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 627
+#line 611
                 nstarts *= stride[j];
-#line 627
+#line 611
             }
-#line 627
+#line 611
             for (m = 0; m < nstarts; m++) {
-#line 627
+#line 611
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 627
+#line 611
                 IF (err)
-#line 627
+#line 611
                     error("error in toMixedBase");
-#line 627
+#line 611
                 nels = 1;
-#line 627
+#line 611
                 for (j = 0; j < var_rank[i]; j++) {
-#line 627
+#line 611
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 627
+#line 611
                     nels *= count[j];
-#line 627
+#line 611
                     index[j] += start[j];
-#line 627
+#line 611
                 }
-#line 627
+#line 611
                         /* Random choice of forward or backward */
-#line 627
+#line 611
 /* TODO
-#line 627
+#line 611
                 if ( roll(2) ) {
-#line 627
+#line 611
                     for (j = 0; j < var_rank[i]; j++) {
-#line 627
+#line 611
                         index[j] += (count[j] - 1) * stride[j];
-#line 627
+#line 611
                         stride[j] = -stride[j];
-#line 627
+#line 611
                     }
-#line 627
+#line 611
                 }
-#line 627
+#line 611
 */
-#line 627
+#line 611
 		allInExtRange = allInIntRange = 1;
-#line 627
+#line 611
 		for (j = 0; j < nels; j++) {
-#line 627
+#line 611
 		    err = toMixedBase(j, var_rank[i], count, index2);
-#line 627
+#line 611
 		    IF (err)
-#line 627
+#line 611
 			error("error in toMixedBase 1");
-#line 627
+#line 611
 		    for (d = 0; d < var_rank[i]; d++)
-#line 627
+#line 611
 			index2[d] = index[d] + index2[d] * stride[d];
-#line 627
+#line 611
 		    expect[j] = hash4(var_type[i], var_rank[i], index2, 
-#line 627
+#line 611
 			NCT_INT);
-#line 627
+#line 611
 		    if (inRange3(expect[j],var_type[i],NCT_INT)) {
-#line 627
+#line 611
 			allInIntRange = allInIntRange && expect[j] >= int_min
-#line 627
+#line 611
 			    && expect[j] <= int_max;
-#line 627
+#line 611
 		    } else {
-#line 627
+#line 611
 			allInExtRange = 0;
-#line 627
+#line 611
 		    }
-#line 627
+#line 611
 		}
-#line 627
+#line 611
                 if (var_rank[i] == 0 && i%2 )
-#line 627
+#line 611
                     err = nc_get_vars_int(ncid, i, NULL, NULL, NULL, value);
-#line 627
+#line 611
                 else
-#line 627
+#line 611
                     err = nc_get_vars_int(ncid, i, index, count, stride, value);
-#line 627
+#line 611
 		if (canConvert) {
-#line 627
+#line 611
 		    if (allInExtRange) {
-#line 627
+#line 611
 			if (allInIntRange) {
-#line 627
+#line 611
 			    IF (err)
-#line 627
+#line 611
 				error("%s", nc_strerror(err));
-#line 627
+#line 611
 			} else {
-#line 627
+#line 611
 			    IF (err != NC_ERANGE)
-#line 627
+#line 611
 				error("Range error: status = %d", err);
-#line 627
+#line 611
 			}
-#line 627
+#line 611
 		    } else {
-#line 627
+#line 611
 			IF (err != 0 && err != NC_ERANGE)
-#line 627
+#line 611
 			    error("OK or Range error: status = %d", err);
-#line 627
+#line 611
 		    }
-#line 627
+#line 611
 		    for (j = 0; j < nels; j++) {
-#line 627
+#line 611
 			if (inRange3(expect[j],var_type[i],NCT_INT)
-#line 627
+#line 611
 				&& expect[j] >= int_min && expect[j] <= int_max) {
-#line 627
+#line 611
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_INT)){
-#line 627
+#line 611
 				error("value read not that expected");
-#line 627
+#line 611
 				if (verbose) {
-#line 627
+#line 611
 				    error("\n");
-#line 627
+#line 611
 				    error("varid: %d, ", i);
-#line 627
+#line 611
 				    error("var_name: %s, ", var_name[i]);
-#line 627
+#line 611
 				    error("element number: %d ", j);
-#line 627
+#line 611
                                     error("expect: %g, ", expect[j]);
-#line 627
+#line 611
 				    error("got: %g", (double) value[j]);
-#line 627
+#line 611
 				}
-#line 627
+#line 611
 			    } else {
-#line 627
+#line 611
 				nok++;
-#line 627
+#line 611
 			    }
-#line 627
+#line 611
 			}
-#line 627
+#line 611
 		    }
-#line 627
+#line 611
 		} else {
-#line 627
+#line 611
 		    IF (nels > 0 && err != NC_ECHAR)
-#line 627
+#line 611
 			error("wrong type: status = %d", err);
-#line 627
+#line 611
 		}
-#line 627
+#line 611
 	    }
-#line 627
+#line 611
 	}
-#line 627
+#line 611
 
-#line 627
+#line 611
     }
-#line 627
+#line 611
     err = nc_close(ncid);
-#line 627
+#line 611
     IF (err)
-#line 627
+#line 611
         error("nc_close: %s", nc_strerror(err));
-#line 627
+#line 611
     print_nok(nok);
-#line 627
+#line 611
 }
-#line 627
+#line 611
 
 void
-#line 628
+#line 612
 test_nc_get_vars_long(void)
-#line 628
+#line 612
 {
-#line 628
+#line 612
     int ncid;
-#line 628
+#line 612
     int d;
-#line 628
+#line 612
     int i;
-#line 628
+#line 612
     int j;
-#line 628
+#line 612
     int k;
-#line 628
+#line 612
     int m;
-#line 628
+#line 612
     int err;
-#line 628
+#line 612
     int allInExtRange;	/* all values within external range? */
-#line 628
+#line 612
     int allInIntRange;	/* all values within internal range? */
-#line 628
+#line 612
     int nels;
-#line 628
+#line 612
     int nslabs;
-#line 628
+#line 612
     int nstarts;        /* number of different starts */
-#line 628
+#line 612
     int nok = 0;      /* count of valid comparisons */
-#line 628
+#line 612
     size_t start[MAX_RANK];
-#line 628
+#line 612
     size_t edge[MAX_RANK];
-#line 628
+#line 612
     size_t index[MAX_RANK];
-#line 628
+#line 612
     size_t index2[MAX_RANK];
-#line 628
+#line 612
     size_t mid[MAX_RANK];
-#line 628
+#line 612
     size_t count[MAX_RANK];
-#line 628
+#line 612
     size_t sstride[MAX_RANK];
-#line 628
+#line 612
     ptrdiff_t stride[MAX_RANK];
-#line 628
+#line 612
     int canConvert;     /* Both text or both numeric */
-#line 628
+#line 612
     long value[MAX_NELS];
-#line 628
+#line 612
     double expect[MAX_NELS];
-#line 628
+#line 612
 
-#line 628
-#ifdef USE_PNETCDF
-#line 628
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 628
-#else
-#line 628
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 628
-#endif
-#line 628
+#line 612
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 612
     IF (err)
-#line 628
+#line 612
         error("nc_open: %s", nc_strerror(err));
-#line 628
+#line 612
     for (i = 0; i < numVars; i++) {
-#line 628
+#line 612
         canConvert = (var_type[i] == NC_CHAR) == (NCT_LONG == NCT_TEXT);
-#line 628
+#line 612
         assert(var_rank[i] <= MAX_RANK);
-#line 628
+#line 612
         assert(var_nels[i] <= MAX_NELS);
-#line 628
+#line 612
         for (j = 0; j < var_rank[i]; j++) {
-#line 628
+#line 612
             start[j] = 0;
-#line 628
+#line 612
             edge[j] = 1;
-#line 628
+#line 612
             stride[j] = 1;
-#line 628
+#line 612
         }
-#line 628
+#line 612
         err = nc_get_vars_long(BAD_ID, i, start, edge, stride, value);
-#line 628
+#line 612
         IF (err != NC_EBADID)
-#line 628
+#line 612
             error("bad ncid: status = %d", err);
-#line 628
+#line 612
         err = nc_get_vars_long(ncid, BAD_VARID, start, edge, stride, value);
-#line 628
+#line 612
         IF (err != NC_ENOTVAR)
-#line 628
+#line 612
             error("bad var id: status = %d", err);
-#line 628
+#line 612
         for (j = 0; j < var_rank[i]; j++) {
-#line 628
+#line 612
             start[j] = var_shape[i][j];
-#line 628
+#line 612
             err = nc_get_vars_long(ncid, i, start, edge, stride, value);
-#line 628
+#line 612
 	  if(!canConvert) {
-#line 628
+#line 612
 		IF (err != NC_ECHAR)
-#line 628
+#line 612
                	    error("conversion: status = %d", err);
-#line 628
+#line 612
 	  } else {
-#line 628
+#line 612
             IF (err != NC_EINVALCOORDS)
-#line 628
+#line 612
                 error("bad index: status = %d", err);
-#line 628
+#line 612
             start[j] = 0;
-#line 628
+#line 612
             edge[j] = var_shape[i][j] + 1;
-#line 628
+#line 612
             err = nc_get_vars_long(ncid, i, start, edge, stride, value);
-#line 628
+#line 612
             IF (err != NC_EEDGE)
-#line 628
+#line 612
                 error("bad edge: status = %d", err);
-#line 628
+#line 612
             edge[j] = 1;
-#line 628
+#line 612
             stride[j] = 0;
-#line 628
+#line 612
             err = nc_get_vars_long(ncid, i, start, edge, stride, value);
-#line 628
+#line 612
             IF (err != NC_ESTRIDE)
-#line 628
+#line 612
                 error("bad stride: status = %d", err);
-#line 628
+#line 612
             stride[j] = 1;
-#line 628
+#line 612
 	  }
-#line 628
+#line 612
         }
-#line 628
+#line 612
             /* Choose a random point dividing each dim into 2 parts */
-#line 628
+#line 612
             /* get 2^rank (nslabs) slabs so defined */
-#line 628
+#line 612
         nslabs = 1;
-#line 628
+#line 612
         for (j = 0; j < var_rank[i]; j++) {
-#line 628
+#line 612
             mid[j] = roll( var_shape[i][j] );
-#line 628
+#line 612
             nslabs *= 2;
-#line 628
+#line 612
         }
-#line 628
+#line 612
             /* bits of k determine whether to get lower or upper part of dim */
-#line 628
+#line 612
             /* choose random stride from 1 to edge */
-#line 628
+#line 612
         for (k = 0; k < nslabs; k++) {
-#line 628
+#line 612
             nstarts = 1;
-#line 628
+#line 612
             for (j = 0; j < var_rank[i]; j++) {
-#line 628
+#line 612
                 if ((k >> j) & 1) {
-#line 628
+#line 612
                     start[j] = 0;
-#line 628
+#line 612
                     edge[j] = mid[j];
-#line 628
+#line 612
                 }else{
-#line 628
+#line 612
                     start[j] = mid[j];
-#line 628
+#line 612
                     edge[j] = var_shape[i][j] - mid[j];
-#line 628
+#line 612
                 }
-#line 628
+#line 612
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 628
+#line 612
                 nstarts *= stride[j];
-#line 628
+#line 612
             }
-#line 628
+#line 612
             for (m = 0; m < nstarts; m++) {
-#line 628
+#line 612
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 628
+#line 612
                 IF (err)
-#line 628
+#line 612
                     error("error in toMixedBase");
-#line 628
+#line 612
                 nels = 1;
-#line 628
+#line 612
                 for (j = 0; j < var_rank[i]; j++) {
-#line 628
+#line 612
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 628
+#line 612
                     nels *= count[j];
-#line 628
+#line 612
                     index[j] += start[j];
-#line 628
+#line 612
                 }
-#line 628
+#line 612
                         /* Random choice of forward or backward */
-#line 628
+#line 612
 /* TODO
-#line 628
+#line 612
                 if ( roll(2) ) {
-#line 628
+#line 612
                     for (j = 0; j < var_rank[i]; j++) {
-#line 628
+#line 612
                         index[j] += (count[j] - 1) * stride[j];
-#line 628
+#line 612
                         stride[j] = -stride[j];
-#line 628
+#line 612
                     }
-#line 628
+#line 612
                 }
-#line 628
+#line 612
 */
-#line 628
+#line 612
 		allInExtRange = allInIntRange = 1;
-#line 628
+#line 612
 		for (j = 0; j < nels; j++) {
-#line 628
+#line 612
 		    err = toMixedBase(j, var_rank[i], count, index2);
-#line 628
+#line 612
 		    IF (err)
-#line 628
+#line 612
 			error("error in toMixedBase 1");
-#line 628
+#line 612
 		    for (d = 0; d < var_rank[i]; d++)
-#line 628
+#line 612
 			index2[d] = index[d] + index2[d] * stride[d];
-#line 628
+#line 612
 		    expect[j] = hash4(var_type[i], var_rank[i], index2, 
-#line 628
+#line 612
 			NCT_LONG);
-#line 628
+#line 612
 		    if (inRange3(expect[j],var_type[i],NCT_LONG)) {
-#line 628
+#line 612
 			allInIntRange = allInIntRange && expect[j] >= long_min
-#line 628
+#line 612
 			    && expect[j] <= long_max;
-#line 628
+#line 612
 		    } else {
-#line 628
+#line 612
 			allInExtRange = 0;
-#line 628
+#line 612
 		    }
-#line 628
+#line 612
 		}
-#line 628
+#line 612
                 if (var_rank[i] == 0 && i%2 )
-#line 628
+#line 612
                     err = nc_get_vars_long(ncid, i, NULL, NULL, NULL, value);
-#line 628
+#line 612
                 else
-#line 628
+#line 612
                     err = nc_get_vars_long(ncid, i, index, count, stride, value);
-#line 628
+#line 612
 		if (canConvert) {
-#line 628
+#line 612
 		    if (allInExtRange) {
-#line 628
+#line 612
 			if (allInIntRange) {
-#line 628
+#line 612
 			    IF (err)
-#line 628
+#line 612
 				error("%s", nc_strerror(err));
-#line 628
+#line 612
 			} else {
-#line 628
+#line 612
 			    IF (err != NC_ERANGE)
-#line 628
+#line 612
 				error("Range error: status = %d", err);
-#line 628
+#line 612
 			}
-#line 628
+#line 612
 		    } else {
-#line 628
+#line 612
 			IF (err != 0 && err != NC_ERANGE)
-#line 628
+#line 612
 			    error("OK or Range error: status = %d", err);
-#line 628
+#line 612
 		    }
-#line 628
+#line 612
 		    for (j = 0; j < nels; j++) {
-#line 628
+#line 612
 			if (inRange3(expect[j],var_type[i],NCT_LONG)
-#line 628
+#line 612
 				&& expect[j] >= long_min && expect[j] <= long_max) {
-#line 628
+#line 612
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_LONG)){
-#line 628
+#line 612
 				error("value read not that expected");
-#line 628
+#line 612
 				if (verbose) {
-#line 628
+#line 612
 				    error("\n");
-#line 628
+#line 612
 				    error("varid: %d, ", i);
-#line 628
+#line 612
 				    error("var_name: %s, ", var_name[i]);
-#line 628
+#line 612
 				    error("element number: %d ", j);
-#line 628
+#line 612
                                     error("expect: %g, ", expect[j]);
-#line 628
+#line 612
 				    error("got: %g", (double) value[j]);
-#line 628
+#line 612
 				}
-#line 628
+#line 612
 			    } else {
-#line 628
+#line 612
 				nok++;
-#line 628
+#line 612
 			    }
-#line 628
+#line 612
 			}
-#line 628
+#line 612
 		    }
-#line 628
+#line 612
 		} else {
-#line 628
+#line 612
 		    IF (nels > 0 && err != NC_ECHAR)
-#line 628
+#line 612
 			error("wrong type: status = %d", err);
-#line 628
+#line 612
 		}
-#line 628
+#line 612
 	    }
-#line 628
+#line 612
 	}
-#line 628
+#line 612
 
-#line 628
+#line 612
     }
-#line 628
+#line 612
     err = nc_close(ncid);
-#line 628
+#line 612
     IF (err)
-#line 628
+#line 612
         error("nc_close: %s", nc_strerror(err));
-#line 628
+#line 612
     print_nok(nok);
-#line 628
+#line 612
 }
-#line 628
+#line 612
 
 void
-#line 629
+#line 613
 test_nc_get_vars_float(void)
-#line 629
+#line 613
 {
-#line 629
+#line 613
     int ncid;
-#line 629
+#line 613
     int d;
-#line 629
+#line 613
     int i;
-#line 629
+#line 613
     int j;
-#line 629
+#line 613
     int k;
-#line 629
+#line 613
     int m;
-#line 629
+#line 613
     int err;
-#line 629
+#line 613
     int allInExtRange;	/* all values within external range? */
-#line 629
+#line 613
     int allInIntRange;	/* all values within internal range? */
-#line 629
+#line 613
     int nels;
-#line 629
+#line 613
     int nslabs;
-#line 629
+#line 613
     int nstarts;        /* number of different starts */
-#line 629
+#line 613
     int nok = 0;      /* count of valid comparisons */
-#line 629
+#line 613
     size_t start[MAX_RANK];
-#line 629
+#line 613
     size_t edge[MAX_RANK];
-#line 629
+#line 613
     size_t index[MAX_RANK];
-#line 629
+#line 613
     size_t index2[MAX_RANK];
-#line 629
+#line 613
     size_t mid[MAX_RANK];
-#line 629
+#line 613
     size_t count[MAX_RANK];
-#line 629
+#line 613
     size_t sstride[MAX_RANK];
-#line 629
+#line 613
     ptrdiff_t stride[MAX_RANK];
-#line 629
+#line 613
     int canConvert;     /* Both text or both numeric */
-#line 629
+#line 613
     float value[MAX_NELS];
-#line 629
+#line 613
     double expect[MAX_NELS];
-#line 629
+#line 613
 
-#line 629
-#ifdef USE_PNETCDF
-#line 629
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 629
-#else
-#line 629
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 629
-#endif
-#line 629
+#line 613
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 613
     IF (err)
-#line 629
+#line 613
         error("nc_open: %s", nc_strerror(err));
-#line 629
+#line 613
     for (i = 0; i < numVars; i++) {
-#line 629
+#line 613
         canConvert = (var_type[i] == NC_CHAR) == (NCT_FLOAT == NCT_TEXT);
-#line 629
+#line 613
         assert(var_rank[i] <= MAX_RANK);
-#line 629
+#line 613
         assert(var_nels[i] <= MAX_NELS);
-#line 629
+#line 613
         for (j = 0; j < var_rank[i]; j++) {
-#line 629
+#line 613
             start[j] = 0;
-#line 629
+#line 613
             edge[j] = 1;
-#line 629
+#line 613
             stride[j] = 1;
-#line 629
+#line 613
         }
-#line 629
+#line 613
         err = nc_get_vars_float(BAD_ID, i, start, edge, stride, value);
-#line 629
+#line 613
         IF (err != NC_EBADID)
-#line 629
+#line 613
             error("bad ncid: status = %d", err);
-#line 629
+#line 613
         err = nc_get_vars_float(ncid, BAD_VARID, start, edge, stride, value);
-#line 629
+#line 613
         IF (err != NC_ENOTVAR)
-#line 629
+#line 613
             error("bad var id: status = %d", err);
-#line 629
+#line 613
         for (j = 0; j < var_rank[i]; j++) {
-#line 629
+#line 613
             start[j] = var_shape[i][j];
-#line 629
+#line 613
             err = nc_get_vars_float(ncid, i, start, edge, stride, value);
-#line 629
+#line 613
 	  if(!canConvert) {
-#line 629
+#line 613
 		IF (err != NC_ECHAR)
-#line 629
+#line 613
                	    error("conversion: status = %d", err);
-#line 629
+#line 613
 	  } else {
-#line 629
+#line 613
             IF (err != NC_EINVALCOORDS)
-#line 629
+#line 613
                 error("bad index: status = %d", err);
-#line 629
+#line 613
             start[j] = 0;
-#line 629
+#line 613
             edge[j] = var_shape[i][j] + 1;
-#line 629
+#line 613
             err = nc_get_vars_float(ncid, i, start, edge, stride, value);
-#line 629
+#line 613
             IF (err != NC_EEDGE)
-#line 629
+#line 613
                 error("bad edge: status = %d", err);
-#line 629
+#line 613
             edge[j] = 1;
-#line 629
+#line 613
             stride[j] = 0;
-#line 629
+#line 613
             err = nc_get_vars_float(ncid, i, start, edge, stride, value);
-#line 629
+#line 613
             IF (err != NC_ESTRIDE)
-#line 629
+#line 613
                 error("bad stride: status = %d", err);
-#line 629
+#line 613
             stride[j] = 1;
-#line 629
+#line 613
 	  }
-#line 629
+#line 613
         }
-#line 629
+#line 613
             /* Choose a random point dividing each dim into 2 parts */
-#line 629
+#line 613
             /* get 2^rank (nslabs) slabs so defined */
-#line 629
+#line 613
         nslabs = 1;
-#line 629
+#line 613
         for (j = 0; j < var_rank[i]; j++) {
-#line 629
+#line 613
             mid[j] = roll( var_shape[i][j] );
-#line 629
+#line 613
             nslabs *= 2;
-#line 629
+#line 613
         }
-#line 629
+#line 613
             /* bits of k determine whether to get lower or upper part of dim */
-#line 629
+#line 613
             /* choose random stride from 1 to edge */
-#line 629
+#line 613
         for (k = 0; k < nslabs; k++) {
-#line 629
+#line 613
             nstarts = 1;
-#line 629
+#line 613
             for (j = 0; j < var_rank[i]; j++) {
-#line 629
+#line 613
                 if ((k >> j) & 1) {
-#line 629
+#line 613
                     start[j] = 0;
-#line 629
+#line 613
                     edge[j] = mid[j];
-#line 629
+#line 613
                 }else{
-#line 629
+#line 613
                     start[j] = mid[j];
-#line 629
+#line 613
                     edge[j] = var_shape[i][j] - mid[j];
-#line 629
+#line 613
                 }
-#line 629
+#line 613
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 629
+#line 613
                 nstarts *= stride[j];
-#line 629
+#line 613
             }
-#line 629
+#line 613
             for (m = 0; m < nstarts; m++) {
-#line 629
+#line 613
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 629
+#line 613
                 IF (err)
-#line 629
+#line 613
                     error("error in toMixedBase");
-#line 629
+#line 613
                 nels = 1;
-#line 629
+#line 613
                 for (j = 0; j < var_rank[i]; j++) {
-#line 629
+#line 613
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 629
+#line 613
                     nels *= count[j];
-#line 629
+#line 613
                     index[j] += start[j];
-#line 629
+#line 613
                 }
-#line 629
+#line 613
                         /* Random choice of forward or backward */
-#line 629
+#line 613
 /* TODO
-#line 629
+#line 613
                 if ( roll(2) ) {
-#line 629
+#line 613
                     for (j = 0; j < var_rank[i]; j++) {
-#line 629
+#line 613
                         index[j] += (count[j] - 1) * stride[j];
-#line 629
+#line 613
                         stride[j] = -stride[j];
-#line 629
+#line 613
                     }
-#line 629
+#line 613
                 }
-#line 629
+#line 613
 */
-#line 629
+#line 613
 		allInExtRange = allInIntRange = 1;
-#line 629
+#line 613
 		for (j = 0; j < nels; j++) {
-#line 629
+#line 613
 		    err = toMixedBase(j, var_rank[i], count, index2);
-#line 629
+#line 613
 		    IF (err)
-#line 629
+#line 613
 			error("error in toMixedBase 1");
-#line 629
+#line 613
 		    for (d = 0; d < var_rank[i]; d++)
-#line 629
+#line 613
 			index2[d] = index[d] + index2[d] * stride[d];
-#line 629
+#line 613
 		    expect[j] = hash4(var_type[i], var_rank[i], index2, 
-#line 629
+#line 613
 			NCT_FLOAT);
-#line 629
+#line 613
 		    if (inRange3(expect[j],var_type[i],NCT_FLOAT)) {
-#line 629
+#line 613
 			allInIntRange = allInIntRange && expect[j] >= float_min
-#line 629
+#line 613
 			    && expect[j] <= float_max;
-#line 629
+#line 613
 		    } else {
-#line 629
+#line 613
 			allInExtRange = 0;
-#line 629
+#line 613
 		    }
-#line 629
+#line 613
 		}
-#line 629
+#line 613
                 if (var_rank[i] == 0 && i%2 )
-#line 629
+#line 613
                     err = nc_get_vars_float(ncid, i, NULL, NULL, NULL, value);
-#line 629
+#line 613
                 else
-#line 629
+#line 613
                     err = nc_get_vars_float(ncid, i, index, count, stride, value);
-#line 629
+#line 613
 		if (canConvert) {
-#line 629
+#line 613
 		    if (allInExtRange) {
-#line 629
+#line 613
 			if (allInIntRange) {
-#line 629
+#line 613
 			    IF (err)
-#line 629
+#line 613
 				error("%s", nc_strerror(err));
-#line 629
+#line 613
 			} else {
-#line 629
+#line 613
 			    IF (err != NC_ERANGE)
-#line 629
+#line 613
 				error("Range error: status = %d", err);
-#line 629
+#line 613
 			}
-#line 629
+#line 613
 		    } else {
-#line 629
+#line 613
 			IF (err != 0 && err != NC_ERANGE)
-#line 629
+#line 613
 			    error("OK or Range error: status = %d", err);
-#line 629
+#line 613
 		    }
-#line 629
+#line 613
 		    for (j = 0; j < nels; j++) {
-#line 629
+#line 613
 			if (inRange3(expect[j],var_type[i],NCT_FLOAT)
-#line 629
+#line 613
 				&& expect[j] >= float_min && expect[j] <= float_max) {
-#line 629
+#line 613
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_FLOAT)){
-#line 629
+#line 613
 				error("value read not that expected");
-#line 629
+#line 613
 				if (verbose) {
-#line 629
+#line 613
 				    error("\n");
-#line 629
+#line 613
 				    error("varid: %d, ", i);
-#line 629
+#line 613
 				    error("var_name: %s, ", var_name[i]);
-#line 629
+#line 613
 				    error("element number: %d ", j);
-#line 629
+#line 613
                                     error("expect: %g, ", expect[j]);
-#line 629
+#line 613
 				    error("got: %g", (double) value[j]);
-#line 629
+#line 613
 				}
-#line 629
+#line 613
 			    } else {
-#line 629
+#line 613
 				nok++;
-#line 629
+#line 613
 			    }
-#line 629
+#line 613
 			}
-#line 629
+#line 613
 		    }
-#line 629
+#line 613
 		} else {
-#line 629
+#line 613
 		    IF (nels > 0 && err != NC_ECHAR)
-#line 629
+#line 613
 			error("wrong type: status = %d", err);
-#line 629
+#line 613
 		}
-#line 629
+#line 613
 	    }
-#line 629
+#line 613
 	}
-#line 629
+#line 613
 
-#line 629
+#line 613
     }
-#line 629
+#line 613
     err = nc_close(ncid);
-#line 629
+#line 613
     IF (err)
-#line 629
+#line 613
         error("nc_close: %s", nc_strerror(err));
-#line 629
+#line 613
     print_nok(nok);
-#line 629
+#line 613
 }
-#line 629
+#line 613
 
 void
-#line 630
+#line 614
 test_nc_get_vars_double(void)
-#line 630
+#line 614
 {
-#line 630
+#line 614
     int ncid;
-#line 630
+#line 614
     int d;
-#line 630
+#line 614
     int i;
-#line 630
+#line 614
     int j;
-#line 630
+#line 614
     int k;
-#line 630
+#line 614
     int m;
-#line 630
+#line 614
     int err;
-#line 630
+#line 614
     int allInExtRange;	/* all values within external range? */
-#line 630
+#line 614
     int allInIntRange;	/* all values within internal range? */
-#line 630
+#line 614
     int nels;
-#line 630
+#line 614
     int nslabs;
-#line 630
+#line 614
     int nstarts;        /* number of different starts */
-#line 630
+#line 614
     int nok = 0;      /* count of valid comparisons */
-#line 630
+#line 614
     size_t start[MAX_RANK];
-#line 630
+#line 614
     size_t edge[MAX_RANK];
-#line 630
+#line 614
     size_t index[MAX_RANK];
-#line 630
+#line 614
     size_t index2[MAX_RANK];
-#line 630
+#line 614
     size_t mid[MAX_RANK];
-#line 630
+#line 614
     size_t count[MAX_RANK];
-#line 630
+#line 614
     size_t sstride[MAX_RANK];
-#line 630
+#line 614
     ptrdiff_t stride[MAX_RANK];
-#line 630
+#line 614
     int canConvert;     /* Both text or both numeric */
-#line 630
+#line 614
     double value[MAX_NELS];
-#line 630
+#line 614
     double expect[MAX_NELS];
-#line 630
+#line 614
 
-#line 630
-#ifdef USE_PNETCDF
-#line 630
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 630
-#else
-#line 630
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 630
-#endif
-#line 630
+#line 614
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 614
     IF (err)
-#line 630
+#line 614
         error("nc_open: %s", nc_strerror(err));
-#line 630
+#line 614
     for (i = 0; i < numVars; i++) {
-#line 630
+#line 614
         canConvert = (var_type[i] == NC_CHAR) == (NCT_DOUBLE == NCT_TEXT);
-#line 630
+#line 614
         assert(var_rank[i] <= MAX_RANK);
-#line 630
+#line 614
         assert(var_nels[i] <= MAX_NELS);
-#line 630
+#line 614
         for (j = 0; j < var_rank[i]; j++) {
-#line 630
+#line 614
             start[j] = 0;
-#line 630
+#line 614
             edge[j] = 1;
-#line 630
+#line 614
             stride[j] = 1;
-#line 630
+#line 614
         }
-#line 630
+#line 614
         err = nc_get_vars_double(BAD_ID, i, start, edge, stride, value);
-#line 630
+#line 614
         IF (err != NC_EBADID)
-#line 630
+#line 614
             error("bad ncid: status = %d", err);
-#line 630
+#line 614
         err = nc_get_vars_double(ncid, BAD_VARID, start, edge, stride, value);
-#line 630
+#line 614
         IF (err != NC_ENOTVAR)
-#line 630
+#line 614
             error("bad var id: status = %d", err);
-#line 630
+#line 614
         for (j = 0; j < var_rank[i]; j++) {
-#line 630
+#line 614
             start[j] = var_shape[i][j];
-#line 630
+#line 614
             err = nc_get_vars_double(ncid, i, start, edge, stride, value);
-#line 630
+#line 614
 	  if(!canConvert) {
-#line 630
+#line 614
 		IF (err != NC_ECHAR)
-#line 630
+#line 614
                	    error("conversion: status = %d", err);
-#line 630
+#line 614
 	  } else {
-#line 630
+#line 614
             IF (err != NC_EINVALCOORDS)
-#line 630
+#line 614
                 error("bad index: status = %d", err);
-#line 630
+#line 614
             start[j] = 0;
-#line 630
+#line 614
             edge[j] = var_shape[i][j] + 1;
-#line 630
+#line 614
             err = nc_get_vars_double(ncid, i, start, edge, stride, value);
-#line 630
+#line 614
             IF (err != NC_EEDGE)
-#line 630
+#line 614
                 error("bad edge: status = %d", err);
-#line 630
+#line 614
             edge[j] = 1;
-#line 630
+#line 614
             stride[j] = 0;
-#line 630
+#line 614
             err = nc_get_vars_double(ncid, i, start, edge, stride, value);
-#line 630
+#line 614
             IF (err != NC_ESTRIDE)
-#line 630
+#line 614
                 error("bad stride: status = %d", err);
-#line 630
+#line 614
             stride[j] = 1;
-#line 630
+#line 614
 	  }
-#line 630
+#line 614
         }
-#line 630
+#line 614
             /* Choose a random point dividing each dim into 2 parts */
-#line 630
+#line 614
             /* get 2^rank (nslabs) slabs so defined */
-#line 630
+#line 614
         nslabs = 1;
-#line 630
+#line 614
         for (j = 0; j < var_rank[i]; j++) {
-#line 630
+#line 614
             mid[j] = roll( var_shape[i][j] );
-#line 630
+#line 614
             nslabs *= 2;
-#line 630
+#line 614
         }
-#line 630
+#line 614
             /* bits of k determine whether to get lower or upper part of dim */
-#line 630
+#line 614
             /* choose random stride from 1 to edge */
-#line 630
+#line 614
         for (k = 0; k < nslabs; k++) {
-#line 630
+#line 614
             nstarts = 1;
-#line 630
+#line 614
             for (j = 0; j < var_rank[i]; j++) {
-#line 630
+#line 614
                 if ((k >> j) & 1) {
-#line 630
+#line 614
                     start[j] = 0;
-#line 630
+#line 614
                     edge[j] = mid[j];
-#line 630
+#line 614
                 }else{
-#line 630
+#line 614
                     start[j] = mid[j];
-#line 630
+#line 614
                     edge[j] = var_shape[i][j] - mid[j];
-#line 630
+#line 614
                 }
-#line 630
+#line 614
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 630
+#line 614
                 nstarts *= stride[j];
-#line 630
+#line 614
             }
-#line 630
+#line 614
             for (m = 0; m < nstarts; m++) {
-#line 630
+#line 614
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 630
+#line 614
                 IF (err)
-#line 630
+#line 614
                     error("error in toMixedBase");
-#line 630
+#line 614
                 nels = 1;
-#line 630
+#line 614
                 for (j = 0; j < var_rank[i]; j++) {
-#line 630
+#line 614
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 630
+#line 614
                     nels *= count[j];
-#line 630
+#line 614
                     index[j] += start[j];
-#line 630
+#line 614
                 }
-#line 630
+#line 614
                         /* Random choice of forward or backward */
-#line 630
+#line 614
 /* TODO
-#line 630
+#line 614
                 if ( roll(2) ) {
-#line 630
+#line 614
                     for (j = 0; j < var_rank[i]; j++) {
-#line 630
+#line 614
                         index[j] += (count[j] - 1) * stride[j];
-#line 630
+#line 614
                         stride[j] = -stride[j];
-#line 630
+#line 614
                     }
-#line 630
+#line 614
                 }
-#line 630
+#line 614
 */
-#line 630
+#line 614
 		allInExtRange = allInIntRange = 1;
-#line 630
+#line 614
 		for (j = 0; j < nels; j++) {
-#line 630
+#line 614
 		    err = toMixedBase(j, var_rank[i], count, index2);
-#line 630
+#line 614
 		    IF (err)
-#line 630
+#line 614
 			error("error in toMixedBase 1");
-#line 630
+#line 614
 		    for (d = 0; d < var_rank[i]; d++)
-#line 630
+#line 614
 			index2[d] = index[d] + index2[d] * stride[d];
-#line 630
+#line 614
 		    expect[j] = hash4(var_type[i], var_rank[i], index2, 
-#line 630
+#line 614
 			NCT_DOUBLE);
-#line 630
+#line 614
 		    if (inRange3(expect[j],var_type[i],NCT_DOUBLE)) {
-#line 630
+#line 614
 			allInIntRange = allInIntRange && expect[j] >= double_min
-#line 630
+#line 614
 			    && expect[j] <= double_max;
-#line 630
+#line 614
 		    } else {
-#line 630
+#line 614
 			allInExtRange = 0;
-#line 630
+#line 614
 		    }
-#line 630
+#line 614
 		}
-#line 630
+#line 614
                 if (var_rank[i] == 0 && i%2 )
-#line 630
+#line 614
                     err = nc_get_vars_double(ncid, i, NULL, NULL, NULL, value);
-#line 630
+#line 614
                 else
-#line 630
+#line 614
                     err = nc_get_vars_double(ncid, i, index, count, stride, value);
-#line 630
+#line 614
 		if (canConvert) {
-#line 630
+#line 614
 		    if (allInExtRange) {
-#line 630
+#line 614
 			if (allInIntRange) {
-#line 630
+#line 614
 			    IF (err)
-#line 630
+#line 614
 				error("%s", nc_strerror(err));
-#line 630
+#line 614
 			} else {
-#line 630
+#line 614
 			    IF (err != NC_ERANGE)
-#line 630
+#line 614
 				error("Range error: status = %d", err);
-#line 630
+#line 614
 			}
-#line 630
+#line 614
 		    } else {
-#line 630
+#line 614
 			IF (err != 0 && err != NC_ERANGE)
-#line 630
+#line 614
 			    error("OK or Range error: status = %d", err);
-#line 630
+#line 614
 		    }
-#line 630
+#line 614
 		    for (j = 0; j < nels; j++) {
-#line 630
+#line 614
 			if (inRange3(expect[j],var_type[i],NCT_DOUBLE)
-#line 630
+#line 614
 				&& expect[j] >= double_min && expect[j] <= double_max) {
-#line 630
+#line 614
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_DOUBLE)){
-#line 630
+#line 614
 				error("value read not that expected");
-#line 630
+#line 614
 				if (verbose) {
-#line 630
+#line 614
 				    error("\n");
-#line 630
+#line 614
 				    error("varid: %d, ", i);
-#line 630
+#line 614
 				    error("var_name: %s, ", var_name[i]);
-#line 630
+#line 614
 				    error("element number: %d ", j);
-#line 630
+#line 614
                                     error("expect: %g, ", expect[j]);
-#line 630
+#line 614
 				    error("got: %g", (double) value[j]);
-#line 630
+#line 614
 				}
-#line 630
+#line 614
 			    } else {
-#line 630
+#line 614
 				nok++;
-#line 630
+#line 614
 			    }
-#line 630
+#line 614
 			}
-#line 630
+#line 614
 		    }
-#line 630
+#line 614
 		} else {
-#line 630
+#line 614
 		    IF (nels > 0 && err != NC_ECHAR)
-#line 630
+#line 614
 			error("wrong type: status = %d", err);
-#line 630
+#line 614
 		}
-#line 630
+#line 614
 	    }
-#line 630
+#line 614
 	}
-#line 630
+#line 614
 
-#line 630
+#line 614
     }
-#line 630
+#line 614
     err = nc_close(ncid);
-#line 630
+#line 614
     IF (err)
-#line 630
+#line 614
         error("nc_close: %s", nc_strerror(err));
-#line 630
+#line 614
     print_nok(nok);
-#line 630
+#line 614
 }
-#line 630
+#line 614
 
 void
-#line 631
+#line 615
 test_nc_get_vars_ushort(void)
-#line 631
+#line 615
 {
-#line 631
+#line 615
     int ncid;
-#line 631
+#line 615
     int d;
-#line 631
+#line 615
     int i;
-#line 631
+#line 615
     int j;
-#line 631
+#line 615
     int k;
-#line 631
+#line 615
     int m;
-#line 631
+#line 615
     int err;
-#line 631
+#line 615
     int allInExtRange;	/* all values within external range? */
-#line 631
+#line 615
     int allInIntRange;	/* all values within internal range? */
-#line 631
+#line 615
     int nels;
-#line 631
+#line 615
     int nslabs;
-#line 631
+#line 615
     int nstarts;        /* number of different starts */
-#line 631
+#line 615
     int nok = 0;      /* count of valid comparisons */
-#line 631
+#line 615
     size_t start[MAX_RANK];
-#line 631
+#line 615
     size_t edge[MAX_RANK];
-#line 631
+#line 615
     size_t index[MAX_RANK];
-#line 631
+#line 615
     size_t index2[MAX_RANK];
-#line 631
+#line 615
     size_t mid[MAX_RANK];
-#line 631
+#line 615
     size_t count[MAX_RANK];
-#line 631
+#line 615
     size_t sstride[MAX_RANK];
-#line 631
+#line 615
     ptrdiff_t stride[MAX_RANK];
-#line 631
+#line 615
     int canConvert;     /* Both text or both numeric */
-#line 631
+#line 615
     ushort value[MAX_NELS];
-#line 631
+#line 615
     double expect[MAX_NELS];
-#line 631
+#line 615
 
-#line 631
-#ifdef USE_PNETCDF
-#line 631
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 631
-#else
-#line 631
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 631
-#endif
-#line 631
+#line 615
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 615
     IF (err)
-#line 631
+#line 615
         error("nc_open: %s", nc_strerror(err));
-#line 631
+#line 615
     for (i = 0; i < numVars; i++) {
-#line 631
+#line 615
         canConvert = (var_type[i] == NC_CHAR) == (NCT_USHORT == NCT_TEXT);
-#line 631
+#line 615
         assert(var_rank[i] <= MAX_RANK);
-#line 631
+#line 615
         assert(var_nels[i] <= MAX_NELS);
-#line 631
+#line 615
         for (j = 0; j < var_rank[i]; j++) {
-#line 631
+#line 615
             start[j] = 0;
-#line 631
+#line 615
             edge[j] = 1;
-#line 631
+#line 615
             stride[j] = 1;
-#line 631
+#line 615
         }
-#line 631
+#line 615
         err = nc_get_vars_ushort(BAD_ID, i, start, edge, stride, value);
-#line 631
+#line 615
         IF (err != NC_EBADID)
-#line 631
+#line 615
             error("bad ncid: status = %d", err);
-#line 631
+#line 615
         err = nc_get_vars_ushort(ncid, BAD_VARID, start, edge, stride, value);
-#line 631
+#line 615
         IF (err != NC_ENOTVAR)
-#line 631
+#line 615
             error("bad var id: status = %d", err);
-#line 631
+#line 615
         for (j = 0; j < var_rank[i]; j++) {
-#line 631
+#line 615
             start[j] = var_shape[i][j];
-#line 631
+#line 615
             err = nc_get_vars_ushort(ncid, i, start, edge, stride, value);
-#line 631
+#line 615
 	  if(!canConvert) {
-#line 631
+#line 615
 		IF (err != NC_ECHAR)
-#line 631
+#line 615
                	    error("conversion: status = %d", err);
-#line 631
+#line 615
 	  } else {
-#line 631
+#line 615
             IF (err != NC_EINVALCOORDS)
-#line 631
+#line 615
                 error("bad index: status = %d", err);
-#line 631
+#line 615
             start[j] = 0;
-#line 631
+#line 615
             edge[j] = var_shape[i][j] + 1;
-#line 631
+#line 615
             err = nc_get_vars_ushort(ncid, i, start, edge, stride, value);
-#line 631
+#line 615
             IF (err != NC_EEDGE)
-#line 631
+#line 615
                 error("bad edge: status = %d", err);
-#line 631
+#line 615
             edge[j] = 1;
-#line 631
+#line 615
             stride[j] = 0;
-#line 631
+#line 615
             err = nc_get_vars_ushort(ncid, i, start, edge, stride, value);
-#line 631
+#line 615
             IF (err != NC_ESTRIDE)
-#line 631
+#line 615
                 error("bad stride: status = %d", err);
-#line 631
+#line 615
             stride[j] = 1;
-#line 631
+#line 615
 	  }
-#line 631
+#line 615
         }
-#line 631
+#line 615
             /* Choose a random point dividing each dim into 2 parts */
-#line 631
+#line 615
             /* get 2^rank (nslabs) slabs so defined */
-#line 631
+#line 615
         nslabs = 1;
-#line 631
+#line 615
         for (j = 0; j < var_rank[i]; j++) {
-#line 631
+#line 615
             mid[j] = roll( var_shape[i][j] );
-#line 631
+#line 615
             nslabs *= 2;
-#line 631
+#line 615
         }
-#line 631
+#line 615
             /* bits of k determine whether to get lower or upper part of dim */
-#line 631
+#line 615
             /* choose random stride from 1 to edge */
-#line 631
+#line 615
         for (k = 0; k < nslabs; k++) {
-#line 631
+#line 615
             nstarts = 1;
-#line 631
+#line 615
             for (j = 0; j < var_rank[i]; j++) {
-#line 631
+#line 615
                 if ((k >> j) & 1) {
-#line 631
+#line 615
                     start[j] = 0;
-#line 631
+#line 615
                     edge[j] = mid[j];
-#line 631
+#line 615
                 }else{
-#line 631
+#line 615
                     start[j] = mid[j];
-#line 631
+#line 615
                     edge[j] = var_shape[i][j] - mid[j];
-#line 631
+#line 615
                 }
-#line 631
+#line 615
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 631
+#line 615
                 nstarts *= stride[j];
-#line 631
+#line 615
             }
-#line 631
+#line 615
             for (m = 0; m < nstarts; m++) {
-#line 631
+#line 615
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 631
+#line 615
                 IF (err)
-#line 631
+#line 615
                     error("error in toMixedBase");
-#line 631
+#line 615
                 nels = 1;
-#line 631
+#line 615
                 for (j = 0; j < var_rank[i]; j++) {
-#line 631
+#line 615
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 631
+#line 615
                     nels *= count[j];
-#line 631
+#line 615
                     index[j] += start[j];
-#line 631
+#line 615
                 }
-#line 631
+#line 615
                         /* Random choice of forward or backward */
-#line 631
+#line 615
 /* TODO
-#line 631
+#line 615
                 if ( roll(2) ) {
-#line 631
+#line 615
                     for (j = 0; j < var_rank[i]; j++) {
-#line 631
+#line 615
                         index[j] += (count[j] - 1) * stride[j];
-#line 631
+#line 615
                         stride[j] = -stride[j];
-#line 631
+#line 615
                     }
-#line 631
+#line 615
                 }
-#line 631
+#line 615
 */
-#line 631
+#line 615
 		allInExtRange = allInIntRange = 1;
-#line 631
+#line 615
 		for (j = 0; j < nels; j++) {
-#line 631
+#line 615
 		    err = toMixedBase(j, var_rank[i], count, index2);
-#line 631
+#line 615
 		    IF (err)
-#line 631
+#line 615
 			error("error in toMixedBase 1");
-#line 631
+#line 615
 		    for (d = 0; d < var_rank[i]; d++)
-#line 631
+#line 615
 			index2[d] = index[d] + index2[d] * stride[d];
-#line 631
+#line 615
 		    expect[j] = hash4(var_type[i], var_rank[i], index2, 
-#line 631
+#line 615
 			NCT_USHORT);
-#line 631
+#line 615
 		    if (inRange3(expect[j],var_type[i],NCT_USHORT)) {
-#line 631
+#line 615
 			allInIntRange = allInIntRange && expect[j] >= ushort_min
-#line 631
+#line 615
 			    && expect[j] <= ushort_max;
-#line 631
+#line 615
 		    } else {
-#line 631
+#line 615
 			allInExtRange = 0;
-#line 631
+#line 615
 		    }
-#line 631
+#line 615
 		}
-#line 631
+#line 615
                 if (var_rank[i] == 0 && i%2 )
-#line 631
+#line 615
                     err = nc_get_vars_ushort(ncid, i, NULL, NULL, NULL, value);
-#line 631
+#line 615
                 else
-#line 631
+#line 615
                     err = nc_get_vars_ushort(ncid, i, index, count, stride, value);
-#line 631
+#line 615
 		if (canConvert) {
-#line 631
+#line 615
 		    if (allInExtRange) {
-#line 631
+#line 615
 			if (allInIntRange) {
-#line 631
+#line 615
 			    IF (err)
-#line 631
+#line 615
 				error("%s", nc_strerror(err));
-#line 631
+#line 615
 			} else {
-#line 631
+#line 615
 			    IF (err != NC_ERANGE)
-#line 631
+#line 615
 				error("Range error: status = %d", err);
-#line 631
+#line 615
 			}
-#line 631
+#line 615
 		    } else {
-#line 631
+#line 615
 			IF (err != 0 && err != NC_ERANGE)
-#line 631
+#line 615
 			    error("OK or Range error: status = %d", err);
-#line 631
+#line 615
 		    }
-#line 631
+#line 615
 		    for (j = 0; j < nels; j++) {
-#line 631
+#line 615
 			if (inRange3(expect[j],var_type[i],NCT_USHORT)
-#line 631
+#line 615
 				&& expect[j] >= ushort_min && expect[j] <= ushort_max) {
-#line 631
+#line 615
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_USHORT)){
-#line 631
+#line 615
 				error("value read not that expected");
-#line 631
+#line 615
 				if (verbose) {
-#line 631
+#line 615
 				    error("\n");
-#line 631
+#line 615
 				    error("varid: %d, ", i);
-#line 631
+#line 615
 				    error("var_name: %s, ", var_name[i]);
-#line 631
+#line 615
 				    error("element number: %d ", j);
-#line 631
+#line 615
                                     error("expect: %g, ", expect[j]);
-#line 631
+#line 615
 				    error("got: %g", (double) value[j]);
-#line 631
+#line 615
 				}
-#line 631
+#line 615
 			    } else {
-#line 631
+#line 615
 				nok++;
-#line 631
+#line 615
 			    }
-#line 631
+#line 615
 			}
-#line 631
+#line 615
 		    }
-#line 631
+#line 615
 		} else {
-#line 631
+#line 615
 		    IF (nels > 0 && err != NC_ECHAR)
-#line 631
+#line 615
 			error("wrong type: status = %d", err);
-#line 631
+#line 615
 		}
-#line 631
+#line 615
 	    }
-#line 631
+#line 615
 	}
-#line 631
+#line 615
 
-#line 631
+#line 615
     }
-#line 631
+#line 615
     err = nc_close(ncid);
-#line 631
+#line 615
     IF (err)
-#line 631
+#line 615
         error("nc_close: %s", nc_strerror(err));
-#line 631
+#line 615
     print_nok(nok);
-#line 631
+#line 615
 }
-#line 631
+#line 615
 
 void
-#line 632
+#line 616
 test_nc_get_vars_uint(void)
-#line 632
+#line 616
 {
-#line 632
+#line 616
     int ncid;
-#line 632
+#line 616
     int d;
-#line 632
+#line 616
     int i;
-#line 632
+#line 616
     int j;
-#line 632
+#line 616
     int k;
-#line 632
+#line 616
     int m;
-#line 632
+#line 616
     int err;
-#line 632
+#line 616
     int allInExtRange;	/* all values within external range? */
-#line 632
+#line 616
     int allInIntRange;	/* all values within internal range? */
-#line 632
+#line 616
     int nels;
-#line 632
+#line 616
     int nslabs;
-#line 632
+#line 616
     int nstarts;        /* number of different starts */
-#line 632
+#line 616
     int nok = 0;      /* count of valid comparisons */
-#line 632
+#line 616
     size_t start[MAX_RANK];
-#line 632
+#line 616
     size_t edge[MAX_RANK];
-#line 632
+#line 616
     size_t index[MAX_RANK];
-#line 632
+#line 616
     size_t index2[MAX_RANK];
-#line 632
+#line 616
     size_t mid[MAX_RANK];
-#line 632
+#line 616
     size_t count[MAX_RANK];
-#line 632
+#line 616
     size_t sstride[MAX_RANK];
-#line 632
+#line 616
     ptrdiff_t stride[MAX_RANK];
-#line 632
+#line 616
     int canConvert;     /* Both text or both numeric */
-#line 632
+#line 616
     uint value[MAX_NELS];
-#line 632
+#line 616
     double expect[MAX_NELS];
-#line 632
+#line 616
 
-#line 632
-#ifdef USE_PNETCDF
-#line 632
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 632
-#else
-#line 632
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 632
-#endif
-#line 632
+#line 616
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 616
     IF (err)
-#line 632
+#line 616
         error("nc_open: %s", nc_strerror(err));
-#line 632
+#line 616
     for (i = 0; i < numVars; i++) {
-#line 632
+#line 616
         canConvert = (var_type[i] == NC_CHAR) == (NCT_UINT == NCT_TEXT);
-#line 632
+#line 616
         assert(var_rank[i] <= MAX_RANK);
-#line 632
+#line 616
         assert(var_nels[i] <= MAX_NELS);
-#line 632
+#line 616
         for (j = 0; j < var_rank[i]; j++) {
-#line 632
+#line 616
             start[j] = 0;
-#line 632
+#line 616
             edge[j] = 1;
-#line 632
+#line 616
             stride[j] = 1;
-#line 632
+#line 616
         }
-#line 632
+#line 616
         err = nc_get_vars_uint(BAD_ID, i, start, edge, stride, value);
-#line 632
+#line 616
         IF (err != NC_EBADID)
-#line 632
+#line 616
             error("bad ncid: status = %d", err);
-#line 632
+#line 616
         err = nc_get_vars_uint(ncid, BAD_VARID, start, edge, stride, value);
-#line 632
+#line 616
         IF (err != NC_ENOTVAR)
-#line 632
+#line 616
             error("bad var id: status = %d", err);
-#line 632
+#line 616
         for (j = 0; j < var_rank[i]; j++) {
-#line 632
+#line 616
             start[j] = var_shape[i][j];
-#line 632
+#line 616
             err = nc_get_vars_uint(ncid, i, start, edge, stride, value);
-#line 632
+#line 616
 	  if(!canConvert) {
-#line 632
+#line 616
 		IF (err != NC_ECHAR)
-#line 632
+#line 616
                	    error("conversion: status = %d", err);
-#line 632
+#line 616
 	  } else {
-#line 632
+#line 616
             IF (err != NC_EINVALCOORDS)
-#line 632
+#line 616
                 error("bad index: status = %d", err);
-#line 632
+#line 616
             start[j] = 0;
-#line 632
+#line 616
             edge[j] = var_shape[i][j] + 1;
-#line 632
+#line 616
             err = nc_get_vars_uint(ncid, i, start, edge, stride, value);
-#line 632
+#line 616
             IF (err != NC_EEDGE)
-#line 632
+#line 616
                 error("bad edge: status = %d", err);
-#line 632
+#line 616
             edge[j] = 1;
-#line 632
+#line 616
             stride[j] = 0;
-#line 632
+#line 616
             err = nc_get_vars_uint(ncid, i, start, edge, stride, value);
-#line 632
+#line 616
             IF (err != NC_ESTRIDE)
-#line 632
+#line 616
                 error("bad stride: status = %d", err);
-#line 632
+#line 616
             stride[j] = 1;
-#line 632
+#line 616
 	  }
-#line 632
+#line 616
         }
-#line 632
+#line 616
             /* Choose a random point dividing each dim into 2 parts */
-#line 632
+#line 616
             /* get 2^rank (nslabs) slabs so defined */
-#line 632
+#line 616
         nslabs = 1;
-#line 632
+#line 616
         for (j = 0; j < var_rank[i]; j++) {
-#line 632
+#line 616
             mid[j] = roll( var_shape[i][j] );
-#line 632
+#line 616
             nslabs *= 2;
-#line 632
+#line 616
         }
-#line 632
+#line 616
             /* bits of k determine whether to get lower or upper part of dim */
-#line 632
+#line 616
             /* choose random stride from 1 to edge */
-#line 632
+#line 616
         for (k = 0; k < nslabs; k++) {
-#line 632
+#line 616
             nstarts = 1;
-#line 632
+#line 616
             for (j = 0; j < var_rank[i]; j++) {
-#line 632
+#line 616
                 if ((k >> j) & 1) {
-#line 632
+#line 616
                     start[j] = 0;
-#line 632
+#line 616
                     edge[j] = mid[j];
-#line 632
+#line 616
                 }else{
-#line 632
+#line 616
                     start[j] = mid[j];
-#line 632
+#line 616
                     edge[j] = var_shape[i][j] - mid[j];
-#line 632
+#line 616
                 }
-#line 632
+#line 616
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 632
+#line 616
                 nstarts *= stride[j];
-#line 632
+#line 616
             }
-#line 632
+#line 616
             for (m = 0; m < nstarts; m++) {
-#line 632
+#line 616
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 632
+#line 616
                 IF (err)
-#line 632
+#line 616
                     error("error in toMixedBase");
-#line 632
+#line 616
                 nels = 1;
-#line 632
+#line 616
                 for (j = 0; j < var_rank[i]; j++) {
-#line 632
+#line 616
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 632
+#line 616
                     nels *= count[j];
-#line 632
+#line 616
                     index[j] += start[j];
-#line 632
+#line 616
                 }
-#line 632
+#line 616
                         /* Random choice of forward or backward */
-#line 632
+#line 616
 /* TODO
-#line 632
+#line 616
                 if ( roll(2) ) {
-#line 632
+#line 616
                     for (j = 0; j < var_rank[i]; j++) {
-#line 632
+#line 616
                         index[j] += (count[j] - 1) * stride[j];
-#line 632
+#line 616
                         stride[j] = -stride[j];
-#line 632
+#line 616
                     }
-#line 632
+#line 616
                 }
-#line 632
+#line 616
 */
-#line 632
+#line 616
 		allInExtRange = allInIntRange = 1;
-#line 632
+#line 616
 		for (j = 0; j < nels; j++) {
-#line 632
+#line 616
 		    err = toMixedBase(j, var_rank[i], count, index2);
-#line 632
+#line 616
 		    IF (err)
-#line 632
+#line 616
 			error("error in toMixedBase 1");
-#line 632
+#line 616
 		    for (d = 0; d < var_rank[i]; d++)
-#line 632
+#line 616
 			index2[d] = index[d] + index2[d] * stride[d];
-#line 632
+#line 616
 		    expect[j] = hash4(var_type[i], var_rank[i], index2, 
-#line 632
+#line 616
 			NCT_UINT);
-#line 632
+#line 616
 		    if (inRange3(expect[j],var_type[i],NCT_UINT)) {
-#line 632
+#line 616
 			allInIntRange = allInIntRange && expect[j] >= uint_min
-#line 632
+#line 616
 			    && expect[j] <= uint_max;
-#line 632
+#line 616
 		    } else {
-#line 632
+#line 616
 			allInExtRange = 0;
-#line 632
+#line 616
 		    }
-#line 632
+#line 616
 		}
-#line 632
+#line 616
                 if (var_rank[i] == 0 && i%2 )
-#line 632
+#line 616
                     err = nc_get_vars_uint(ncid, i, NULL, NULL, NULL, value);
-#line 632
+#line 616
                 else
-#line 632
+#line 616
                     err = nc_get_vars_uint(ncid, i, index, count, stride, value);
-#line 632
+#line 616
 		if (canConvert) {
-#line 632
+#line 616
 		    if (allInExtRange) {
-#line 632
+#line 616
 			if (allInIntRange) {
-#line 632
+#line 616
 			    IF (err)
-#line 632
+#line 616
 				error("%s", nc_strerror(err));
-#line 632
+#line 616
 			} else {
-#line 632
+#line 616
 			    IF (err != NC_ERANGE)
-#line 632
+#line 616
 				error("Range error: status = %d", err);
-#line 632
+#line 616
 			}
-#line 632
+#line 616
 		    } else {
-#line 632
+#line 616
 			IF (err != 0 && err != NC_ERANGE)
-#line 632
+#line 616
 			    error("OK or Range error: status = %d", err);
-#line 632
+#line 616
 		    }
-#line 632
+#line 616
 		    for (j = 0; j < nels; j++) {
-#line 632
+#line 616
 			if (inRange3(expect[j],var_type[i],NCT_UINT)
-#line 632
+#line 616
 				&& expect[j] >= uint_min && expect[j] <= uint_max) {
-#line 632
+#line 616
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_UINT)){
-#line 632
+#line 616
 				error("value read not that expected");
-#line 632
+#line 616
 				if (verbose) {
-#line 632
+#line 616
 				    error("\n");
-#line 632
+#line 616
 				    error("varid: %d, ", i);
-#line 632
+#line 616
 				    error("var_name: %s, ", var_name[i]);
-#line 632
+#line 616
 				    error("element number: %d ", j);
-#line 632
+#line 616
                                     error("expect: %g, ", expect[j]);
-#line 632
+#line 616
 				    error("got: %g", (double) value[j]);
-#line 632
+#line 616
 				}
-#line 632
+#line 616
 			    } else {
-#line 632
+#line 616
 				nok++;
-#line 632
+#line 616
 			    }
-#line 632
+#line 616
 			}
-#line 632
+#line 616
 		    }
-#line 632
+#line 616
 		} else {
-#line 632
+#line 616
 		    IF (nels > 0 && err != NC_ECHAR)
-#line 632
+#line 616
 			error("wrong type: status = %d", err);
-#line 632
+#line 616
 		}
-#line 632
+#line 616
 	    }
-#line 632
+#line 616
 	}
-#line 632
+#line 616
 
-#line 632
+#line 616
     }
-#line 632
+#line 616
     err = nc_close(ncid);
-#line 632
+#line 616
     IF (err)
-#line 632
+#line 616
         error("nc_close: %s", nc_strerror(err));
-#line 632
+#line 616
     print_nok(nok);
-#line 632
+#line 616
 }
-#line 632
+#line 616
 
 void
-#line 633
+#line 617
 test_nc_get_vars_longlong(void)
-#line 633
+#line 617
 {
-#line 633
+#line 617
     int ncid;
-#line 633
+#line 617
     int d;
-#line 633
+#line 617
     int i;
-#line 633
+#line 617
     int j;
-#line 633
+#line 617
     int k;
-#line 633
+#line 617
     int m;
-#line 633
+#line 617
     int err;
-#line 633
+#line 617
     int allInExtRange;	/* all values within external range? */
-#line 633
+#line 617
     int allInIntRange;	/* all values within internal range? */
-#line 633
+#line 617
     int nels;
-#line 633
+#line 617
     int nslabs;
-#line 633
+#line 617
     int nstarts;        /* number of different starts */
-#line 633
+#line 617
     int nok = 0;      /* count of valid comparisons */
-#line 633
+#line 617
     size_t start[MAX_RANK];
-#line 633
+#line 617
     size_t edge[MAX_RANK];
-#line 633
+#line 617
     size_t index[MAX_RANK];
-#line 633
+#line 617
     size_t index2[MAX_RANK];
-#line 633
+#line 617
     size_t mid[MAX_RANK];
-#line 633
+#line 617
     size_t count[MAX_RANK];
-#line 633
+#line 617
     size_t sstride[MAX_RANK];
-#line 633
+#line 617
     ptrdiff_t stride[MAX_RANK];
-#line 633
+#line 617
     int canConvert;     /* Both text or both numeric */
-#line 633
+#line 617
     longlong value[MAX_NELS];
-#line 633
+#line 617
     double expect[MAX_NELS];
-#line 633
+#line 617
 
-#line 633
-#ifdef USE_PNETCDF
-#line 633
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 633
-#else
-#line 633
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 633
-#endif
-#line 633
+#line 617
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 617
     IF (err)
-#line 633
+#line 617
         error("nc_open: %s", nc_strerror(err));
-#line 633
+#line 617
     for (i = 0; i < numVars; i++) {
-#line 633
+#line 617
         canConvert = (var_type[i] == NC_CHAR) == (NCT_LONGLONG == NCT_TEXT);
-#line 633
+#line 617
         assert(var_rank[i] <= MAX_RANK);
-#line 633
+#line 617
         assert(var_nels[i] <= MAX_NELS);
-#line 633
+#line 617
         for (j = 0; j < var_rank[i]; j++) {
-#line 633
+#line 617
             start[j] = 0;
-#line 633
+#line 617
             edge[j] = 1;
-#line 633
+#line 617
             stride[j] = 1;
-#line 633
+#line 617
         }
-#line 633
+#line 617
         err = nc_get_vars_longlong(BAD_ID, i, start, edge, stride, value);
-#line 633
+#line 617
         IF (err != NC_EBADID)
-#line 633
+#line 617
             error("bad ncid: status = %d", err);
-#line 633
+#line 617
         err = nc_get_vars_longlong(ncid, BAD_VARID, start, edge, stride, value);
-#line 633
+#line 617
         IF (err != NC_ENOTVAR)
-#line 633
+#line 617
             error("bad var id: status = %d", err);
-#line 633
+#line 617
         for (j = 0; j < var_rank[i]; j++) {
-#line 633
+#line 617
             start[j] = var_shape[i][j];
-#line 633
+#line 617
             err = nc_get_vars_longlong(ncid, i, start, edge, stride, value);
-#line 633
+#line 617
 	  if(!canConvert) {
-#line 633
+#line 617
 		IF (err != NC_ECHAR)
-#line 633
+#line 617
                	    error("conversion: status = %d", err);
-#line 633
+#line 617
 	  } else {
-#line 633
+#line 617
             IF (err != NC_EINVALCOORDS)
-#line 633
+#line 617
                 error("bad index: status = %d", err);
-#line 633
+#line 617
             start[j] = 0;
-#line 633
+#line 617
             edge[j] = var_shape[i][j] + 1;
-#line 633
+#line 617
             err = nc_get_vars_longlong(ncid, i, start, edge, stride, value);
-#line 633
+#line 617
             IF (err != NC_EEDGE)
-#line 633
+#line 617
                 error("bad edge: status = %d", err);
-#line 633
+#line 617
             edge[j] = 1;
-#line 633
+#line 617
             stride[j] = 0;
-#line 633
+#line 617
             err = nc_get_vars_longlong(ncid, i, start, edge, stride, value);
-#line 633
+#line 617
             IF (err != NC_ESTRIDE)
-#line 633
+#line 617
                 error("bad stride: status = %d", err);
-#line 633
+#line 617
             stride[j] = 1;
-#line 633
+#line 617
 	  }
-#line 633
+#line 617
         }
-#line 633
+#line 617
             /* Choose a random point dividing each dim into 2 parts */
-#line 633
+#line 617
             /* get 2^rank (nslabs) slabs so defined */
-#line 633
+#line 617
         nslabs = 1;
-#line 633
+#line 617
         for (j = 0; j < var_rank[i]; j++) {
-#line 633
+#line 617
             mid[j] = roll( var_shape[i][j] );
-#line 633
+#line 617
             nslabs *= 2;
-#line 633
+#line 617
         }
-#line 633
+#line 617
             /* bits of k determine whether to get lower or upper part of dim */
-#line 633
+#line 617
             /* choose random stride from 1 to edge */
-#line 633
+#line 617
         for (k = 0; k < nslabs; k++) {
-#line 633
+#line 617
             nstarts = 1;
-#line 633
+#line 617
             for (j = 0; j < var_rank[i]; j++) {
-#line 633
+#line 617
                 if ((k >> j) & 1) {
-#line 633
+#line 617
                     start[j] = 0;
-#line 633
+#line 617
                     edge[j] = mid[j];
-#line 633
+#line 617
                 }else{
-#line 633
+#line 617
                     start[j] = mid[j];
-#line 633
+#line 617
                     edge[j] = var_shape[i][j] - mid[j];
-#line 633
+#line 617
                 }
-#line 633
+#line 617
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 633
+#line 617
                 nstarts *= stride[j];
-#line 633
+#line 617
             }
-#line 633
+#line 617
             for (m = 0; m < nstarts; m++) {
-#line 633
+#line 617
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 633
+#line 617
                 IF (err)
-#line 633
+#line 617
                     error("error in toMixedBase");
-#line 633
+#line 617
                 nels = 1;
-#line 633
+#line 617
                 for (j = 0; j < var_rank[i]; j++) {
-#line 633
+#line 617
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 633
+#line 617
                     nels *= count[j];
-#line 633
+#line 617
                     index[j] += start[j];
-#line 633
+#line 617
                 }
-#line 633
+#line 617
                         /* Random choice of forward or backward */
-#line 633
+#line 617
 /* TODO
-#line 633
+#line 617
                 if ( roll(2) ) {
-#line 633
+#line 617
                     for (j = 0; j < var_rank[i]; j++) {
-#line 633
+#line 617
                         index[j] += (count[j] - 1) * stride[j];
-#line 633
+#line 617
                         stride[j] = -stride[j];
-#line 633
+#line 617
                     }
-#line 633
+#line 617
                 }
-#line 633
+#line 617
 */
-#line 633
+#line 617
 		allInExtRange = allInIntRange = 1;
-#line 633
+#line 617
 		for (j = 0; j < nels; j++) {
-#line 633
+#line 617
 		    err = toMixedBase(j, var_rank[i], count, index2);
-#line 633
+#line 617
 		    IF (err)
-#line 633
+#line 617
 			error("error in toMixedBase 1");
-#line 633
+#line 617
 		    for (d = 0; d < var_rank[i]; d++)
-#line 633
+#line 617
 			index2[d] = index[d] + index2[d] * stride[d];
-#line 633
+#line 617
 		    expect[j] = hash4(var_type[i], var_rank[i], index2, 
-#line 633
+#line 617
 			NCT_LONGLONG);
-#line 633
+#line 617
 		    if (inRange3(expect[j],var_type[i],NCT_LONGLONG)) {
-#line 633
+#line 617
 			allInIntRange = allInIntRange && expect[j] >= longlong_min
-#line 633
+#line 617
 			    && expect[j] <= longlong_max;
-#line 633
+#line 617
 		    } else {
-#line 633
+#line 617
 			allInExtRange = 0;
-#line 633
+#line 617
 		    }
-#line 633
+#line 617
 		}
-#line 633
+#line 617
                 if (var_rank[i] == 0 && i%2 )
-#line 633
+#line 617
                     err = nc_get_vars_longlong(ncid, i, NULL, NULL, NULL, value);
-#line 633
+#line 617
                 else
-#line 633
+#line 617
                     err = nc_get_vars_longlong(ncid, i, index, count, stride, value);
-#line 633
+#line 617
 		if (canConvert) {
-#line 633
+#line 617
 		    if (allInExtRange) {
-#line 633
+#line 617
 			if (allInIntRange) {
-#line 633
+#line 617
 			    IF (err)
-#line 633
+#line 617
 				error("%s", nc_strerror(err));
-#line 633
+#line 617
 			} else {
-#line 633
+#line 617
 			    IF (err != NC_ERANGE)
-#line 633
+#line 617
 				error("Range error: status = %d", err);
-#line 633
+#line 617
 			}
-#line 633
+#line 617
 		    } else {
-#line 633
+#line 617
 			IF (err != 0 && err != NC_ERANGE)
-#line 633
+#line 617
 			    error("OK or Range error: status = %d", err);
-#line 633
+#line 617
 		    }
-#line 633
+#line 617
 		    for (j = 0; j < nels; j++) {
-#line 633
+#line 617
 			if (inRange3(expect[j],var_type[i],NCT_LONGLONG)
-#line 633
+#line 617
 				&& expect[j] >= longlong_min && expect[j] <= longlong_max) {
-#line 633
+#line 617
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_LONGLONG)){
-#line 633
+#line 617
 				error("value read not that expected");
-#line 633
+#line 617
 				if (verbose) {
-#line 633
+#line 617
 				    error("\n");
-#line 633
+#line 617
 				    error("varid: %d, ", i);
-#line 633
+#line 617
 				    error("var_name: %s, ", var_name[i]);
-#line 633
+#line 617
 				    error("element number: %d ", j);
-#line 633
+#line 617
                                     error("expect: %g, ", expect[j]);
-#line 633
+#line 617
 				    error("got: %g", (double) value[j]);
-#line 633
+#line 617
 				}
-#line 633
+#line 617
 			    } else {
-#line 633
+#line 617
 				nok++;
-#line 633
+#line 617
 			    }
-#line 633
+#line 617
 			}
-#line 633
+#line 617
 		    }
-#line 633
+#line 617
 		} else {
-#line 633
+#line 617
 		    IF (nels > 0 && err != NC_ECHAR)
-#line 633
+#line 617
 			error("wrong type: status = %d", err);
-#line 633
+#line 617
 		}
-#line 633
+#line 617
 	    }
-#line 633
+#line 617
 	}
-#line 633
+#line 617
 
-#line 633
+#line 617
     }
-#line 633
+#line 617
     err = nc_close(ncid);
-#line 633
+#line 617
     IF (err)
-#line 633
+#line 617
         error("nc_close: %s", nc_strerror(err));
-#line 633
+#line 617
     print_nok(nok);
-#line 633
+#line 617
 }
-#line 633
+#line 617
 
 void
-#line 634
+#line 618
 test_nc_get_vars_ulonglong(void)
-#line 634
+#line 618
 {
-#line 634
+#line 618
     int ncid;
-#line 634
+#line 618
     int d;
-#line 634
+#line 618
     int i;
-#line 634
+#line 618
     int j;
-#line 634
+#line 618
     int k;
-#line 634
+#line 618
     int m;
-#line 634
+#line 618
     int err;
-#line 634
+#line 618
     int allInExtRange;	/* all values within external range? */
-#line 634
+#line 618
     int allInIntRange;	/* all values within internal range? */
-#line 634
+#line 618
     int nels;
-#line 634
+#line 618
     int nslabs;
-#line 634
+#line 618
     int nstarts;        /* number of different starts */
-#line 634
+#line 618
     int nok = 0;      /* count of valid comparisons */
-#line 634
+#line 618
     size_t start[MAX_RANK];
-#line 634
+#line 618
     size_t edge[MAX_RANK];
-#line 634
+#line 618
     size_t index[MAX_RANK];
-#line 634
+#line 618
     size_t index2[MAX_RANK];
-#line 634
+#line 618
     size_t mid[MAX_RANK];
-#line 634
+#line 618
     size_t count[MAX_RANK];
-#line 634
+#line 618
     size_t sstride[MAX_RANK];
-#line 634
+#line 618
     ptrdiff_t stride[MAX_RANK];
-#line 634
+#line 618
     int canConvert;     /* Both text or both numeric */
-#line 634
+#line 618
     ulonglong value[MAX_NELS];
-#line 634
+#line 618
     double expect[MAX_NELS];
-#line 634
+#line 618
 
-#line 634
-#ifdef USE_PNETCDF
-#line 634
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 634
-#else
-#line 634
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 634
-#endif
-#line 634
+#line 618
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 618
     IF (err)
-#line 634
+#line 618
         error("nc_open: %s", nc_strerror(err));
-#line 634
+#line 618
     for (i = 0; i < numVars; i++) {
-#line 634
+#line 618
         canConvert = (var_type[i] == NC_CHAR) == (NCT_ULONGLONG == NCT_TEXT);
-#line 634
+#line 618
         assert(var_rank[i] <= MAX_RANK);
-#line 634
+#line 618
         assert(var_nels[i] <= MAX_NELS);
-#line 634
+#line 618
         for (j = 0; j < var_rank[i]; j++) {
-#line 634
+#line 618
             start[j] = 0;
-#line 634
+#line 618
             edge[j] = 1;
-#line 634
+#line 618
             stride[j] = 1;
-#line 634
+#line 618
         }
-#line 634
+#line 618
         err = nc_get_vars_ulonglong(BAD_ID, i, start, edge, stride, value);
-#line 634
+#line 618
         IF (err != NC_EBADID)
-#line 634
+#line 618
             error("bad ncid: status = %d", err);
-#line 634
+#line 618
         err = nc_get_vars_ulonglong(ncid, BAD_VARID, start, edge, stride, value);
-#line 634
+#line 618
         IF (err != NC_ENOTVAR)
-#line 634
+#line 618
             error("bad var id: status = %d", err);
-#line 634
+#line 618
         for (j = 0; j < var_rank[i]; j++) {
-#line 634
+#line 618
             start[j] = var_shape[i][j];
-#line 634
+#line 618
             err = nc_get_vars_ulonglong(ncid, i, start, edge, stride, value);
-#line 634
+#line 618
 	  if(!canConvert) {
-#line 634
+#line 618
 		IF (err != NC_ECHAR)
-#line 634
+#line 618
                	    error("conversion: status = %d", err);
-#line 634
+#line 618
 	  } else {
-#line 634
+#line 618
             IF (err != NC_EINVALCOORDS)
-#line 634
+#line 618
                 error("bad index: status = %d", err);
-#line 634
+#line 618
             start[j] = 0;
-#line 634
+#line 618
             edge[j] = var_shape[i][j] + 1;
-#line 634
+#line 618
             err = nc_get_vars_ulonglong(ncid, i, start, edge, stride, value);
-#line 634
+#line 618
             IF (err != NC_EEDGE)
-#line 634
+#line 618
                 error("bad edge: status = %d", err);
-#line 634
+#line 618
             edge[j] = 1;
-#line 634
+#line 618
             stride[j] = 0;
-#line 634
+#line 618
             err = nc_get_vars_ulonglong(ncid, i, start, edge, stride, value);
-#line 634
+#line 618
             IF (err != NC_ESTRIDE)
-#line 634
+#line 618
                 error("bad stride: status = %d", err);
-#line 634
+#line 618
             stride[j] = 1;
-#line 634
+#line 618
 	  }
-#line 634
+#line 618
         }
-#line 634
+#line 618
             /* Choose a random point dividing each dim into 2 parts */
-#line 634
+#line 618
             /* get 2^rank (nslabs) slabs so defined */
-#line 634
+#line 618
         nslabs = 1;
-#line 634
+#line 618
         for (j = 0; j < var_rank[i]; j++) {
-#line 634
+#line 618
             mid[j] = roll( var_shape[i][j] );
-#line 634
+#line 618
             nslabs *= 2;
-#line 634
+#line 618
         }
-#line 634
+#line 618
             /* bits of k determine whether to get lower or upper part of dim */
-#line 634
+#line 618
             /* choose random stride from 1 to edge */
-#line 634
+#line 618
         for (k = 0; k < nslabs; k++) {
-#line 634
+#line 618
             nstarts = 1;
-#line 634
+#line 618
             for (j = 0; j < var_rank[i]; j++) {
-#line 634
+#line 618
                 if ((k >> j) & 1) {
-#line 634
+#line 618
                     start[j] = 0;
-#line 634
+#line 618
                     edge[j] = mid[j];
-#line 634
+#line 618
                 }else{
-#line 634
+#line 618
                     start[j] = mid[j];
-#line 634
+#line 618
                     edge[j] = var_shape[i][j] - mid[j];
-#line 634
+#line 618
                 }
-#line 634
+#line 618
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 634
+#line 618
                 nstarts *= stride[j];
-#line 634
+#line 618
             }
-#line 634
+#line 618
             for (m = 0; m < nstarts; m++) {
-#line 634
+#line 618
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 634
+#line 618
                 IF (err)
-#line 634
+#line 618
                     error("error in toMixedBase");
-#line 634
+#line 618
                 nels = 1;
-#line 634
+#line 618
                 for (j = 0; j < var_rank[i]; j++) {
-#line 634
+#line 618
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 634
+#line 618
                     nels *= count[j];
-#line 634
+#line 618
                     index[j] += start[j];
-#line 634
+#line 618
                 }
-#line 634
+#line 618
                         /* Random choice of forward or backward */
-#line 634
+#line 618
 /* TODO
-#line 634
+#line 618
                 if ( roll(2) ) {
-#line 634
+#line 618
                     for (j = 0; j < var_rank[i]; j++) {
-#line 634
+#line 618
                         index[j] += (count[j] - 1) * stride[j];
-#line 634
+#line 618
                         stride[j] = -stride[j];
-#line 634
+#line 618
                     }
-#line 634
+#line 618
                 }
-#line 634
+#line 618
 */
-#line 634
+#line 618
 		allInExtRange = allInIntRange = 1;
-#line 634
+#line 618
 		for (j = 0; j < nels; j++) {
-#line 634
+#line 618
 		    err = toMixedBase(j, var_rank[i], count, index2);
-#line 634
+#line 618
 		    IF (err)
-#line 634
+#line 618
 			error("error in toMixedBase 1");
-#line 634
+#line 618
 		    for (d = 0; d < var_rank[i]; d++)
-#line 634
+#line 618
 			index2[d] = index[d] + index2[d] * stride[d];
-#line 634
+#line 618
 		    expect[j] = hash4(var_type[i], var_rank[i], index2, 
-#line 634
+#line 618
 			NCT_ULONGLONG);
-#line 634
+#line 618
 		    if (inRange3(expect[j],var_type[i],NCT_ULONGLONG)) {
-#line 634
+#line 618
 			allInIntRange = allInIntRange && expect[j] >= ulonglong_min
-#line 634
+#line 618
 			    && expect[j] <= ulonglong_max;
-#line 634
+#line 618
 		    } else {
-#line 634
+#line 618
 			allInExtRange = 0;
-#line 634
+#line 618
 		    }
-#line 634
+#line 618
 		}
-#line 634
+#line 618
                 if (var_rank[i] == 0 && i%2 )
-#line 634
+#line 618
                     err = nc_get_vars_ulonglong(ncid, i, NULL, NULL, NULL, value);
-#line 634
+#line 618
                 else
-#line 634
+#line 618
                     err = nc_get_vars_ulonglong(ncid, i, index, count, stride, value);
-#line 634
+#line 618
 		if (canConvert) {
-#line 634
+#line 618
 		    if (allInExtRange) {
-#line 634
+#line 618
 			if (allInIntRange) {
-#line 634
+#line 618
 			    IF (err)
-#line 634
+#line 618
 				error("%s", nc_strerror(err));
-#line 634
+#line 618
 			} else {
-#line 634
+#line 618
 			    IF (err != NC_ERANGE)
-#line 634
+#line 618
 				error("Range error: status = %d", err);
-#line 634
+#line 618
 			}
-#line 634
+#line 618
 		    } else {
-#line 634
+#line 618
 			IF (err != 0 && err != NC_ERANGE)
-#line 634
+#line 618
 			    error("OK or Range error: status = %d", err);
-#line 634
+#line 618
 		    }
-#line 634
+#line 618
 		    for (j = 0; j < nels; j++) {
-#line 634
+#line 618
 			if (inRange3(expect[j],var_type[i],NCT_ULONGLONG)
-#line 634
+#line 618
 				&& expect[j] >= ulonglong_min && expect[j] <= ulonglong_max) {
-#line 634
+#line 618
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_ULONGLONG)){
-#line 634
+#line 618
 				error("value read not that expected");
-#line 634
+#line 618
 				if (verbose) {
-#line 634
+#line 618
 				    error("\n");
-#line 634
+#line 618
 				    error("varid: %d, ", i);
-#line 634
+#line 618
 				    error("var_name: %s, ", var_name[i]);
-#line 634
+#line 618
 				    error("element number: %d ", j);
-#line 634
+#line 618
                                     error("expect: %g, ", expect[j]);
-#line 634
+#line 618
 				    error("got: %g", (double) value[j]);
-#line 634
+#line 618
 				}
-#line 634
+#line 618
 			    } else {
-#line 634
+#line 618
 				nok++;
-#line 634
+#line 618
 			    }
-#line 634
+#line 618
 			}
-#line 634
+#line 618
 		    }
-#line 634
+#line 618
 		} else {
-#line 634
+#line 618
 		    IF (nels > 0 && err != NC_ECHAR)
-#line 634
+#line 618
 			error("wrong type: status = %d", err);
-#line 634
+#line 618
 		}
-#line 634
+#line 618
 	    }
-#line 634
+#line 618
 	}
-#line 634
+#line 618
 
-#line 634
+#line 618
     }
-#line 634
+#line 618
     err = nc_close(ncid);
-#line 634
+#line 618
     IF (err)
-#line 634
+#line 618
         error("nc_close: %s", nc_strerror(err));
-#line 634
+#line 618
     print_nok(nok);
-#line 634
+#line 618
 }
-#line 634
+#line 618
 
 
 
-#line 827
+#line 807
 
 void
-#line 828
+#line 808
 test_nc_get_varm_text(void)
-#line 828
+#line 808
 {
-#line 828
+#line 808
     int ncid;
-#line 828
+#line 808
     int d;
-#line 828
+#line 808
     int i;
-#line 828
+#line 808
     int j;
-#line 828
+#line 808
     int k;
-#line 828
+#line 808
     int m;
-#line 828
+#line 808
     int err;
-#line 828
+#line 808
     int allInExtRange;	/* all values within external range? */
-#line 828
+#line 808
     int allInIntRange;	/* all values within internal range? */
-#line 828
+#line 808
     int nels;
-#line 828
+#line 808
     int nslabs;
-#line 828
+#line 808
     int nstarts;        /* number of different starts */
-#line 828
+#line 808
     int nok = 0;      /* count of valid comparisons */
-#line 828
+#line 808
     size_t start[MAX_RANK];
-#line 828
+#line 808
     size_t edge[MAX_RANK];
-#line 828
+#line 808
     size_t index[MAX_RANK];
-#line 828
+#line 808
     size_t index2[MAX_RANK];
-#line 828
+#line 808
     size_t mid[MAX_RANK];
-#line 828
+#line 808
     size_t count[MAX_RANK];
-#line 828
+#line 808
     size_t sstride[MAX_RANK];
-#line 828
+#line 808
     ptrdiff_t stride[MAX_RANK];
-#line 828
+#line 808
     ptrdiff_t imap[MAX_RANK];
-#line 828
+#line 808
     int canConvert;     /* Both text or both numeric */
-#line 828
+#line 808
     text value[MAX_NELS];
-#line 828
+#line 808
     double expect[MAX_NELS];
-#line 828
+#line 808
 
-#line 828
-#ifdef USE_PNETCDF
-#line 828
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 828
-#else
-#line 828
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 828
-#endif
-#line 828
+#line 808
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 808
     IF (err)
-#line 828
+#line 808
         error("nc_open: %s", nc_strerror(err));
-#line 828
+#line 808
     for (i = 0; i < numVars; i++) {
-#line 828
+#line 808
         canConvert = (var_type[i] == NC_CHAR) == (NCT_TEXT == NCT_TEXT);
-#line 828
+#line 808
         assert(var_rank[i] <= MAX_RANK);
-#line 828
+#line 808
         assert(var_nels[i] <= MAX_NELS);
-#line 828
+#line 808
         for (j = 0; j < var_rank[i]; j++) {
-#line 828
+#line 808
             start[j] = 0;
-#line 828
+#line 808
             edge[j] = 1;
-#line 828
+#line 808
             stride[j] = 1;
-#line 828
+#line 808
             imap[j] = 1;
-#line 828
+#line 808
         }
-#line 828
+#line 808
         err = nc_get_varm_text(BAD_ID, i, start, edge, stride, imap, value);
-#line 828
+#line 808
         IF (err != NC_EBADID)
-#line 828
+#line 808
             error("bad ncid: status = %d", err);
-#line 828
+#line 808
         err = nc_get_varm_text(ncid, BAD_VARID, start, edge, stride, imap, value);
-#line 828
+#line 808
         IF (err != NC_ENOTVAR)
-#line 828
+#line 808
             error("bad var id: status = %d", err);
-#line 828
+#line 808
         for (j = 0; j < var_rank[i]; j++) {
-#line 828
+#line 808
             start[j] = var_shape[i][j];
-#line 828
+#line 808
             err = nc_get_varm_text(ncid, i, start, edge, stride, imap, value);
-#line 828
+#line 808
 	  if(!canConvert) {
-#line 828
+#line 808
 		IF (err != NC_ECHAR)
-#line 828
+#line 808
                	    error("conversion: status = %d", err);
-#line 828
+#line 808
 	  } else {
-#line 828
+#line 808
 	    IF (err != NC_EINVALCOORDS)
-#line 828
+#line 808
                 error("bad index: status = %d", err);
-#line 828
+#line 808
             start[j] = 0;
-#line 828
+#line 808
             edge[j] = var_shape[i][j] + 1;
-#line 828
+#line 808
             err = nc_get_varm_text(ncid, i, start, edge, stride, imap, value);
-#line 828
+#line 808
             IF (err != NC_EEDGE)
-#line 828
+#line 808
                 error("bad edge: status = %d", err);
-#line 828
+#line 808
             edge[j] = 1;
-#line 828
+#line 808
             stride[j] = 0;
-#line 828
+#line 808
             err = nc_get_varm_text(ncid, i, start, edge, stride, imap, value);
-#line 828
+#line 808
             IF (err != NC_ESTRIDE)
-#line 828
+#line 808
                 error("bad stride: status = %d", err);
-#line 828
+#line 808
             stride[j] = 1;
-#line 828
+#line 808
            }
-#line 828
+#line 808
         }
-#line 828
+#line 808
             /* Choose a random point dividing each dim into 2 parts */
-#line 828
+#line 808
             /* get 2^rank (nslabs) slabs so defined */
-#line 828
+#line 808
         nslabs = 1;
-#line 828
+#line 808
         for (j = 0; j < var_rank[i]; j++) {
-#line 828
+#line 808
             mid[j] = roll( var_shape[i][j] );
-#line 828
+#line 808
             nslabs *= 2;
-#line 828
+#line 808
         }
-#line 828
+#line 808
             /* bits of k determine whether to get lower or upper part of dim */
-#line 828
+#line 808
             /* choose random stride from 1 to edge */
-#line 828
+#line 808
         for (k = 0; k < nslabs; k++) {
-#line 828
+#line 808
             nstarts = 1;
-#line 828
+#line 808
             for (j = 0; j < var_rank[i]; j++) {
-#line 828
+#line 808
                 if ((k >> j) & 1) {
-#line 828
+#line 808
                     start[j] = 0;
-#line 828
+#line 808
                     edge[j] = mid[j];
-#line 828
+#line 808
                 }else{
-#line 828
+#line 808
                     start[j] = mid[j];
-#line 828
+#line 808
                     edge[j] = var_shape[i][j] - mid[j];
-#line 828
+#line 808
                 }
-#line 828
+#line 808
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 828
+#line 808
                 nstarts *= stride[j];
-#line 828
+#line 808
             }
-#line 828
+#line 808
             for (m = 0; m < nstarts; m++) {
-#line 828
+#line 808
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 828
+#line 808
                 IF (err)
-#line 828
+#line 808
                     error("error in toMixedBase");
-#line 828
+#line 808
                 nels = 1;
-#line 828
+#line 808
                 for (j = 0; j < var_rank[i]; j++) {
-#line 828
+#line 808
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 828
+#line 808
                     nels *= count[j];
-#line 828
+#line 808
                     index[j] += start[j];
-#line 828
+#line 808
                 }
-#line 828
+#line 808
 		    /* Random choice of forward or backward */
-#line 828
+#line 808
 /* TODO
-#line 828
+#line 808
 		if ( roll(2) ) {
-#line 828
+#line 808
 		    for (j = 0; j < var_rank[i]; j++) {
-#line 828
+#line 808
 			index[j] += (count[j] - 1) * stride[j];
-#line 828
+#line 808
 			stride[j] = -stride[j];
-#line 828
+#line 808
 		    }
-#line 828
+#line 808
 		}
-#line 828
+#line 808
  */
-#line 828
+#line 808
 		if (var_rank[i] > 0) {
-#line 828
+#line 808
 		    j = var_rank[i] - 1;
-#line 828
+#line 808
 		    imap[j] = 1;
-#line 828
+#line 808
 		    for (; j > 0; j--)
-#line 828
+#line 808
 			imap[j-1] = imap[j] * count[j];
-#line 828
+#line 808
 		}
-#line 828
+#line 808
                 allInExtRange = allInIntRange = 1;
-#line 828
+#line 808
                 for (j = 0; j < nels; j++) {
-#line 828
+#line 808
                     err = toMixedBase(j, var_rank[i], count, index2);
-#line 828
+#line 808
                     IF (err)
-#line 828
+#line 808
                         error("error in toMixedBase 1");
-#line 828
+#line 808
                     for (d = 0; d < var_rank[i]; d++)
-#line 828
+#line 808
                         index2[d] = index[d] + index2[d] * stride[d];
-#line 828
+#line 808
                     expect[j] = hash4(var_type[i], var_rank[i], index2,
-#line 828
+#line 808
                         NCT_TEXT);
-#line 828
+#line 808
                     if (inRange3(expect[j],var_type[i],NCT_TEXT)) {
-#line 828
+#line 808
                         allInIntRange = allInIntRange && expect[j] >= text_min
-#line 828
+#line 808
                             && expect[j] <= text_max;
-#line 828
+#line 808
                     } else {
-#line 828
+#line 808
                         allInExtRange = 0;
-#line 828
+#line 808
                     }
-#line 828
+#line 808
                 }
-#line 828
+#line 808
                 if (var_rank[i] == 0 && i%2 )
-#line 828
+#line 808
                     err = nc_get_varm_text(ncid,i,NULL,NULL,NULL,NULL,value);
-#line 828
+#line 808
                 else
-#line 828
+#line 808
                     err = nc_get_varm_text(ncid,i,index,count,stride,imap,value);
-#line 828
+#line 808
                 if (canConvert) {
-#line 828
+#line 808
                     if (allInExtRange) {
-#line 828
+#line 808
                         if (allInIntRange) {
-#line 828
+#line 808
                             IF (err)
-#line 828
+#line 808
                                 error("%s", nc_strerror(err));
-#line 828
+#line 808
                         } else {
-#line 828
+#line 808
                             IF (err != NC_ERANGE)
-#line 828
+#line 808
                                 error("Range error: status = %d", err);
-#line 828
+#line 808
                         }
-#line 828
+#line 808
                     } else {
-#line 828
+#line 808
                         IF (err != 0 && err != NC_ERANGE)
-#line 828
+#line 808
                             error("OK or Range error: status = %d", err);
-#line 828
+#line 808
                     }
-#line 828
+#line 808
                     for (j = 0; j < nels; j++) {
-#line 828
+#line 808
                         if (inRange3(expect[j],var_type[i],NCT_TEXT)
-#line 828
+#line 808
                                 && expect[j] >= text_min 
-#line 828
+#line 808
 				&& expect[j] <= text_max) {
-#line 828
+#line 808
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_TEXT)){
-#line 828
+#line 808
                                 error("value read not that expected");
-#line 828
+#line 808
                                 if (verbose) {
-#line 828
+#line 808
                                     error("\n");
-#line 828
+#line 808
                                     error("varid: %d, ", i);
-#line 828
+#line 808
                                     error("var_name: %s, ", var_name[i]);
-#line 828
+#line 808
                                     error("element number: %d ", j);
-#line 828
+#line 808
                                     error("expect: %g, ", expect[j]);
-#line 828
+#line 808
                                     error("got: %g", (double) value[j]);
-#line 828
+#line 808
                                 }
-#line 828
+#line 808
                             } else {
-#line 828
+#line 808
                                 nok++;
-#line 828
+#line 808
                             }
-#line 828
+#line 808
                         }
-#line 828
+#line 808
                     }
-#line 828
+#line 808
                 } else {
-#line 828
+#line 808
                     IF (nels > 0 && err != NC_ECHAR)
-#line 828
+#line 808
                         error("wrong type: status = %d", err);
-#line 828
+#line 808
                 }
-#line 828
+#line 808
             }
-#line 828
+#line 808
         }
-#line 828
+#line 808
     }
-#line 828
+#line 808
     err = nc_close(ncid);
-#line 828
+#line 808
     IF (err)
-#line 828
+#line 808
         error("nc_close: %s", nc_strerror(err));
-#line 828
+#line 808
     print_nok(nok);
-#line 828
+#line 808
 }
-#line 828
+#line 808
 
 void
-#line 829
+#line 809
 test_nc_get_varm_uchar(void)
-#line 829
+#line 809
 {
-#line 829
+#line 809
     int ncid;
-#line 829
+#line 809
     int d;
-#line 829
+#line 809
     int i;
-#line 829
+#line 809
     int j;
-#line 829
+#line 809
     int k;
-#line 829
+#line 809
     int m;
-#line 829
+#line 809
     int err;
-#line 829
+#line 809
     int allInExtRange;	/* all values within external range? */
-#line 829
+#line 809
     int allInIntRange;	/* all values within internal range? */
-#line 829
+#line 809
     int nels;
-#line 829
+#line 809
     int nslabs;
-#line 829
+#line 809
     int nstarts;        /* number of different starts */
-#line 829
+#line 809
     int nok = 0;      /* count of valid comparisons */
-#line 829
+#line 809
     size_t start[MAX_RANK];
-#line 829
+#line 809
     size_t edge[MAX_RANK];
-#line 829
+#line 809
     size_t index[MAX_RANK];
-#line 829
+#line 809
     size_t index2[MAX_RANK];
-#line 829
+#line 809
     size_t mid[MAX_RANK];
-#line 829
+#line 809
     size_t count[MAX_RANK];
-#line 829
+#line 809
     size_t sstride[MAX_RANK];
-#line 829
+#line 809
     ptrdiff_t stride[MAX_RANK];
-#line 829
+#line 809
     ptrdiff_t imap[MAX_RANK];
-#line 829
+#line 809
     int canConvert;     /* Both text or both numeric */
-#line 829
+#line 809
     uchar value[MAX_NELS];
-#line 829
+#line 809
     double expect[MAX_NELS];
-#line 829
+#line 809
 
-#line 829
-#ifdef USE_PNETCDF
-#line 829
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 829
-#else
-#line 829
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 829
-#endif
-#line 829
+#line 809
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 809
     IF (err)
-#line 829
+#line 809
         error("nc_open: %s", nc_strerror(err));
-#line 829
+#line 809
     for (i = 0; i < numVars; i++) {
-#line 829
+#line 809
         canConvert = (var_type[i] == NC_CHAR) == (NCT_UCHAR == NCT_TEXT);
-#line 829
+#line 809
         assert(var_rank[i] <= MAX_RANK);
-#line 829
+#line 809
         assert(var_nels[i] <= MAX_NELS);
-#line 829
+#line 809
         for (j = 0; j < var_rank[i]; j++) {
-#line 829
+#line 809
             start[j] = 0;
-#line 829
+#line 809
             edge[j] = 1;
-#line 829
+#line 809
             stride[j] = 1;
-#line 829
+#line 809
             imap[j] = 1;
-#line 829
+#line 809
         }
-#line 829
+#line 809
         err = nc_get_varm_uchar(BAD_ID, i, start, edge, stride, imap, value);
-#line 829
+#line 809
         IF (err != NC_EBADID)
-#line 829
+#line 809
             error("bad ncid: status = %d", err);
-#line 829
+#line 809
         err = nc_get_varm_uchar(ncid, BAD_VARID, start, edge, stride, imap, value);
-#line 829
+#line 809
         IF (err != NC_ENOTVAR)
-#line 829
+#line 809
             error("bad var id: status = %d", err);
-#line 829
+#line 809
         for (j = 0; j < var_rank[i]; j++) {
-#line 829
+#line 809
             start[j] = var_shape[i][j];
-#line 829
+#line 809
             err = nc_get_varm_uchar(ncid, i, start, edge, stride, imap, value);
-#line 829
+#line 809
 	  if(!canConvert) {
-#line 829
+#line 809
 		IF (err != NC_ECHAR)
-#line 829
+#line 809
                	    error("conversion: status = %d", err);
-#line 829
+#line 809
 	  } else {
-#line 829
+#line 809
 	    IF (err != NC_EINVALCOORDS)
-#line 829
+#line 809
                 error("bad index: status = %d", err);
-#line 829
+#line 809
             start[j] = 0;
-#line 829
+#line 809
             edge[j] = var_shape[i][j] + 1;
-#line 829
+#line 809
             err = nc_get_varm_uchar(ncid, i, start, edge, stride, imap, value);
-#line 829
+#line 809
             IF (err != NC_EEDGE)
-#line 829
+#line 809
                 error("bad edge: status = %d", err);
-#line 829
+#line 809
             edge[j] = 1;
-#line 829
+#line 809
             stride[j] = 0;
-#line 829
+#line 809
             err = nc_get_varm_uchar(ncid, i, start, edge, stride, imap, value);
-#line 829
+#line 809
             IF (err != NC_ESTRIDE)
-#line 829
+#line 809
                 error("bad stride: status = %d", err);
-#line 829
+#line 809
             stride[j] = 1;
-#line 829
+#line 809
            }
-#line 829
+#line 809
         }
-#line 829
+#line 809
             /* Choose a random point dividing each dim into 2 parts */
-#line 829
+#line 809
             /* get 2^rank (nslabs) slabs so defined */
-#line 829
+#line 809
         nslabs = 1;
-#line 829
+#line 809
         for (j = 0; j < var_rank[i]; j++) {
-#line 829
+#line 809
             mid[j] = roll( var_shape[i][j] );
-#line 829
+#line 809
             nslabs *= 2;
-#line 829
+#line 809
         }
-#line 829
+#line 809
             /* bits of k determine whether to get lower or upper part of dim */
-#line 829
+#line 809
             /* choose random stride from 1 to edge */
-#line 829
+#line 809
         for (k = 0; k < nslabs; k++) {
-#line 829
+#line 809
             nstarts = 1;
-#line 829
+#line 809
             for (j = 0; j < var_rank[i]; j++) {
-#line 829
+#line 809
                 if ((k >> j) & 1) {
-#line 829
+#line 809
                     start[j] = 0;
-#line 829
+#line 809
                     edge[j] = mid[j];
-#line 829
+#line 809
                 }else{
-#line 829
+#line 809
                     start[j] = mid[j];
-#line 829
+#line 809
                     edge[j] = var_shape[i][j] - mid[j];
-#line 829
+#line 809
                 }
-#line 829
+#line 809
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 829
+#line 809
                 nstarts *= stride[j];
-#line 829
+#line 809
             }
-#line 829
+#line 809
             for (m = 0; m < nstarts; m++) {
-#line 829
+#line 809
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 829
+#line 809
                 IF (err)
-#line 829
+#line 809
                     error("error in toMixedBase");
-#line 829
+#line 809
                 nels = 1;
-#line 829
+#line 809
                 for (j = 0; j < var_rank[i]; j++) {
-#line 829
+#line 809
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 829
+#line 809
                     nels *= count[j];
-#line 829
+#line 809
                     index[j] += start[j];
-#line 829
+#line 809
                 }
-#line 829
+#line 809
 		    /* Random choice of forward or backward */
-#line 829
+#line 809
 /* TODO
-#line 829
+#line 809
 		if ( roll(2) ) {
-#line 829
+#line 809
 		    for (j = 0; j < var_rank[i]; j++) {
-#line 829
+#line 809
 			index[j] += (count[j] - 1) * stride[j];
-#line 829
+#line 809
 			stride[j] = -stride[j];
-#line 829
+#line 809
 		    }
-#line 829
+#line 809
 		}
-#line 829
+#line 809
  */
-#line 829
+#line 809
 		if (var_rank[i] > 0) {
-#line 829
+#line 809
 		    j = var_rank[i] - 1;
-#line 829
+#line 809
 		    imap[j] = 1;
-#line 829
+#line 809
 		    for (; j > 0; j--)
-#line 829
+#line 809
 			imap[j-1] = imap[j] * count[j];
-#line 829
+#line 809
 		}
-#line 829
+#line 809
                 allInExtRange = allInIntRange = 1;
-#line 829
+#line 809
                 for (j = 0; j < nels; j++) {
-#line 829
+#line 809
                     err = toMixedBase(j, var_rank[i], count, index2);
-#line 829
+#line 809
                     IF (err)
-#line 829
+#line 809
                         error("error in toMixedBase 1");
-#line 829
+#line 809
                     for (d = 0; d < var_rank[i]; d++)
-#line 829
+#line 809
                         index2[d] = index[d] + index2[d] * stride[d];
-#line 829
+#line 809
                     expect[j] = hash4(var_type[i], var_rank[i], index2,
-#line 829
+#line 809
                         NCT_UCHAR);
-#line 829
+#line 809
                     if (inRange3(expect[j],var_type[i],NCT_UCHAR)) {
-#line 829
+#line 809
                         allInIntRange = allInIntRange && expect[j] >= uchar_min
-#line 829
+#line 809
                             && expect[j] <= uchar_max;
-#line 829
+#line 809
                     } else {
-#line 829
+#line 809
                         allInExtRange = 0;
-#line 829
+#line 809
                     }
-#line 829
+#line 809
                 }
-#line 829
+#line 809
                 if (var_rank[i] == 0 && i%2 )
-#line 829
+#line 809
                     err = nc_get_varm_uchar(ncid,i,NULL,NULL,NULL,NULL,value);
-#line 829
+#line 809
                 else
-#line 829
+#line 809
                     err = nc_get_varm_uchar(ncid,i,index,count,stride,imap,value);
-#line 829
+#line 809
                 if (canConvert) {
-#line 829
+#line 809
                     if (allInExtRange) {
-#line 829
+#line 809
                         if (allInIntRange) {
-#line 829
+#line 809
                             IF (err)
-#line 829
+#line 809
                                 error("%s", nc_strerror(err));
-#line 829
+#line 809
                         } else {
-#line 829
+#line 809
                             IF (err != NC_ERANGE)
-#line 829
+#line 809
                                 error("Range error: status = %d", err);
-#line 829
+#line 809
                         }
-#line 829
+#line 809
                     } else {
-#line 829
+#line 809
                         IF (err != 0 && err != NC_ERANGE)
-#line 829
+#line 809
                             error("OK or Range error: status = %d", err);
-#line 829
+#line 809
                     }
-#line 829
+#line 809
                     for (j = 0; j < nels; j++) {
-#line 829
+#line 809
                         if (inRange3(expect[j],var_type[i],NCT_UCHAR)
-#line 829
+#line 809
                                 && expect[j] >= uchar_min 
-#line 829
+#line 809
 				&& expect[j] <= uchar_max) {
-#line 829
+#line 809
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_UCHAR)){
-#line 829
+#line 809
                                 error("value read not that expected");
-#line 829
+#line 809
                                 if (verbose) {
-#line 829
+#line 809
                                     error("\n");
-#line 829
+#line 809
                                     error("varid: %d, ", i);
-#line 829
+#line 809
                                     error("var_name: %s, ", var_name[i]);
-#line 829
+#line 809
                                     error("element number: %d ", j);
-#line 829
+#line 809
                                     error("expect: %g, ", expect[j]);
-#line 829
+#line 809
                                     error("got: %g", (double) value[j]);
-#line 829
+#line 809
                                 }
-#line 829
+#line 809
                             } else {
-#line 829
+#line 809
                                 nok++;
-#line 829
+#line 809
                             }
-#line 829
+#line 809
                         }
-#line 829
+#line 809
                     }
-#line 829
+#line 809
                 } else {
-#line 829
+#line 809
                     IF (nels > 0 && err != NC_ECHAR)
-#line 829
+#line 809
                         error("wrong type: status = %d", err);
-#line 829
+#line 809
                 }
-#line 829
+#line 809
             }
-#line 829
+#line 809
         }
-#line 829
+#line 809
     }
-#line 829
+#line 809
     err = nc_close(ncid);
-#line 829
+#line 809
     IF (err)
-#line 829
+#line 809
         error("nc_close: %s", nc_strerror(err));
-#line 829
+#line 809
     print_nok(nok);
-#line 829
+#line 809
 }
-#line 829
+#line 809
 
 void
-#line 830
+#line 810
 test_nc_get_varm_schar(void)
-#line 830
+#line 810
 {
-#line 830
+#line 810
     int ncid;
-#line 830
+#line 810
     int d;
-#line 830
+#line 810
     int i;
-#line 830
+#line 810
     int j;
-#line 830
+#line 810
     int k;
-#line 830
+#line 810
     int m;
-#line 830
+#line 810
     int err;
-#line 830
+#line 810
     int allInExtRange;	/* all values within external range? */
-#line 830
+#line 810
     int allInIntRange;	/* all values within internal range? */
-#line 830
+#line 810
     int nels;
-#line 830
+#line 810
     int nslabs;
-#line 830
+#line 810
     int nstarts;        /* number of different starts */
-#line 830
+#line 810
     int nok = 0;      /* count of valid comparisons */
-#line 830
+#line 810
     size_t start[MAX_RANK];
-#line 830
+#line 810
     size_t edge[MAX_RANK];
-#line 830
+#line 810
     size_t index[MAX_RANK];
-#line 830
+#line 810
     size_t index2[MAX_RANK];
-#line 830
+#line 810
     size_t mid[MAX_RANK];
-#line 830
+#line 810
     size_t count[MAX_RANK];
-#line 830
+#line 810
     size_t sstride[MAX_RANK];
-#line 830
+#line 810
     ptrdiff_t stride[MAX_RANK];
-#line 830
+#line 810
     ptrdiff_t imap[MAX_RANK];
-#line 830
+#line 810
     int canConvert;     /* Both text or both numeric */
-#line 830
+#line 810
     schar value[MAX_NELS];
-#line 830
+#line 810
     double expect[MAX_NELS];
-#line 830
+#line 810
 
-#line 830
-#ifdef USE_PNETCDF
-#line 830
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 830
-#else
-#line 830
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 830
-#endif
-#line 830
+#line 810
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 810
     IF (err)
-#line 830
+#line 810
         error("nc_open: %s", nc_strerror(err));
-#line 830
+#line 810
     for (i = 0; i < numVars; i++) {
-#line 830
+#line 810
         canConvert = (var_type[i] == NC_CHAR) == (NCT_SCHAR == NCT_TEXT);
-#line 830
+#line 810
         assert(var_rank[i] <= MAX_RANK);
-#line 830
+#line 810
         assert(var_nels[i] <= MAX_NELS);
-#line 830
+#line 810
         for (j = 0; j < var_rank[i]; j++) {
-#line 830
+#line 810
             start[j] = 0;
-#line 830
+#line 810
             edge[j] = 1;
-#line 830
+#line 810
             stride[j] = 1;
-#line 830
+#line 810
             imap[j] = 1;
-#line 830
+#line 810
         }
-#line 830
+#line 810
         err = nc_get_varm_schar(BAD_ID, i, start, edge, stride, imap, value);
-#line 830
+#line 810
         IF (err != NC_EBADID)
-#line 830
+#line 810
             error("bad ncid: status = %d", err);
-#line 830
+#line 810
         err = nc_get_varm_schar(ncid, BAD_VARID, start, edge, stride, imap, value);
-#line 830
+#line 810
         IF (err != NC_ENOTVAR)
-#line 830
+#line 810
             error("bad var id: status = %d", err);
-#line 830
+#line 810
         for (j = 0; j < var_rank[i]; j++) {
-#line 830
+#line 810
             start[j] = var_shape[i][j];
-#line 830
+#line 810
             err = nc_get_varm_schar(ncid, i, start, edge, stride, imap, value);
-#line 830
+#line 810
 	  if(!canConvert) {
-#line 830
+#line 810
 		IF (err != NC_ECHAR)
-#line 830
+#line 810
                	    error("conversion: status = %d", err);
-#line 830
+#line 810
 	  } else {
-#line 830
+#line 810
 	    IF (err != NC_EINVALCOORDS)
-#line 830
+#line 810
                 error("bad index: status = %d", err);
-#line 830
+#line 810
             start[j] = 0;
-#line 830
+#line 810
             edge[j] = var_shape[i][j] + 1;
-#line 830
+#line 810
             err = nc_get_varm_schar(ncid, i, start, edge, stride, imap, value);
-#line 830
+#line 810
             IF (err != NC_EEDGE)
-#line 830
+#line 810
                 error("bad edge: status = %d", err);
-#line 830
+#line 810
             edge[j] = 1;
-#line 830
+#line 810
             stride[j] = 0;
-#line 830
+#line 810
             err = nc_get_varm_schar(ncid, i, start, edge, stride, imap, value);
-#line 830
+#line 810
             IF (err != NC_ESTRIDE)
-#line 830
+#line 810
                 error("bad stride: status = %d", err);
-#line 830
+#line 810
             stride[j] = 1;
-#line 830
+#line 810
            }
-#line 830
+#line 810
         }
-#line 830
+#line 810
             /* Choose a random point dividing each dim into 2 parts */
-#line 830
+#line 810
             /* get 2^rank (nslabs) slabs so defined */
-#line 830
+#line 810
         nslabs = 1;
-#line 830
+#line 810
         for (j = 0; j < var_rank[i]; j++) {
-#line 830
+#line 810
             mid[j] = roll( var_shape[i][j] );
-#line 830
+#line 810
             nslabs *= 2;
-#line 830
+#line 810
         }
-#line 830
+#line 810
             /* bits of k determine whether to get lower or upper part of dim */
-#line 830
+#line 810
             /* choose random stride from 1 to edge */
-#line 830
+#line 810
         for (k = 0; k < nslabs; k++) {
-#line 830
+#line 810
             nstarts = 1;
-#line 830
+#line 810
             for (j = 0; j < var_rank[i]; j++) {
-#line 830
+#line 810
                 if ((k >> j) & 1) {
-#line 830
+#line 810
                     start[j] = 0;
-#line 830
+#line 810
                     edge[j] = mid[j];
-#line 830
+#line 810
                 }else{
-#line 830
+#line 810
                     start[j] = mid[j];
-#line 830
+#line 810
                     edge[j] = var_shape[i][j] - mid[j];
-#line 830
+#line 810
                 }
-#line 830
+#line 810
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 830
+#line 810
                 nstarts *= stride[j];
-#line 830
+#line 810
             }
-#line 830
+#line 810
             for (m = 0; m < nstarts; m++) {
-#line 830
+#line 810
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 830
+#line 810
                 IF (err)
-#line 830
+#line 810
                     error("error in toMixedBase");
-#line 830
+#line 810
                 nels = 1;
-#line 830
+#line 810
                 for (j = 0; j < var_rank[i]; j++) {
-#line 830
+#line 810
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 830
+#line 810
                     nels *= count[j];
-#line 830
+#line 810
                     index[j] += start[j];
-#line 830
+#line 810
                 }
-#line 830
+#line 810
 		    /* Random choice of forward or backward */
-#line 830
+#line 810
 /* TODO
-#line 830
+#line 810
 		if ( roll(2) ) {
-#line 830
+#line 810
 		    for (j = 0; j < var_rank[i]; j++) {
-#line 830
+#line 810
 			index[j] += (count[j] - 1) * stride[j];
-#line 830
+#line 810
 			stride[j] = -stride[j];
-#line 830
+#line 810
 		    }
-#line 830
+#line 810
 		}
-#line 830
+#line 810
  */
-#line 830
+#line 810
 		if (var_rank[i] > 0) {
-#line 830
+#line 810
 		    j = var_rank[i] - 1;
-#line 830
+#line 810
 		    imap[j] = 1;
-#line 830
+#line 810
 		    for (; j > 0; j--)
-#line 830
+#line 810
 			imap[j-1] = imap[j] * count[j];
-#line 830
+#line 810
 		}
-#line 830
+#line 810
                 allInExtRange = allInIntRange = 1;
-#line 830
+#line 810
                 for (j = 0; j < nels; j++) {
-#line 830
+#line 810
                     err = toMixedBase(j, var_rank[i], count, index2);
-#line 830
+#line 810
                     IF (err)
-#line 830
+#line 810
                         error("error in toMixedBase 1");
-#line 830
+#line 810
                     for (d = 0; d < var_rank[i]; d++)
-#line 830
+#line 810
                         index2[d] = index[d] + index2[d] * stride[d];
-#line 830
+#line 810
                     expect[j] = hash4(var_type[i], var_rank[i], index2,
-#line 830
+#line 810
                         NCT_SCHAR);
-#line 830
+#line 810
                     if (inRange3(expect[j],var_type[i],NCT_SCHAR)) {
-#line 830
+#line 810
                         allInIntRange = allInIntRange && expect[j] >= schar_min
-#line 830
+#line 810
                             && expect[j] <= schar_max;
-#line 830
+#line 810
                     } else {
-#line 830
+#line 810
                         allInExtRange = 0;
-#line 830
+#line 810
                     }
-#line 830
+#line 810
                 }
-#line 830
+#line 810
                 if (var_rank[i] == 0 && i%2 )
-#line 830
+#line 810
                     err = nc_get_varm_schar(ncid,i,NULL,NULL,NULL,NULL,value);
-#line 830
+#line 810
                 else
-#line 830
+#line 810
                     err = nc_get_varm_schar(ncid,i,index,count,stride,imap,value);
-#line 830
+#line 810
                 if (canConvert) {
-#line 830
+#line 810
                     if (allInExtRange) {
-#line 830
+#line 810
                         if (allInIntRange) {
-#line 830
+#line 810
                             IF (err)
-#line 830
+#line 810
                                 error("%s", nc_strerror(err));
-#line 830
+#line 810
                         } else {
-#line 830
+#line 810
                             IF (err != NC_ERANGE)
-#line 830
+#line 810
                                 error("Range error: status = %d", err);
-#line 830
+#line 810
                         }
-#line 830
+#line 810
                     } else {
-#line 830
+#line 810
                         IF (err != 0 && err != NC_ERANGE)
-#line 830
+#line 810
                             error("OK or Range error: status = %d", err);
-#line 830
+#line 810
                     }
-#line 830
+#line 810
                     for (j = 0; j < nels; j++) {
-#line 830
+#line 810
                         if (inRange3(expect[j],var_type[i],NCT_SCHAR)
-#line 830
+#line 810
                                 && expect[j] >= schar_min 
-#line 830
+#line 810
 				&& expect[j] <= schar_max) {
-#line 830
+#line 810
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_SCHAR)){
-#line 830
+#line 810
                                 error("value read not that expected");
-#line 830
+#line 810
                                 if (verbose) {
-#line 830
+#line 810
                                     error("\n");
-#line 830
+#line 810
                                     error("varid: %d, ", i);
-#line 830
+#line 810
                                     error("var_name: %s, ", var_name[i]);
-#line 830
+#line 810
                                     error("element number: %d ", j);
-#line 830
+#line 810
                                     error("expect: %g, ", expect[j]);
-#line 830
+#line 810
                                     error("got: %g", (double) value[j]);
-#line 830
+#line 810
                                 }
-#line 830
+#line 810
                             } else {
-#line 830
+#line 810
                                 nok++;
-#line 830
+#line 810
                             }
-#line 830
+#line 810
                         }
-#line 830
+#line 810
                     }
-#line 830
+#line 810
                 } else {
-#line 830
+#line 810
                     IF (nels > 0 && err != NC_ECHAR)
-#line 830
+#line 810
                         error("wrong type: status = %d", err);
-#line 830
+#line 810
                 }
-#line 830
+#line 810
             }
-#line 830
+#line 810
         }
-#line 830
+#line 810
     }
-#line 830
+#line 810
     err = nc_close(ncid);
-#line 830
+#line 810
     IF (err)
-#line 830
+#line 810
         error("nc_close: %s", nc_strerror(err));
-#line 830
+#line 810
     print_nok(nok);
-#line 830
+#line 810
 }
-#line 830
+#line 810
 
 void
-#line 831
+#line 811
 test_nc_get_varm_short(void)
-#line 831
+#line 811
 {
-#line 831
+#line 811
     int ncid;
-#line 831
+#line 811
     int d;
-#line 831
+#line 811
     int i;
-#line 831
+#line 811
     int j;
-#line 831
+#line 811
     int k;
-#line 831
+#line 811
     int m;
-#line 831
+#line 811
     int err;
-#line 831
+#line 811
     int allInExtRange;	/* all values within external range? */
-#line 831
+#line 811
     int allInIntRange;	/* all values within internal range? */
-#line 831
+#line 811
     int nels;
-#line 831
+#line 811
     int nslabs;
-#line 831
+#line 811
     int nstarts;        /* number of different starts */
-#line 831
+#line 811
     int nok = 0;      /* count of valid comparisons */
-#line 831
+#line 811
     size_t start[MAX_RANK];
-#line 831
+#line 811
     size_t edge[MAX_RANK];
-#line 831
+#line 811
     size_t index[MAX_RANK];
-#line 831
+#line 811
     size_t index2[MAX_RANK];
-#line 831
+#line 811
     size_t mid[MAX_RANK];
-#line 831
+#line 811
     size_t count[MAX_RANK];
-#line 831
+#line 811
     size_t sstride[MAX_RANK];
-#line 831
+#line 811
     ptrdiff_t stride[MAX_RANK];
-#line 831
+#line 811
     ptrdiff_t imap[MAX_RANK];
-#line 831
+#line 811
     int canConvert;     /* Both text or both numeric */
-#line 831
+#line 811
     short value[MAX_NELS];
-#line 831
+#line 811
     double expect[MAX_NELS];
-#line 831
+#line 811
 
-#line 831
-#ifdef USE_PNETCDF
-#line 831
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 831
-#else
-#line 831
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 831
-#endif
-#line 831
+#line 811
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 811
     IF (err)
-#line 831
+#line 811
         error("nc_open: %s", nc_strerror(err));
-#line 831
+#line 811
     for (i = 0; i < numVars; i++) {
-#line 831
+#line 811
         canConvert = (var_type[i] == NC_CHAR) == (NCT_SHORT == NCT_TEXT);
-#line 831
+#line 811
         assert(var_rank[i] <= MAX_RANK);
-#line 831
+#line 811
         assert(var_nels[i] <= MAX_NELS);
-#line 831
+#line 811
         for (j = 0; j < var_rank[i]; j++) {
-#line 831
+#line 811
             start[j] = 0;
-#line 831
+#line 811
             edge[j] = 1;
-#line 831
+#line 811
             stride[j] = 1;
-#line 831
+#line 811
             imap[j] = 1;
-#line 831
+#line 811
         }
-#line 831
+#line 811
         err = nc_get_varm_short(BAD_ID, i, start, edge, stride, imap, value);
-#line 831
+#line 811
         IF (err != NC_EBADID)
-#line 831
+#line 811
             error("bad ncid: status = %d", err);
-#line 831
+#line 811
         err = nc_get_varm_short(ncid, BAD_VARID, start, edge, stride, imap, value);
-#line 831
+#line 811
         IF (err != NC_ENOTVAR)
-#line 831
+#line 811
             error("bad var id: status = %d", err);
-#line 831
+#line 811
         for (j = 0; j < var_rank[i]; j++) {
-#line 831
+#line 811
             start[j] = var_shape[i][j];
-#line 831
+#line 811
             err = nc_get_varm_short(ncid, i, start, edge, stride, imap, value);
-#line 831
+#line 811
 	  if(!canConvert) {
-#line 831
+#line 811
 		IF (err != NC_ECHAR)
-#line 831
+#line 811
                	    error("conversion: status = %d", err);
-#line 831
+#line 811
 	  } else {
-#line 831
+#line 811
 	    IF (err != NC_EINVALCOORDS)
-#line 831
+#line 811
                 error("bad index: status = %d", err);
-#line 831
+#line 811
             start[j] = 0;
-#line 831
+#line 811
             edge[j] = var_shape[i][j] + 1;
-#line 831
+#line 811
             err = nc_get_varm_short(ncid, i, start, edge, stride, imap, value);
-#line 831
+#line 811
             IF (err != NC_EEDGE)
-#line 831
+#line 811
                 error("bad edge: status = %d", err);
-#line 831
+#line 811
             edge[j] = 1;
-#line 831
+#line 811
             stride[j] = 0;
-#line 831
+#line 811
             err = nc_get_varm_short(ncid, i, start, edge, stride, imap, value);
-#line 831
+#line 811
             IF (err != NC_ESTRIDE)
-#line 831
+#line 811
                 error("bad stride: status = %d", err);
-#line 831
+#line 811
             stride[j] = 1;
-#line 831
+#line 811
            }
-#line 831
+#line 811
         }
-#line 831
+#line 811
             /* Choose a random point dividing each dim into 2 parts */
-#line 831
+#line 811
             /* get 2^rank (nslabs) slabs so defined */
-#line 831
+#line 811
         nslabs = 1;
-#line 831
+#line 811
         for (j = 0; j < var_rank[i]; j++) {
-#line 831
+#line 811
             mid[j] = roll( var_shape[i][j] );
-#line 831
+#line 811
             nslabs *= 2;
-#line 831
+#line 811
         }
-#line 831
+#line 811
             /* bits of k determine whether to get lower or upper part of dim */
-#line 831
+#line 811
             /* choose random stride from 1 to edge */
-#line 831
+#line 811
         for (k = 0; k < nslabs; k++) {
-#line 831
+#line 811
             nstarts = 1;
-#line 831
+#line 811
             for (j = 0; j < var_rank[i]; j++) {
-#line 831
+#line 811
                 if ((k >> j) & 1) {
-#line 831
+#line 811
                     start[j] = 0;
-#line 831
+#line 811
                     edge[j] = mid[j];
-#line 831
+#line 811
                 }else{
-#line 831
+#line 811
                     start[j] = mid[j];
-#line 831
+#line 811
                     edge[j] = var_shape[i][j] - mid[j];
-#line 831
+#line 811
                 }
-#line 831
+#line 811
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 831
+#line 811
                 nstarts *= stride[j];
-#line 831
+#line 811
             }
-#line 831
+#line 811
             for (m = 0; m < nstarts; m++) {
-#line 831
+#line 811
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 831
+#line 811
                 IF (err)
-#line 831
+#line 811
                     error("error in toMixedBase");
-#line 831
+#line 811
                 nels = 1;
-#line 831
+#line 811
                 for (j = 0; j < var_rank[i]; j++) {
-#line 831
+#line 811
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 831
+#line 811
                     nels *= count[j];
-#line 831
+#line 811
                     index[j] += start[j];
-#line 831
+#line 811
                 }
-#line 831
+#line 811
 		    /* Random choice of forward or backward */
-#line 831
+#line 811
 /* TODO
-#line 831
+#line 811
 		if ( roll(2) ) {
-#line 831
+#line 811
 		    for (j = 0; j < var_rank[i]; j++) {
-#line 831
+#line 811
 			index[j] += (count[j] - 1) * stride[j];
-#line 831
+#line 811
 			stride[j] = -stride[j];
-#line 831
+#line 811
 		    }
-#line 831
+#line 811
 		}
-#line 831
+#line 811
  */
-#line 831
+#line 811
 		if (var_rank[i] > 0) {
-#line 831
+#line 811
 		    j = var_rank[i] - 1;
-#line 831
+#line 811
 		    imap[j] = 1;
-#line 831
+#line 811
 		    for (; j > 0; j--)
-#line 831
+#line 811
 			imap[j-1] = imap[j] * count[j];
-#line 831
+#line 811
 		}
-#line 831
+#line 811
                 allInExtRange = allInIntRange = 1;
-#line 831
+#line 811
                 for (j = 0; j < nels; j++) {
-#line 831
+#line 811
                     err = toMixedBase(j, var_rank[i], count, index2);
-#line 831
+#line 811
                     IF (err)
-#line 831
+#line 811
                         error("error in toMixedBase 1");
-#line 831
+#line 811
                     for (d = 0; d < var_rank[i]; d++)
-#line 831
+#line 811
                         index2[d] = index[d] + index2[d] * stride[d];
-#line 831
+#line 811
                     expect[j] = hash4(var_type[i], var_rank[i], index2,
-#line 831
+#line 811
                         NCT_SHORT);
-#line 831
+#line 811
                     if (inRange3(expect[j],var_type[i],NCT_SHORT)) {
-#line 831
+#line 811
                         allInIntRange = allInIntRange && expect[j] >= short_min
-#line 831
+#line 811
                             && expect[j] <= short_max;
-#line 831
+#line 811
                     } else {
-#line 831
+#line 811
                         allInExtRange = 0;
-#line 831
+#line 811
                     }
-#line 831
+#line 811
                 }
-#line 831
+#line 811
                 if (var_rank[i] == 0 && i%2 )
-#line 831
+#line 811
                     err = nc_get_varm_short(ncid,i,NULL,NULL,NULL,NULL,value);
-#line 831
+#line 811
                 else
-#line 831
+#line 811
                     err = nc_get_varm_short(ncid,i,index,count,stride,imap,value);
-#line 831
+#line 811
                 if (canConvert) {
-#line 831
+#line 811
                     if (allInExtRange) {
-#line 831
+#line 811
                         if (allInIntRange) {
-#line 831
+#line 811
                             IF (err)
-#line 831
+#line 811
                                 error("%s", nc_strerror(err));
-#line 831
+#line 811
                         } else {
-#line 831
+#line 811
                             IF (err != NC_ERANGE)
-#line 831
+#line 811
                                 error("Range error: status = %d", err);
-#line 831
+#line 811
                         }
-#line 831
+#line 811
                     } else {
-#line 831
+#line 811
                         IF (err != 0 && err != NC_ERANGE)
-#line 831
+#line 811
                             error("OK or Range error: status = %d", err);
-#line 831
+#line 811
                     }
-#line 831
+#line 811
                     for (j = 0; j < nels; j++) {
-#line 831
+#line 811
                         if (inRange3(expect[j],var_type[i],NCT_SHORT)
-#line 831
+#line 811
                                 && expect[j] >= short_min 
-#line 831
+#line 811
 				&& expect[j] <= short_max) {
-#line 831
+#line 811
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_SHORT)){
-#line 831
+#line 811
                                 error("value read not that expected");
-#line 831
+#line 811
                                 if (verbose) {
-#line 831
+#line 811
                                     error("\n");
-#line 831
+#line 811
                                     error("varid: %d, ", i);
-#line 831
+#line 811
                                     error("var_name: %s, ", var_name[i]);
-#line 831
+#line 811
                                     error("element number: %d ", j);
-#line 831
+#line 811
                                     error("expect: %g, ", expect[j]);
-#line 831
+#line 811
                                     error("got: %g", (double) value[j]);
-#line 831
+#line 811
                                 }
-#line 831
+#line 811
                             } else {
-#line 831
+#line 811
                                 nok++;
-#line 831
+#line 811
                             }
-#line 831
+#line 811
                         }
-#line 831
+#line 811
                     }
-#line 831
+#line 811
                 } else {
-#line 831
+#line 811
                     IF (nels > 0 && err != NC_ECHAR)
-#line 831
+#line 811
                         error("wrong type: status = %d", err);
-#line 831
+#line 811
                 }
-#line 831
+#line 811
             }
-#line 831
+#line 811
         }
-#line 831
+#line 811
     }
-#line 831
+#line 811
     err = nc_close(ncid);
-#line 831
+#line 811
     IF (err)
-#line 831
+#line 811
         error("nc_close: %s", nc_strerror(err));
-#line 831
+#line 811
     print_nok(nok);
-#line 831
+#line 811
 }
-#line 831
+#line 811
 
 void
-#line 832
+#line 812
 test_nc_get_varm_int(void)
-#line 832
+#line 812
 {
-#line 832
+#line 812
     int ncid;
-#line 832
+#line 812
     int d;
-#line 832
+#line 812
     int i;
-#line 832
+#line 812
     int j;
-#line 832
+#line 812
     int k;
-#line 832
+#line 812
     int m;
-#line 832
+#line 812
     int err;
-#line 832
+#line 812
     int allInExtRange;	/* all values within external range? */
-#line 832
+#line 812
     int allInIntRange;	/* all values within internal range? */
-#line 832
+#line 812
     int nels;
-#line 832
+#line 812
     int nslabs;
-#line 832
+#line 812
     int nstarts;        /* number of different starts */
-#line 832
+#line 812
     int nok = 0;      /* count of valid comparisons */
-#line 832
+#line 812
     size_t start[MAX_RANK];
-#line 832
+#line 812
     size_t edge[MAX_RANK];
-#line 832
+#line 812
     size_t index[MAX_RANK];
-#line 832
+#line 812
     size_t index2[MAX_RANK];
-#line 832
+#line 812
     size_t mid[MAX_RANK];
-#line 832
+#line 812
     size_t count[MAX_RANK];
-#line 832
+#line 812
     size_t sstride[MAX_RANK];
-#line 832
+#line 812
     ptrdiff_t stride[MAX_RANK];
-#line 832
+#line 812
     ptrdiff_t imap[MAX_RANK];
-#line 832
+#line 812
     int canConvert;     /* Both text or both numeric */
-#line 832
+#line 812
     int value[MAX_NELS];
-#line 832
+#line 812
     double expect[MAX_NELS];
-#line 832
+#line 812
 
-#line 832
-#ifdef USE_PNETCDF
-#line 832
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 832
-#else
-#line 832
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 832
-#endif
-#line 832
+#line 812
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 812
     IF (err)
-#line 832
+#line 812
         error("nc_open: %s", nc_strerror(err));
-#line 832
+#line 812
     for (i = 0; i < numVars; i++) {
-#line 832
+#line 812
         canConvert = (var_type[i] == NC_CHAR) == (NCT_INT == NCT_TEXT);
-#line 832
+#line 812
         assert(var_rank[i] <= MAX_RANK);
-#line 832
+#line 812
         assert(var_nels[i] <= MAX_NELS);
-#line 832
+#line 812
         for (j = 0; j < var_rank[i]; j++) {
-#line 832
+#line 812
             start[j] = 0;
-#line 832
+#line 812
             edge[j] = 1;
-#line 832
+#line 812
             stride[j] = 1;
-#line 832
+#line 812
             imap[j] = 1;
-#line 832
+#line 812
         }
-#line 832
+#line 812
         err = nc_get_varm_int(BAD_ID, i, start, edge, stride, imap, value);
-#line 832
+#line 812
         IF (err != NC_EBADID)
-#line 832
+#line 812
             error("bad ncid: status = %d", err);
-#line 832
+#line 812
         err = nc_get_varm_int(ncid, BAD_VARID, start, edge, stride, imap, value);
-#line 832
+#line 812
         IF (err != NC_ENOTVAR)
-#line 832
+#line 812
             error("bad var id: status = %d", err);
-#line 832
+#line 812
         for (j = 0; j < var_rank[i]; j++) {
-#line 832
+#line 812
             start[j] = var_shape[i][j];
-#line 832
+#line 812
             err = nc_get_varm_int(ncid, i, start, edge, stride, imap, value);
-#line 832
+#line 812
 	  if(!canConvert) {
-#line 832
+#line 812
 		IF (err != NC_ECHAR)
-#line 832
+#line 812
                	    error("conversion: status = %d", err);
-#line 832
+#line 812
 	  } else {
-#line 832
+#line 812
 	    IF (err != NC_EINVALCOORDS)
-#line 832
+#line 812
                 error("bad index: status = %d", err);
-#line 832
+#line 812
             start[j] = 0;
-#line 832
+#line 812
             edge[j] = var_shape[i][j] + 1;
-#line 832
+#line 812
             err = nc_get_varm_int(ncid, i, start, edge, stride, imap, value);
-#line 832
+#line 812
             IF (err != NC_EEDGE)
-#line 832
+#line 812
                 error("bad edge: status = %d", err);
-#line 832
+#line 812
             edge[j] = 1;
-#line 832
+#line 812
             stride[j] = 0;
-#line 832
+#line 812
             err = nc_get_varm_int(ncid, i, start, edge, stride, imap, value);
-#line 832
+#line 812
             IF (err != NC_ESTRIDE)
-#line 832
+#line 812
                 error("bad stride: status = %d", err);
-#line 832
+#line 812
             stride[j] = 1;
-#line 832
+#line 812
            }
-#line 832
+#line 812
         }
-#line 832
+#line 812
             /* Choose a random point dividing each dim into 2 parts */
-#line 832
+#line 812
             /* get 2^rank (nslabs) slabs so defined */
-#line 832
+#line 812
         nslabs = 1;
-#line 832
+#line 812
         for (j = 0; j < var_rank[i]; j++) {
-#line 832
+#line 812
             mid[j] = roll( var_shape[i][j] );
-#line 832
+#line 812
             nslabs *= 2;
-#line 832
+#line 812
         }
-#line 832
+#line 812
             /* bits of k determine whether to get lower or upper part of dim */
-#line 832
+#line 812
             /* choose random stride from 1 to edge */
-#line 832
+#line 812
         for (k = 0; k < nslabs; k++) {
-#line 832
+#line 812
             nstarts = 1;
-#line 832
+#line 812
             for (j = 0; j < var_rank[i]; j++) {
-#line 832
+#line 812
                 if ((k >> j) & 1) {
-#line 832
+#line 812
                     start[j] = 0;
-#line 832
+#line 812
                     edge[j] = mid[j];
-#line 832
+#line 812
                 }else{
-#line 832
+#line 812
                     start[j] = mid[j];
-#line 832
+#line 812
                     edge[j] = var_shape[i][j] - mid[j];
-#line 832
+#line 812
                 }
-#line 832
+#line 812
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 832
+#line 812
                 nstarts *= stride[j];
-#line 832
+#line 812
             }
-#line 832
+#line 812
             for (m = 0; m < nstarts; m++) {
-#line 832
+#line 812
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 832
+#line 812
                 IF (err)
-#line 832
+#line 812
                     error("error in toMixedBase");
-#line 832
+#line 812
                 nels = 1;
-#line 832
+#line 812
                 for (j = 0; j < var_rank[i]; j++) {
-#line 832
+#line 812
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 832
+#line 812
                     nels *= count[j];
-#line 832
+#line 812
                     index[j] += start[j];
-#line 832
+#line 812
                 }
-#line 832
+#line 812
 		    /* Random choice of forward or backward */
-#line 832
+#line 812
 /* TODO
-#line 832
+#line 812
 		if ( roll(2) ) {
-#line 832
+#line 812
 		    for (j = 0; j < var_rank[i]; j++) {
-#line 832
+#line 812
 			index[j] += (count[j] - 1) * stride[j];
-#line 832
+#line 812
 			stride[j] = -stride[j];
-#line 832
+#line 812
 		    }
-#line 832
+#line 812
 		}
-#line 832
+#line 812
  */
-#line 832
+#line 812
 		if (var_rank[i] > 0) {
-#line 832
+#line 812
 		    j = var_rank[i] - 1;
-#line 832
+#line 812
 		    imap[j] = 1;
-#line 832
+#line 812
 		    for (; j > 0; j--)
-#line 832
+#line 812
 			imap[j-1] = imap[j] * count[j];
-#line 832
+#line 812
 		}
-#line 832
+#line 812
                 allInExtRange = allInIntRange = 1;
-#line 832
+#line 812
                 for (j = 0; j < nels; j++) {
-#line 832
+#line 812
                     err = toMixedBase(j, var_rank[i], count, index2);
-#line 832
+#line 812
                     IF (err)
-#line 832
+#line 812
                         error("error in toMixedBase 1");
-#line 832
+#line 812
                     for (d = 0; d < var_rank[i]; d++)
-#line 832
+#line 812
                         index2[d] = index[d] + index2[d] * stride[d];
-#line 832
+#line 812
                     expect[j] = hash4(var_type[i], var_rank[i], index2,
-#line 832
+#line 812
                         NCT_INT);
-#line 832
+#line 812
                     if (inRange3(expect[j],var_type[i],NCT_INT)) {
-#line 832
+#line 812
                         allInIntRange = allInIntRange && expect[j] >= int_min
-#line 832
+#line 812
                             && expect[j] <= int_max;
-#line 832
+#line 812
                     } else {
-#line 832
+#line 812
                         allInExtRange = 0;
-#line 832
+#line 812
                     }
-#line 832
+#line 812
                 }
-#line 832
+#line 812
                 if (var_rank[i] == 0 && i%2 )
-#line 832
+#line 812
                     err = nc_get_varm_int(ncid,i,NULL,NULL,NULL,NULL,value);
-#line 832
+#line 812
                 else
-#line 832
+#line 812
                     err = nc_get_varm_int(ncid,i,index,count,stride,imap,value);
-#line 832
+#line 812
                 if (canConvert) {
-#line 832
+#line 812
                     if (allInExtRange) {
-#line 832
+#line 812
                         if (allInIntRange) {
-#line 832
+#line 812
                             IF (err)
-#line 832
+#line 812
                                 error("%s", nc_strerror(err));
-#line 832
+#line 812
                         } else {
-#line 832
+#line 812
                             IF (err != NC_ERANGE)
-#line 832
+#line 812
                                 error("Range error: status = %d", err);
-#line 832
+#line 812
                         }
-#line 832
+#line 812
                     } else {
-#line 832
+#line 812
                         IF (err != 0 && err != NC_ERANGE)
-#line 832
+#line 812
                             error("OK or Range error: status = %d", err);
-#line 832
+#line 812
                     }
-#line 832
+#line 812
                     for (j = 0; j < nels; j++) {
-#line 832
+#line 812
                         if (inRange3(expect[j],var_type[i],NCT_INT)
-#line 832
+#line 812
                                 && expect[j] >= int_min 
-#line 832
+#line 812
 				&& expect[j] <= int_max) {
-#line 832
+#line 812
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_INT)){
-#line 832
+#line 812
                                 error("value read not that expected");
-#line 832
+#line 812
                                 if (verbose) {
-#line 832
+#line 812
                                     error("\n");
-#line 832
+#line 812
                                     error("varid: %d, ", i);
-#line 832
+#line 812
                                     error("var_name: %s, ", var_name[i]);
-#line 832
+#line 812
                                     error("element number: %d ", j);
-#line 832
+#line 812
                                     error("expect: %g, ", expect[j]);
-#line 832
+#line 812
                                     error("got: %g", (double) value[j]);
-#line 832
+#line 812
                                 }
-#line 832
+#line 812
                             } else {
-#line 832
+#line 812
                                 nok++;
-#line 832
+#line 812
                             }
-#line 832
+#line 812
                         }
-#line 832
+#line 812
                     }
-#line 832
+#line 812
                 } else {
-#line 832
+#line 812
                     IF (nels > 0 && err != NC_ECHAR)
-#line 832
+#line 812
                         error("wrong type: status = %d", err);
-#line 832
+#line 812
                 }
-#line 832
+#line 812
             }
-#line 832
+#line 812
         }
-#line 832
+#line 812
     }
-#line 832
+#line 812
     err = nc_close(ncid);
-#line 832
+#line 812
     IF (err)
-#line 832
+#line 812
         error("nc_close: %s", nc_strerror(err));
-#line 832
+#line 812
     print_nok(nok);
-#line 832
+#line 812
 }
-#line 832
+#line 812
 
 void
-#line 833
+#line 813
 test_nc_get_varm_long(void)
-#line 833
+#line 813
 {
-#line 833
+#line 813
     int ncid;
-#line 833
+#line 813
     int d;
-#line 833
+#line 813
     int i;
-#line 833
+#line 813
     int j;
-#line 833
+#line 813
     int k;
-#line 833
+#line 813
     int m;
-#line 833
+#line 813
     int err;
-#line 833
+#line 813
     int allInExtRange;	/* all values within external range? */
-#line 833
+#line 813
     int allInIntRange;	/* all values within internal range? */
-#line 833
+#line 813
     int nels;
-#line 833
+#line 813
     int nslabs;
-#line 833
+#line 813
     int nstarts;        /* number of different starts */
-#line 833
+#line 813
     int nok = 0;      /* count of valid comparisons */
-#line 833
+#line 813
     size_t start[MAX_RANK];
-#line 833
+#line 813
     size_t edge[MAX_RANK];
-#line 833
+#line 813
     size_t index[MAX_RANK];
-#line 833
+#line 813
     size_t index2[MAX_RANK];
-#line 833
+#line 813
     size_t mid[MAX_RANK];
-#line 833
+#line 813
     size_t count[MAX_RANK];
-#line 833
+#line 813
     size_t sstride[MAX_RANK];
-#line 833
+#line 813
     ptrdiff_t stride[MAX_RANK];
-#line 833
+#line 813
     ptrdiff_t imap[MAX_RANK];
-#line 833
+#line 813
     int canConvert;     /* Both text or both numeric */
-#line 833
+#line 813
     long value[MAX_NELS];
-#line 833
+#line 813
     double expect[MAX_NELS];
-#line 833
+#line 813
 
-#line 833
-#ifdef USE_PNETCDF
-#line 833
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 833
-#else
-#line 833
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 833
-#endif
-#line 833
+#line 813
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 813
     IF (err)
-#line 833
+#line 813
         error("nc_open: %s", nc_strerror(err));
-#line 833
+#line 813
     for (i = 0; i < numVars; i++) {
-#line 833
+#line 813
         canConvert = (var_type[i] == NC_CHAR) == (NCT_LONG == NCT_TEXT);
-#line 833
+#line 813
         assert(var_rank[i] <= MAX_RANK);
-#line 833
+#line 813
         assert(var_nels[i] <= MAX_NELS);
-#line 833
+#line 813
         for (j = 0; j < var_rank[i]; j++) {
-#line 833
+#line 813
             start[j] = 0;
-#line 833
+#line 813
             edge[j] = 1;
-#line 833
+#line 813
             stride[j] = 1;
-#line 833
+#line 813
             imap[j] = 1;
-#line 833
+#line 813
         }
-#line 833
+#line 813
         err = nc_get_varm_long(BAD_ID, i, start, edge, stride, imap, value);
-#line 833
+#line 813
         IF (err != NC_EBADID)
-#line 833
+#line 813
             error("bad ncid: status = %d", err);
-#line 833
+#line 813
         err = nc_get_varm_long(ncid, BAD_VARID, start, edge, stride, imap, value);
-#line 833
+#line 813
         IF (err != NC_ENOTVAR)
-#line 833
+#line 813
             error("bad var id: status = %d", err);
-#line 833
+#line 813
         for (j = 0; j < var_rank[i]; j++) {
-#line 833
+#line 813
             start[j] = var_shape[i][j];
-#line 833
+#line 813
             err = nc_get_varm_long(ncid, i, start, edge, stride, imap, value);
-#line 833
+#line 813
 	  if(!canConvert) {
-#line 833
+#line 813
 		IF (err != NC_ECHAR)
-#line 833
+#line 813
                	    error("conversion: status = %d", err);
-#line 833
+#line 813
 	  } else {
-#line 833
+#line 813
 	    IF (err != NC_EINVALCOORDS)
-#line 833
+#line 813
                 error("bad index: status = %d", err);
-#line 833
+#line 813
             start[j] = 0;
-#line 833
+#line 813
             edge[j] = var_shape[i][j] + 1;
-#line 833
+#line 813
             err = nc_get_varm_long(ncid, i, start, edge, stride, imap, value);
-#line 833
+#line 813
             IF (err != NC_EEDGE)
-#line 833
+#line 813
                 error("bad edge: status = %d", err);
-#line 833
+#line 813
             edge[j] = 1;
-#line 833
+#line 813
             stride[j] = 0;
-#line 833
+#line 813
             err = nc_get_varm_long(ncid, i, start, edge, stride, imap, value);
-#line 833
+#line 813
             IF (err != NC_ESTRIDE)
-#line 833
+#line 813
                 error("bad stride: status = %d", err);
-#line 833
+#line 813
             stride[j] = 1;
-#line 833
+#line 813
            }
-#line 833
+#line 813
         }
-#line 833
+#line 813
             /* Choose a random point dividing each dim into 2 parts */
-#line 833
+#line 813
             /* get 2^rank (nslabs) slabs so defined */
-#line 833
+#line 813
         nslabs = 1;
-#line 833
+#line 813
         for (j = 0; j < var_rank[i]; j++) {
-#line 833
+#line 813
             mid[j] = roll( var_shape[i][j] );
-#line 833
+#line 813
             nslabs *= 2;
-#line 833
+#line 813
         }
-#line 833
+#line 813
             /* bits of k determine whether to get lower or upper part of dim */
-#line 833
+#line 813
             /* choose random stride from 1 to edge */
-#line 833
+#line 813
         for (k = 0; k < nslabs; k++) {
-#line 833
+#line 813
             nstarts = 1;
-#line 833
+#line 813
             for (j = 0; j < var_rank[i]; j++) {
-#line 833
+#line 813
                 if ((k >> j) & 1) {
-#line 833
+#line 813
                     start[j] = 0;
-#line 833
+#line 813
                     edge[j] = mid[j];
-#line 833
+#line 813
                 }else{
-#line 833
+#line 813
                     start[j] = mid[j];
-#line 833
+#line 813
                     edge[j] = var_shape[i][j] - mid[j];
-#line 833
+#line 813
                 }
-#line 833
+#line 813
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 833
+#line 813
                 nstarts *= stride[j];
-#line 833
+#line 813
             }
-#line 833
+#line 813
             for (m = 0; m < nstarts; m++) {
-#line 833
+#line 813
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 833
+#line 813
                 IF (err)
-#line 833
+#line 813
                     error("error in toMixedBase");
-#line 833
+#line 813
                 nels = 1;
-#line 833
+#line 813
                 for (j = 0; j < var_rank[i]; j++) {
-#line 833
+#line 813
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 833
+#line 813
                     nels *= count[j];
-#line 833
+#line 813
                     index[j] += start[j];
-#line 833
+#line 813
                 }
-#line 833
+#line 813
 		    /* Random choice of forward or backward */
-#line 833
+#line 813
 /* TODO
-#line 833
+#line 813
 		if ( roll(2) ) {
-#line 833
+#line 813
 		    for (j = 0; j < var_rank[i]; j++) {
-#line 833
+#line 813
 			index[j] += (count[j] - 1) * stride[j];
-#line 833
+#line 813
 			stride[j] = -stride[j];
-#line 833
+#line 813
 		    }
-#line 833
+#line 813
 		}
-#line 833
+#line 813
  */
-#line 833
+#line 813
 		if (var_rank[i] > 0) {
-#line 833
+#line 813
 		    j = var_rank[i] - 1;
-#line 833
+#line 813
 		    imap[j] = 1;
-#line 833
+#line 813
 		    for (; j > 0; j--)
-#line 833
+#line 813
 			imap[j-1] = imap[j] * count[j];
-#line 833
+#line 813
 		}
-#line 833
+#line 813
                 allInExtRange = allInIntRange = 1;
-#line 833
+#line 813
                 for (j = 0; j < nels; j++) {
-#line 833
+#line 813
                     err = toMixedBase(j, var_rank[i], count, index2);
-#line 833
+#line 813
                     IF (err)
-#line 833
+#line 813
                         error("error in toMixedBase 1");
-#line 833
+#line 813
                     for (d = 0; d < var_rank[i]; d++)
-#line 833
+#line 813
                         index2[d] = index[d] + index2[d] * stride[d];
-#line 833
+#line 813
                     expect[j] = hash4(var_type[i], var_rank[i], index2,
-#line 833
+#line 813
                         NCT_LONG);
-#line 833
+#line 813
                     if (inRange3(expect[j],var_type[i],NCT_LONG)) {
-#line 833
+#line 813
                         allInIntRange = allInIntRange && expect[j] >= long_min
-#line 833
+#line 813
                             && expect[j] <= long_max;
-#line 833
+#line 813
                     } else {
-#line 833
+#line 813
                         allInExtRange = 0;
-#line 833
+#line 813
                     }
-#line 833
+#line 813
                 }
-#line 833
+#line 813
                 if (var_rank[i] == 0 && i%2 )
-#line 833
+#line 813
                     err = nc_get_varm_long(ncid,i,NULL,NULL,NULL,NULL,value);
-#line 833
+#line 813
                 else
-#line 833
+#line 813
                     err = nc_get_varm_long(ncid,i,index,count,stride,imap,value);
-#line 833
+#line 813
                 if (canConvert) {
-#line 833
+#line 813
                     if (allInExtRange) {
-#line 833
+#line 813
                         if (allInIntRange) {
-#line 833
+#line 813
                             IF (err)
-#line 833
+#line 813
                                 error("%s", nc_strerror(err));
-#line 833
+#line 813
                         } else {
-#line 833
+#line 813
                             IF (err != NC_ERANGE)
-#line 833
+#line 813
                                 error("Range error: status = %d", err);
-#line 833
+#line 813
                         }
-#line 833
+#line 813
                     } else {
-#line 833
+#line 813
                         IF (err != 0 && err != NC_ERANGE)
-#line 833
+#line 813
                             error("OK or Range error: status = %d", err);
-#line 833
+#line 813
                     }
-#line 833
+#line 813
                     for (j = 0; j < nels; j++) {
-#line 833
+#line 813
                         if (inRange3(expect[j],var_type[i],NCT_LONG)
-#line 833
+#line 813
                                 && expect[j] >= long_min 
-#line 833
+#line 813
 				&& expect[j] <= long_max) {
-#line 833
+#line 813
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_LONG)){
-#line 833
+#line 813
                                 error("value read not that expected");
-#line 833
+#line 813
                                 if (verbose) {
-#line 833
+#line 813
                                     error("\n");
-#line 833
+#line 813
                                     error("varid: %d, ", i);
-#line 833
+#line 813
                                     error("var_name: %s, ", var_name[i]);
-#line 833
+#line 813
                                     error("element number: %d ", j);
-#line 833
+#line 813
                                     error("expect: %g, ", expect[j]);
-#line 833
+#line 813
                                     error("got: %g", (double) value[j]);
-#line 833
+#line 813
                                 }
-#line 833
+#line 813
                             } else {
-#line 833
+#line 813
                                 nok++;
-#line 833
+#line 813
                             }
-#line 833
+#line 813
                         }
-#line 833
+#line 813
                     }
-#line 833
+#line 813
                 } else {
-#line 833
+#line 813
                     IF (nels > 0 && err != NC_ECHAR)
-#line 833
+#line 813
                         error("wrong type: status = %d", err);
-#line 833
+#line 813
                 }
-#line 833
+#line 813
             }
-#line 833
+#line 813
         }
-#line 833
+#line 813
     }
-#line 833
+#line 813
     err = nc_close(ncid);
-#line 833
+#line 813
     IF (err)
-#line 833
+#line 813
         error("nc_close: %s", nc_strerror(err));
-#line 833
+#line 813
     print_nok(nok);
-#line 833
+#line 813
 }
-#line 833
+#line 813
 
 void
-#line 834
+#line 814
 test_nc_get_varm_float(void)
-#line 834
+#line 814
 {
-#line 834
+#line 814
     int ncid;
-#line 834
+#line 814
     int d;
-#line 834
+#line 814
     int i;
-#line 834
+#line 814
     int j;
-#line 834
+#line 814
     int k;
-#line 834
+#line 814
     int m;
-#line 834
+#line 814
     int err;
-#line 834
+#line 814
     int allInExtRange;	/* all values within external range? */
-#line 834
+#line 814
     int allInIntRange;	/* all values within internal range? */
-#line 834
+#line 814
     int nels;
-#line 834
+#line 814
     int nslabs;
-#line 834
+#line 814
     int nstarts;        /* number of different starts */
-#line 834
+#line 814
     int nok = 0;      /* count of valid comparisons */
-#line 834
+#line 814
     size_t start[MAX_RANK];
-#line 834
+#line 814
     size_t edge[MAX_RANK];
-#line 834
+#line 814
     size_t index[MAX_RANK];
-#line 834
+#line 814
     size_t index2[MAX_RANK];
-#line 834
+#line 814
     size_t mid[MAX_RANK];
-#line 834
+#line 814
     size_t count[MAX_RANK];
-#line 834
+#line 814
     size_t sstride[MAX_RANK];
-#line 834
+#line 814
     ptrdiff_t stride[MAX_RANK];
-#line 834
+#line 814
     ptrdiff_t imap[MAX_RANK];
-#line 834
+#line 814
     int canConvert;     /* Both text or both numeric */
-#line 834
+#line 814
     float value[MAX_NELS];
-#line 834
+#line 814
     double expect[MAX_NELS];
-#line 834
+#line 814
 
-#line 834
-#ifdef USE_PNETCDF
-#line 834
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 834
-#else
-#line 834
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 834
-#endif
-#line 834
+#line 814
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 814
     IF (err)
-#line 834
+#line 814
         error("nc_open: %s", nc_strerror(err));
-#line 834
+#line 814
     for (i = 0; i < numVars; i++) {
-#line 834
+#line 814
         canConvert = (var_type[i] == NC_CHAR) == (NCT_FLOAT == NCT_TEXT);
-#line 834
+#line 814
         assert(var_rank[i] <= MAX_RANK);
-#line 834
+#line 814
         assert(var_nels[i] <= MAX_NELS);
-#line 834
+#line 814
         for (j = 0; j < var_rank[i]; j++) {
-#line 834
+#line 814
             start[j] = 0;
-#line 834
+#line 814
             edge[j] = 1;
-#line 834
+#line 814
             stride[j] = 1;
-#line 834
+#line 814
             imap[j] = 1;
-#line 834
+#line 814
         }
-#line 834
+#line 814
         err = nc_get_varm_float(BAD_ID, i, start, edge, stride, imap, value);
-#line 834
+#line 814
         IF (err != NC_EBADID)
-#line 834
+#line 814
             error("bad ncid: status = %d", err);
-#line 834
+#line 814
         err = nc_get_varm_float(ncid, BAD_VARID, start, edge, stride, imap, value);
-#line 834
+#line 814
         IF (err != NC_ENOTVAR)
-#line 834
+#line 814
             error("bad var id: status = %d", err);
-#line 834
+#line 814
         for (j = 0; j < var_rank[i]; j++) {
-#line 834
+#line 814
             start[j] = var_shape[i][j];
-#line 834
+#line 814
             err = nc_get_varm_float(ncid, i, start, edge, stride, imap, value);
-#line 834
+#line 814
 	  if(!canConvert) {
-#line 834
+#line 814
 		IF (err != NC_ECHAR)
-#line 834
+#line 814
                	    error("conversion: status = %d", err);
-#line 834
+#line 814
 	  } else {
-#line 834
+#line 814
 	    IF (err != NC_EINVALCOORDS)
-#line 834
+#line 814
                 error("bad index: status = %d", err);
-#line 834
+#line 814
             start[j] = 0;
-#line 834
+#line 814
             edge[j] = var_shape[i][j] + 1;
-#line 834
+#line 814
             err = nc_get_varm_float(ncid, i, start, edge, stride, imap, value);
-#line 834
+#line 814
             IF (err != NC_EEDGE)
-#line 834
+#line 814
                 error("bad edge: status = %d", err);
-#line 834
+#line 814
             edge[j] = 1;
-#line 834
+#line 814
             stride[j] = 0;
-#line 834
+#line 814
             err = nc_get_varm_float(ncid, i, start, edge, stride, imap, value);
-#line 834
+#line 814
             IF (err != NC_ESTRIDE)
-#line 834
+#line 814
                 error("bad stride: status = %d", err);
-#line 834
+#line 814
             stride[j] = 1;
-#line 834
+#line 814
            }
-#line 834
+#line 814
         }
-#line 834
+#line 814
             /* Choose a random point dividing each dim into 2 parts */
-#line 834
+#line 814
             /* get 2^rank (nslabs) slabs so defined */
-#line 834
+#line 814
         nslabs = 1;
-#line 834
+#line 814
         for (j = 0; j < var_rank[i]; j++) {
-#line 834
+#line 814
             mid[j] = roll( var_shape[i][j] );
-#line 834
+#line 814
             nslabs *= 2;
-#line 834
+#line 814
         }
-#line 834
+#line 814
             /* bits of k determine whether to get lower or upper part of dim */
-#line 834
+#line 814
             /* choose random stride from 1 to edge */
-#line 834
+#line 814
         for (k = 0; k < nslabs; k++) {
-#line 834
+#line 814
             nstarts = 1;
-#line 834
+#line 814
             for (j = 0; j < var_rank[i]; j++) {
-#line 834
+#line 814
                 if ((k >> j) & 1) {
-#line 834
+#line 814
                     start[j] = 0;
-#line 834
+#line 814
                     edge[j] = mid[j];
-#line 834
+#line 814
                 }else{
-#line 834
+#line 814
                     start[j] = mid[j];
-#line 834
+#line 814
                     edge[j] = var_shape[i][j] - mid[j];
-#line 834
+#line 814
                 }
-#line 834
+#line 814
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 834
+#line 814
                 nstarts *= stride[j];
-#line 834
+#line 814
             }
-#line 834
+#line 814
             for (m = 0; m < nstarts; m++) {
-#line 834
+#line 814
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 834
+#line 814
                 IF (err)
-#line 834
+#line 814
                     error("error in toMixedBase");
-#line 834
+#line 814
                 nels = 1;
-#line 834
+#line 814
                 for (j = 0; j < var_rank[i]; j++) {
-#line 834
+#line 814
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 834
+#line 814
                     nels *= count[j];
-#line 834
+#line 814
                     index[j] += start[j];
-#line 834
+#line 814
                 }
-#line 834
+#line 814
 		    /* Random choice of forward or backward */
-#line 834
+#line 814
 /* TODO
-#line 834
+#line 814
 		if ( roll(2) ) {
-#line 834
+#line 814
 		    for (j = 0; j < var_rank[i]; j++) {
-#line 834
+#line 814
 			index[j] += (count[j] - 1) * stride[j];
-#line 834
+#line 814
 			stride[j] = -stride[j];
-#line 834
+#line 814
 		    }
-#line 834
+#line 814
 		}
-#line 834
+#line 814
  */
-#line 834
+#line 814
 		if (var_rank[i] > 0) {
-#line 834
+#line 814
 		    j = var_rank[i] - 1;
-#line 834
+#line 814
 		    imap[j] = 1;
-#line 834
+#line 814
 		    for (; j > 0; j--)
-#line 834
+#line 814
 			imap[j-1] = imap[j] * count[j];
-#line 834
+#line 814
 		}
-#line 834
+#line 814
                 allInExtRange = allInIntRange = 1;
-#line 834
+#line 814
                 for (j = 0; j < nels; j++) {
-#line 834
+#line 814
                     err = toMixedBase(j, var_rank[i], count, index2);
-#line 834
+#line 814
                     IF (err)
-#line 834
+#line 814
                         error("error in toMixedBase 1");
-#line 834
+#line 814
                     for (d = 0; d < var_rank[i]; d++)
-#line 834
+#line 814
                         index2[d] = index[d] + index2[d] * stride[d];
-#line 834
+#line 814
                     expect[j] = hash4(var_type[i], var_rank[i], index2,
-#line 834
+#line 814
                         NCT_FLOAT);
-#line 834
+#line 814
                     if (inRange3(expect[j],var_type[i],NCT_FLOAT)) {
-#line 834
+#line 814
                         allInIntRange = allInIntRange && expect[j] >= float_min
-#line 834
+#line 814
                             && expect[j] <= float_max;
-#line 834
+#line 814
                     } else {
-#line 834
+#line 814
                         allInExtRange = 0;
-#line 834
+#line 814
                     }
-#line 834
+#line 814
                 }
-#line 834
+#line 814
                 if (var_rank[i] == 0 && i%2 )
-#line 834
+#line 814
                     err = nc_get_varm_float(ncid,i,NULL,NULL,NULL,NULL,value);
-#line 834
+#line 814
                 else
-#line 834
+#line 814
                     err = nc_get_varm_float(ncid,i,index,count,stride,imap,value);
-#line 834
+#line 814
                 if (canConvert) {
-#line 834
+#line 814
                     if (allInExtRange) {
-#line 834
+#line 814
                         if (allInIntRange) {
-#line 834
+#line 814
                             IF (err)
-#line 834
+#line 814
                                 error("%s", nc_strerror(err));
-#line 834
+#line 814
                         } else {
-#line 834
+#line 814
                             IF (err != NC_ERANGE)
-#line 834
+#line 814
                                 error("Range error: status = %d", err);
-#line 834
+#line 814
                         }
-#line 834
+#line 814
                     } else {
-#line 834
+#line 814
                         IF (err != 0 && err != NC_ERANGE)
-#line 834
+#line 814
                             error("OK or Range error: status = %d", err);
-#line 834
+#line 814
                     }
-#line 834
+#line 814
                     for (j = 0; j < nels; j++) {
-#line 834
+#line 814
                         if (inRange3(expect[j],var_type[i],NCT_FLOAT)
-#line 834
+#line 814
                                 && expect[j] >= float_min 
-#line 834
+#line 814
 				&& expect[j] <= float_max) {
-#line 834
+#line 814
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_FLOAT)){
-#line 834
+#line 814
                                 error("value read not that expected");
-#line 834
+#line 814
                                 if (verbose) {
-#line 834
+#line 814
                                     error("\n");
-#line 834
+#line 814
                                     error("varid: %d, ", i);
-#line 834
+#line 814
                                     error("var_name: %s, ", var_name[i]);
-#line 834
+#line 814
                                     error("element number: %d ", j);
-#line 834
+#line 814
                                     error("expect: %g, ", expect[j]);
-#line 834
+#line 814
                                     error("got: %g", (double) value[j]);
-#line 834
+#line 814
                                 }
-#line 834
+#line 814
                             } else {
-#line 834
+#line 814
                                 nok++;
-#line 834
+#line 814
                             }
-#line 834
+#line 814
                         }
-#line 834
+#line 814
                     }
-#line 834
+#line 814
                 } else {
-#line 834
+#line 814
                     IF (nels > 0 && err != NC_ECHAR)
-#line 834
+#line 814
                         error("wrong type: status = %d", err);
-#line 834
+#line 814
                 }
-#line 834
+#line 814
             }
-#line 834
+#line 814
         }
-#line 834
+#line 814
     }
-#line 834
+#line 814
     err = nc_close(ncid);
-#line 834
+#line 814
     IF (err)
-#line 834
+#line 814
         error("nc_close: %s", nc_strerror(err));
-#line 834
+#line 814
     print_nok(nok);
-#line 834
+#line 814
 }
-#line 834
+#line 814
 
 void
-#line 835
+#line 815
 test_nc_get_varm_double(void)
-#line 835
+#line 815
 {
-#line 835
+#line 815
     int ncid;
-#line 835
+#line 815
     int d;
-#line 835
+#line 815
     int i;
-#line 835
+#line 815
     int j;
-#line 835
+#line 815
     int k;
-#line 835
+#line 815
     int m;
-#line 835
+#line 815
     int err;
-#line 835
+#line 815
     int allInExtRange;	/* all values within external range? */
-#line 835
+#line 815
     int allInIntRange;	/* all values within internal range? */
-#line 835
+#line 815
     int nels;
-#line 835
+#line 815
     int nslabs;
-#line 835
+#line 815
     int nstarts;        /* number of different starts */
-#line 835
+#line 815
     int nok = 0;      /* count of valid comparisons */
-#line 835
+#line 815
     size_t start[MAX_RANK];
-#line 835
+#line 815
     size_t edge[MAX_RANK];
-#line 835
+#line 815
     size_t index[MAX_RANK];
-#line 835
+#line 815
     size_t index2[MAX_RANK];
-#line 835
+#line 815
     size_t mid[MAX_RANK];
-#line 835
+#line 815
     size_t count[MAX_RANK];
-#line 835
+#line 815
     size_t sstride[MAX_RANK];
-#line 835
+#line 815
     ptrdiff_t stride[MAX_RANK];
-#line 835
+#line 815
     ptrdiff_t imap[MAX_RANK];
-#line 835
+#line 815
     int canConvert;     /* Both text or both numeric */
-#line 835
+#line 815
     double value[MAX_NELS];
-#line 835
+#line 815
     double expect[MAX_NELS];
-#line 835
+#line 815
 
-#line 835
-#ifdef USE_PNETCDF
-#line 835
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 835
-#else
-#line 835
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 835
-#endif
-#line 835
+#line 815
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 815
     IF (err)
-#line 835
+#line 815
         error("nc_open: %s", nc_strerror(err));
-#line 835
+#line 815
     for (i = 0; i < numVars; i++) {
-#line 835
+#line 815
         canConvert = (var_type[i] == NC_CHAR) == (NCT_DOUBLE == NCT_TEXT);
-#line 835
+#line 815
         assert(var_rank[i] <= MAX_RANK);
-#line 835
+#line 815
         assert(var_nels[i] <= MAX_NELS);
-#line 835
+#line 815
         for (j = 0; j < var_rank[i]; j++) {
-#line 835
+#line 815
             start[j] = 0;
-#line 835
+#line 815
             edge[j] = 1;
-#line 835
+#line 815
             stride[j] = 1;
-#line 835
+#line 815
             imap[j] = 1;
-#line 835
+#line 815
         }
-#line 835
+#line 815
         err = nc_get_varm_double(BAD_ID, i, start, edge, stride, imap, value);
-#line 835
+#line 815
         IF (err != NC_EBADID)
-#line 835
+#line 815
             error("bad ncid: status = %d", err);
-#line 835
+#line 815
         err = nc_get_varm_double(ncid, BAD_VARID, start, edge, stride, imap, value);
-#line 835
+#line 815
         IF (err != NC_ENOTVAR)
-#line 835
+#line 815
             error("bad var id: status = %d", err);
-#line 835
+#line 815
         for (j = 0; j < var_rank[i]; j++) {
-#line 835
+#line 815
             start[j] = var_shape[i][j];
-#line 835
+#line 815
             err = nc_get_varm_double(ncid, i, start, edge, stride, imap, value);
-#line 835
+#line 815
 	  if(!canConvert) {
-#line 835
+#line 815
 		IF (err != NC_ECHAR)
-#line 835
+#line 815
                	    error("conversion: status = %d", err);
-#line 835
+#line 815
 	  } else {
-#line 835
+#line 815
 	    IF (err != NC_EINVALCOORDS)
-#line 835
+#line 815
                 error("bad index: status = %d", err);
-#line 835
+#line 815
             start[j] = 0;
-#line 835
+#line 815
             edge[j] = var_shape[i][j] + 1;
-#line 835
+#line 815
             err = nc_get_varm_double(ncid, i, start, edge, stride, imap, value);
-#line 835
+#line 815
             IF (err != NC_EEDGE)
-#line 835
+#line 815
                 error("bad edge: status = %d", err);
-#line 835
+#line 815
             edge[j] = 1;
-#line 835
+#line 815
             stride[j] = 0;
-#line 835
+#line 815
             err = nc_get_varm_double(ncid, i, start, edge, stride, imap, value);
-#line 835
+#line 815
             IF (err != NC_ESTRIDE)
-#line 835
+#line 815
                 error("bad stride: status = %d", err);
-#line 835
+#line 815
             stride[j] = 1;
-#line 835
+#line 815
            }
-#line 835
+#line 815
         }
-#line 835
+#line 815
             /* Choose a random point dividing each dim into 2 parts */
-#line 835
+#line 815
             /* get 2^rank (nslabs) slabs so defined */
-#line 835
+#line 815
         nslabs = 1;
-#line 835
+#line 815
         for (j = 0; j < var_rank[i]; j++) {
-#line 835
+#line 815
             mid[j] = roll( var_shape[i][j] );
-#line 835
+#line 815
             nslabs *= 2;
-#line 835
+#line 815
         }
-#line 835
+#line 815
             /* bits of k determine whether to get lower or upper part of dim */
-#line 835
+#line 815
             /* choose random stride from 1 to edge */
-#line 835
+#line 815
         for (k = 0; k < nslabs; k++) {
-#line 835
+#line 815
             nstarts = 1;
-#line 835
+#line 815
             for (j = 0; j < var_rank[i]; j++) {
-#line 835
+#line 815
                 if ((k >> j) & 1) {
-#line 835
+#line 815
                     start[j] = 0;
-#line 835
+#line 815
                     edge[j] = mid[j];
-#line 835
+#line 815
                 }else{
-#line 835
+#line 815
                     start[j] = mid[j];
-#line 835
+#line 815
                     edge[j] = var_shape[i][j] - mid[j];
-#line 835
+#line 815
                 }
-#line 835
+#line 815
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 835
+#line 815
                 nstarts *= stride[j];
-#line 835
+#line 815
             }
-#line 835
+#line 815
             for (m = 0; m < nstarts; m++) {
-#line 835
+#line 815
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 835
+#line 815
                 IF (err)
-#line 835
+#line 815
                     error("error in toMixedBase");
-#line 835
+#line 815
                 nels = 1;
-#line 835
+#line 815
                 for (j = 0; j < var_rank[i]; j++) {
-#line 835
+#line 815
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 835
+#line 815
                     nels *= count[j];
-#line 835
+#line 815
                     index[j] += start[j];
-#line 835
+#line 815
                 }
-#line 835
+#line 815
 		    /* Random choice of forward or backward */
-#line 835
+#line 815
 /* TODO
-#line 835
+#line 815
 		if ( roll(2) ) {
-#line 835
+#line 815
 		    for (j = 0; j < var_rank[i]; j++) {
-#line 835
+#line 815
 			index[j] += (count[j] - 1) * stride[j];
-#line 835
+#line 815
 			stride[j] = -stride[j];
-#line 835
+#line 815
 		    }
-#line 835
+#line 815
 		}
-#line 835
+#line 815
  */
-#line 835
+#line 815
 		if (var_rank[i] > 0) {
-#line 835
+#line 815
 		    j = var_rank[i] - 1;
-#line 835
+#line 815
 		    imap[j] = 1;
-#line 835
+#line 815
 		    for (; j > 0; j--)
-#line 835
+#line 815
 			imap[j-1] = imap[j] * count[j];
-#line 835
+#line 815
 		}
-#line 835
+#line 815
                 allInExtRange = allInIntRange = 1;
-#line 835
+#line 815
                 for (j = 0; j < nels; j++) {
-#line 835
+#line 815
                     err = toMixedBase(j, var_rank[i], count, index2);
-#line 835
+#line 815
                     IF (err)
-#line 835
+#line 815
                         error("error in toMixedBase 1");
-#line 835
+#line 815
                     for (d = 0; d < var_rank[i]; d++)
-#line 835
+#line 815
                         index2[d] = index[d] + index2[d] * stride[d];
-#line 835
+#line 815
                     expect[j] = hash4(var_type[i], var_rank[i], index2,
-#line 835
+#line 815
                         NCT_DOUBLE);
-#line 835
+#line 815
                     if (inRange3(expect[j],var_type[i],NCT_DOUBLE)) {
-#line 835
+#line 815
                         allInIntRange = allInIntRange && expect[j] >= double_min
-#line 835
+#line 815
                             && expect[j] <= double_max;
-#line 835
+#line 815
                     } else {
-#line 835
+#line 815
                         allInExtRange = 0;
-#line 835
+#line 815
                     }
-#line 835
+#line 815
                 }
-#line 835
+#line 815
                 if (var_rank[i] == 0 && i%2 )
-#line 835
+#line 815
                     err = nc_get_varm_double(ncid,i,NULL,NULL,NULL,NULL,value);
-#line 835
+#line 815
                 else
-#line 835
+#line 815
                     err = nc_get_varm_double(ncid,i,index,count,stride,imap,value);
-#line 835
+#line 815
                 if (canConvert) {
-#line 835
+#line 815
                     if (allInExtRange) {
-#line 835
+#line 815
                         if (allInIntRange) {
-#line 835
+#line 815
                             IF (err)
-#line 835
+#line 815
                                 error("%s", nc_strerror(err));
-#line 835
+#line 815
                         } else {
-#line 835
+#line 815
                             IF (err != NC_ERANGE)
-#line 835
+#line 815
                                 error("Range error: status = %d", err);
-#line 835
+#line 815
                         }
-#line 835
+#line 815
                     } else {
-#line 835
+#line 815
                         IF (err != 0 && err != NC_ERANGE)
-#line 835
+#line 815
                             error("OK or Range error: status = %d", err);
-#line 835
+#line 815
                     }
-#line 835
+#line 815
                     for (j = 0; j < nels; j++) {
-#line 835
+#line 815
                         if (inRange3(expect[j],var_type[i],NCT_DOUBLE)
-#line 835
+#line 815
                                 && expect[j] >= double_min 
-#line 835
+#line 815
 				&& expect[j] <= double_max) {
-#line 835
+#line 815
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_DOUBLE)){
-#line 835
+#line 815
                                 error("value read not that expected");
-#line 835
+#line 815
                                 if (verbose) {
-#line 835
+#line 815
                                     error("\n");
-#line 835
+#line 815
                                     error("varid: %d, ", i);
-#line 835
+#line 815
                                     error("var_name: %s, ", var_name[i]);
-#line 835
+#line 815
                                     error("element number: %d ", j);
-#line 835
+#line 815
                                     error("expect: %g, ", expect[j]);
-#line 835
+#line 815
                                     error("got: %g", (double) value[j]);
-#line 835
+#line 815
                                 }
-#line 835
+#line 815
                             } else {
-#line 835
+#line 815
                                 nok++;
-#line 835
+#line 815
                             }
-#line 835
+#line 815
                         }
-#line 835
+#line 815
                     }
-#line 835
+#line 815
                 } else {
-#line 835
+#line 815
                     IF (nels > 0 && err != NC_ECHAR)
-#line 835
+#line 815
                         error("wrong type: status = %d", err);
-#line 835
+#line 815
                 }
-#line 835
+#line 815
             }
-#line 835
+#line 815
         }
-#line 835
+#line 815
     }
-#line 835
+#line 815
     err = nc_close(ncid);
-#line 835
+#line 815
     IF (err)
-#line 835
+#line 815
         error("nc_close: %s", nc_strerror(err));
-#line 835
+#line 815
     print_nok(nok);
-#line 835
+#line 815
 }
-#line 835
+#line 815
 
 void
-#line 836
+#line 816
 test_nc_get_varm_ushort(void)
-#line 836
+#line 816
 {
-#line 836
+#line 816
     int ncid;
-#line 836
+#line 816
     int d;
-#line 836
+#line 816
     int i;
-#line 836
+#line 816
     int j;
-#line 836
+#line 816
     int k;
-#line 836
+#line 816
     int m;
-#line 836
+#line 816
     int err;
-#line 836
+#line 816
     int allInExtRange;	/* all values within external range? */
-#line 836
+#line 816
     int allInIntRange;	/* all values within internal range? */
-#line 836
+#line 816
     int nels;
-#line 836
+#line 816
     int nslabs;
-#line 836
+#line 816
     int nstarts;        /* number of different starts */
-#line 836
+#line 816
     int nok = 0;      /* count of valid comparisons */
-#line 836
+#line 816
     size_t start[MAX_RANK];
-#line 836
+#line 816
     size_t edge[MAX_RANK];
-#line 836
+#line 816
     size_t index[MAX_RANK];
-#line 836
+#line 816
     size_t index2[MAX_RANK];
-#line 836
+#line 816
     size_t mid[MAX_RANK];
-#line 836
+#line 816
     size_t count[MAX_RANK];
-#line 836
+#line 816
     size_t sstride[MAX_RANK];
-#line 836
+#line 816
     ptrdiff_t stride[MAX_RANK];
-#line 836
+#line 816
     ptrdiff_t imap[MAX_RANK];
-#line 836
+#line 816
     int canConvert;     /* Both text or both numeric */
-#line 836
+#line 816
     ushort value[MAX_NELS];
-#line 836
+#line 816
     double expect[MAX_NELS];
-#line 836
+#line 816
 
-#line 836
-#ifdef USE_PNETCDF
-#line 836
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 836
-#else
-#line 836
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 836
-#endif
-#line 836
+#line 816
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 816
     IF (err)
-#line 836
+#line 816
         error("nc_open: %s", nc_strerror(err));
-#line 836
+#line 816
     for (i = 0; i < numVars; i++) {
-#line 836
+#line 816
         canConvert = (var_type[i] == NC_CHAR) == (NCT_USHORT == NCT_TEXT);
-#line 836
+#line 816
         assert(var_rank[i] <= MAX_RANK);
-#line 836
+#line 816
         assert(var_nels[i] <= MAX_NELS);
-#line 836
+#line 816
         for (j = 0; j < var_rank[i]; j++) {
-#line 836
+#line 816
             start[j] = 0;
-#line 836
+#line 816
             edge[j] = 1;
-#line 836
+#line 816
             stride[j] = 1;
-#line 836
+#line 816
             imap[j] = 1;
-#line 836
+#line 816
         }
-#line 836
+#line 816
         err = nc_get_varm_ushort(BAD_ID, i, start, edge, stride, imap, value);
-#line 836
+#line 816
         IF (err != NC_EBADID)
-#line 836
+#line 816
             error("bad ncid: status = %d", err);
-#line 836
+#line 816
         err = nc_get_varm_ushort(ncid, BAD_VARID, start, edge, stride, imap, value);
-#line 836
+#line 816
         IF (err != NC_ENOTVAR)
-#line 836
+#line 816
             error("bad var id: status = %d", err);
-#line 836
+#line 816
         for (j = 0; j < var_rank[i]; j++) {
-#line 836
+#line 816
             start[j] = var_shape[i][j];
-#line 836
+#line 816
             err = nc_get_varm_ushort(ncid, i, start, edge, stride, imap, value);
-#line 836
+#line 816
 	  if(!canConvert) {
-#line 836
+#line 816
 		IF (err != NC_ECHAR)
-#line 836
+#line 816
                	    error("conversion: status = %d", err);
-#line 836
+#line 816
 	  } else {
-#line 836
+#line 816
 	    IF (err != NC_EINVALCOORDS)
-#line 836
+#line 816
                 error("bad index: status = %d", err);
-#line 836
+#line 816
             start[j] = 0;
-#line 836
+#line 816
             edge[j] = var_shape[i][j] + 1;
-#line 836
+#line 816
             err = nc_get_varm_ushort(ncid, i, start, edge, stride, imap, value);
-#line 836
+#line 816
             IF (err != NC_EEDGE)
-#line 836
+#line 816
                 error("bad edge: status = %d", err);
-#line 836
+#line 816
             edge[j] = 1;
-#line 836
+#line 816
             stride[j] = 0;
-#line 836
+#line 816
             err = nc_get_varm_ushort(ncid, i, start, edge, stride, imap, value);
-#line 836
+#line 816
             IF (err != NC_ESTRIDE)
-#line 836
+#line 816
                 error("bad stride: status = %d", err);
-#line 836
+#line 816
             stride[j] = 1;
-#line 836
+#line 816
            }
-#line 836
+#line 816
         }
-#line 836
+#line 816
             /* Choose a random point dividing each dim into 2 parts */
-#line 836
+#line 816
             /* get 2^rank (nslabs) slabs so defined */
-#line 836
+#line 816
         nslabs = 1;
-#line 836
+#line 816
         for (j = 0; j < var_rank[i]; j++) {
-#line 836
+#line 816
             mid[j] = roll( var_shape[i][j] );
-#line 836
+#line 816
             nslabs *= 2;
-#line 836
+#line 816
         }
-#line 836
+#line 816
             /* bits of k determine whether to get lower or upper part of dim */
-#line 836
+#line 816
             /* choose random stride from 1 to edge */
-#line 836
+#line 816
         for (k = 0; k < nslabs; k++) {
-#line 836
+#line 816
             nstarts = 1;
-#line 836
+#line 816
             for (j = 0; j < var_rank[i]; j++) {
-#line 836
+#line 816
                 if ((k >> j) & 1) {
-#line 836
+#line 816
                     start[j] = 0;
-#line 836
+#line 816
                     edge[j] = mid[j];
-#line 836
+#line 816
                 }else{
-#line 836
+#line 816
                     start[j] = mid[j];
-#line 836
+#line 816
                     edge[j] = var_shape[i][j] - mid[j];
-#line 836
+#line 816
                 }
-#line 836
+#line 816
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 836
+#line 816
                 nstarts *= stride[j];
-#line 836
+#line 816
             }
-#line 836
+#line 816
             for (m = 0; m < nstarts; m++) {
-#line 836
+#line 816
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 836
+#line 816
                 IF (err)
-#line 836
+#line 816
                     error("error in toMixedBase");
-#line 836
+#line 816
                 nels = 1;
-#line 836
+#line 816
                 for (j = 0; j < var_rank[i]; j++) {
-#line 836
+#line 816
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 836
+#line 816
                     nels *= count[j];
-#line 836
+#line 816
                     index[j] += start[j];
-#line 836
+#line 816
                 }
-#line 836
+#line 816
 		    /* Random choice of forward or backward */
-#line 836
+#line 816
 /* TODO
-#line 836
+#line 816
 		if ( roll(2) ) {
-#line 836
+#line 816
 		    for (j = 0; j < var_rank[i]; j++) {
-#line 836
+#line 816
 			index[j] += (count[j] - 1) * stride[j];
-#line 836
+#line 816
 			stride[j] = -stride[j];
-#line 836
+#line 816
 		    }
-#line 836
+#line 816
 		}
-#line 836
+#line 816
  */
-#line 836
+#line 816
 		if (var_rank[i] > 0) {
-#line 836
+#line 816
 		    j = var_rank[i] - 1;
-#line 836
+#line 816
 		    imap[j] = 1;
-#line 836
+#line 816
 		    for (; j > 0; j--)
-#line 836
+#line 816
 			imap[j-1] = imap[j] * count[j];
-#line 836
+#line 816
 		}
-#line 836
+#line 816
                 allInExtRange = allInIntRange = 1;
-#line 836
+#line 816
                 for (j = 0; j < nels; j++) {
-#line 836
+#line 816
                     err = toMixedBase(j, var_rank[i], count, index2);
-#line 836
+#line 816
                     IF (err)
-#line 836
+#line 816
                         error("error in toMixedBase 1");
-#line 836
+#line 816
                     for (d = 0; d < var_rank[i]; d++)
-#line 836
+#line 816
                         index2[d] = index[d] + index2[d] * stride[d];
-#line 836
+#line 816
                     expect[j] = hash4(var_type[i], var_rank[i], index2,
-#line 836
+#line 816
                         NCT_USHORT);
-#line 836
+#line 816
                     if (inRange3(expect[j],var_type[i],NCT_USHORT)) {
-#line 836
+#line 816
                         allInIntRange = allInIntRange && expect[j] >= ushort_min
-#line 836
+#line 816
                             && expect[j] <= ushort_max;
-#line 836
+#line 816
                     } else {
-#line 836
+#line 816
                         allInExtRange = 0;
-#line 836
+#line 816
                     }
-#line 836
+#line 816
                 }
-#line 836
+#line 816
                 if (var_rank[i] == 0 && i%2 )
-#line 836
+#line 816
                     err = nc_get_varm_ushort(ncid,i,NULL,NULL,NULL,NULL,value);
-#line 836
+#line 816
                 else
-#line 836
+#line 816
                     err = nc_get_varm_ushort(ncid,i,index,count,stride,imap,value);
-#line 836
+#line 816
                 if (canConvert) {
-#line 836
+#line 816
                     if (allInExtRange) {
-#line 836
+#line 816
                         if (allInIntRange) {
-#line 836
+#line 816
                             IF (err)
-#line 836
+#line 816
                                 error("%s", nc_strerror(err));
-#line 836
+#line 816
                         } else {
-#line 836
+#line 816
                             IF (err != NC_ERANGE)
-#line 836
+#line 816
                                 error("Range error: status = %d", err);
-#line 836
+#line 816
                         }
-#line 836
+#line 816
                     } else {
-#line 836
+#line 816
                         IF (err != 0 && err != NC_ERANGE)
-#line 836
+#line 816
                             error("OK or Range error: status = %d", err);
-#line 836
+#line 816
                     }
-#line 836
+#line 816
                     for (j = 0; j < nels; j++) {
-#line 836
+#line 816
                         if (inRange3(expect[j],var_type[i],NCT_USHORT)
-#line 836
+#line 816
                                 && expect[j] >= ushort_min 
-#line 836
+#line 816
 				&& expect[j] <= ushort_max) {
-#line 836
+#line 816
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_USHORT)){
-#line 836
+#line 816
                                 error("value read not that expected");
-#line 836
+#line 816
                                 if (verbose) {
-#line 836
+#line 816
                                     error("\n");
-#line 836
+#line 816
                                     error("varid: %d, ", i);
-#line 836
+#line 816
                                     error("var_name: %s, ", var_name[i]);
-#line 836
+#line 816
                                     error("element number: %d ", j);
-#line 836
+#line 816
                                     error("expect: %g, ", expect[j]);
-#line 836
+#line 816
                                     error("got: %g", (double) value[j]);
-#line 836
+#line 816
                                 }
-#line 836
+#line 816
                             } else {
-#line 836
+#line 816
                                 nok++;
-#line 836
+#line 816
                             }
-#line 836
+#line 816
                         }
-#line 836
+#line 816
                     }
-#line 836
+#line 816
                 } else {
-#line 836
+#line 816
                     IF (nels > 0 && err != NC_ECHAR)
-#line 836
+#line 816
                         error("wrong type: status = %d", err);
-#line 836
+#line 816
                 }
-#line 836
+#line 816
             }
-#line 836
+#line 816
         }
-#line 836
+#line 816
     }
-#line 836
+#line 816
     err = nc_close(ncid);
-#line 836
+#line 816
     IF (err)
-#line 836
+#line 816
         error("nc_close: %s", nc_strerror(err));
-#line 836
+#line 816
     print_nok(nok);
-#line 836
+#line 816
 }
-#line 836
+#line 816
 
 void
-#line 837
+#line 817
 test_nc_get_varm_uint(void)
-#line 837
+#line 817
 {
-#line 837
+#line 817
     int ncid;
-#line 837
+#line 817
     int d;
-#line 837
+#line 817
     int i;
-#line 837
+#line 817
     int j;
-#line 837
+#line 817
     int k;
-#line 837
+#line 817
     int m;
-#line 837
+#line 817
     int err;
-#line 837
+#line 817
     int allInExtRange;	/* all values within external range? */
-#line 837
+#line 817
     int allInIntRange;	/* all values within internal range? */
-#line 837
+#line 817
     int nels;
-#line 837
+#line 817
     int nslabs;
-#line 837
+#line 817
     int nstarts;        /* number of different starts */
-#line 837
+#line 817
     int nok = 0;      /* count of valid comparisons */
-#line 837
+#line 817
     size_t start[MAX_RANK];
-#line 837
+#line 817
     size_t edge[MAX_RANK];
-#line 837
+#line 817
     size_t index[MAX_RANK];
-#line 837
+#line 817
     size_t index2[MAX_RANK];
-#line 837
+#line 817
     size_t mid[MAX_RANK];
-#line 837
+#line 817
     size_t count[MAX_RANK];
-#line 837
+#line 817
     size_t sstride[MAX_RANK];
-#line 837
+#line 817
     ptrdiff_t stride[MAX_RANK];
-#line 837
+#line 817
     ptrdiff_t imap[MAX_RANK];
-#line 837
+#line 817
     int canConvert;     /* Both text or both numeric */
-#line 837
+#line 817
     uint value[MAX_NELS];
-#line 837
+#line 817
     double expect[MAX_NELS];
-#line 837
+#line 817
 
-#line 837
-#ifdef USE_PNETCDF
-#line 837
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 837
-#else
-#line 837
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 837
-#endif
-#line 837
+#line 817
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 817
     IF (err)
-#line 837
+#line 817
         error("nc_open: %s", nc_strerror(err));
-#line 837
+#line 817
     for (i = 0; i < numVars; i++) {
-#line 837
+#line 817
         canConvert = (var_type[i] == NC_CHAR) == (NCT_UINT == NCT_TEXT);
-#line 837
+#line 817
         assert(var_rank[i] <= MAX_RANK);
-#line 837
+#line 817
         assert(var_nels[i] <= MAX_NELS);
-#line 837
+#line 817
         for (j = 0; j < var_rank[i]; j++) {
-#line 837
+#line 817
             start[j] = 0;
-#line 837
+#line 817
             edge[j] = 1;
-#line 837
+#line 817
             stride[j] = 1;
-#line 837
+#line 817
             imap[j] = 1;
-#line 837
+#line 817
         }
-#line 837
+#line 817
         err = nc_get_varm_uint(BAD_ID, i, start, edge, stride, imap, value);
-#line 837
+#line 817
         IF (err != NC_EBADID)
-#line 837
+#line 817
             error("bad ncid: status = %d", err);
-#line 837
+#line 817
         err = nc_get_varm_uint(ncid, BAD_VARID, start, edge, stride, imap, value);
-#line 837
+#line 817
         IF (err != NC_ENOTVAR)
-#line 837
+#line 817
             error("bad var id: status = %d", err);
-#line 837
+#line 817
         for (j = 0; j < var_rank[i]; j++) {
-#line 837
+#line 817
             start[j] = var_shape[i][j];
-#line 837
+#line 817
             err = nc_get_varm_uint(ncid, i, start, edge, stride, imap, value);
-#line 837
+#line 817
 	  if(!canConvert) {
-#line 837
+#line 817
 		IF (err != NC_ECHAR)
-#line 837
+#line 817
                	    error("conversion: status = %d", err);
-#line 837
+#line 817
 	  } else {
-#line 837
+#line 817
 	    IF (err != NC_EINVALCOORDS)
-#line 837
+#line 817
                 error("bad index: status = %d", err);
-#line 837
+#line 817
             start[j] = 0;
-#line 837
+#line 817
             edge[j] = var_shape[i][j] + 1;
-#line 837
+#line 817
             err = nc_get_varm_uint(ncid, i, start, edge, stride, imap, value);
-#line 837
+#line 817
             IF (err != NC_EEDGE)
-#line 837
+#line 817
                 error("bad edge: status = %d", err);
-#line 837
+#line 817
             edge[j] = 1;
-#line 837
+#line 817
             stride[j] = 0;
-#line 837
+#line 817
             err = nc_get_varm_uint(ncid, i, start, edge, stride, imap, value);
-#line 837
+#line 817
             IF (err != NC_ESTRIDE)
-#line 837
+#line 817
                 error("bad stride: status = %d", err);
-#line 837
+#line 817
             stride[j] = 1;
-#line 837
+#line 817
            }
-#line 837
+#line 817
         }
-#line 837
+#line 817
             /* Choose a random point dividing each dim into 2 parts */
-#line 837
+#line 817
             /* get 2^rank (nslabs) slabs so defined */
-#line 837
+#line 817
         nslabs = 1;
-#line 837
+#line 817
         for (j = 0; j < var_rank[i]; j++) {
-#line 837
+#line 817
             mid[j] = roll( var_shape[i][j] );
-#line 837
+#line 817
             nslabs *= 2;
-#line 837
+#line 817
         }
-#line 837
+#line 817
             /* bits of k determine whether to get lower or upper part of dim */
-#line 837
+#line 817
             /* choose random stride from 1 to edge */
-#line 837
+#line 817
         for (k = 0; k < nslabs; k++) {
-#line 837
+#line 817
             nstarts = 1;
-#line 837
+#line 817
             for (j = 0; j < var_rank[i]; j++) {
-#line 837
+#line 817
                 if ((k >> j) & 1) {
-#line 837
+#line 817
                     start[j] = 0;
-#line 837
+#line 817
                     edge[j] = mid[j];
-#line 837
+#line 817
                 }else{
-#line 837
+#line 817
                     start[j] = mid[j];
-#line 837
+#line 817
                     edge[j] = var_shape[i][j] - mid[j];
-#line 837
+#line 817
                 }
-#line 837
+#line 817
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 837
+#line 817
                 nstarts *= stride[j];
-#line 837
+#line 817
             }
-#line 837
+#line 817
             for (m = 0; m < nstarts; m++) {
-#line 837
+#line 817
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 837
+#line 817
                 IF (err)
-#line 837
+#line 817
                     error("error in toMixedBase");
-#line 837
+#line 817
                 nels = 1;
-#line 837
+#line 817
                 for (j = 0; j < var_rank[i]; j++) {
-#line 837
+#line 817
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 837
+#line 817
                     nels *= count[j];
-#line 837
+#line 817
                     index[j] += start[j];
-#line 837
+#line 817
                 }
-#line 837
+#line 817
 		    /* Random choice of forward or backward */
-#line 837
+#line 817
 /* TODO
-#line 837
+#line 817
 		if ( roll(2) ) {
-#line 837
+#line 817
 		    for (j = 0; j < var_rank[i]; j++) {
-#line 837
+#line 817
 			index[j] += (count[j] - 1) * stride[j];
-#line 837
+#line 817
 			stride[j] = -stride[j];
-#line 837
+#line 817
 		    }
-#line 837
+#line 817
 		}
-#line 837
+#line 817
  */
-#line 837
+#line 817
 		if (var_rank[i] > 0) {
-#line 837
+#line 817
 		    j = var_rank[i] - 1;
-#line 837
+#line 817
 		    imap[j] = 1;
-#line 837
+#line 817
 		    for (; j > 0; j--)
-#line 837
+#line 817
 			imap[j-1] = imap[j] * count[j];
-#line 837
+#line 817
 		}
-#line 837
+#line 817
                 allInExtRange = allInIntRange = 1;
-#line 837
+#line 817
                 for (j = 0; j < nels; j++) {
-#line 837
+#line 817
                     err = toMixedBase(j, var_rank[i], count, index2);
-#line 837
+#line 817
                     IF (err)
-#line 837
+#line 817
                         error("error in toMixedBase 1");
-#line 837
+#line 817
                     for (d = 0; d < var_rank[i]; d++)
-#line 837
+#line 817
                         index2[d] = index[d] + index2[d] * stride[d];
-#line 837
+#line 817
                     expect[j] = hash4(var_type[i], var_rank[i], index2,
-#line 837
+#line 817
                         NCT_UINT);
-#line 837
+#line 817
                     if (inRange3(expect[j],var_type[i],NCT_UINT)) {
-#line 837
+#line 817
                         allInIntRange = allInIntRange && expect[j] >= uint_min
-#line 837
+#line 817
                             && expect[j] <= uint_max;
-#line 837
+#line 817
                     } else {
-#line 837
+#line 817
                         allInExtRange = 0;
-#line 837
+#line 817
                     }
-#line 837
+#line 817
                 }
-#line 837
+#line 817
                 if (var_rank[i] == 0 && i%2 )
-#line 837
+#line 817
                     err = nc_get_varm_uint(ncid,i,NULL,NULL,NULL,NULL,value);
-#line 837
+#line 817
                 else
-#line 837
+#line 817
                     err = nc_get_varm_uint(ncid,i,index,count,stride,imap,value);
-#line 837
+#line 817
                 if (canConvert) {
-#line 837
+#line 817
                     if (allInExtRange) {
-#line 837
+#line 817
                         if (allInIntRange) {
-#line 837
+#line 817
                             IF (err)
-#line 837
+#line 817
                                 error("%s", nc_strerror(err));
-#line 837
+#line 817
                         } else {
-#line 837
+#line 817
                             IF (err != NC_ERANGE)
-#line 837
+#line 817
                                 error("Range error: status = %d", err);
-#line 837
+#line 817
                         }
-#line 837
+#line 817
                     } else {
-#line 837
+#line 817
                         IF (err != 0 && err != NC_ERANGE)
-#line 837
+#line 817
                             error("OK or Range error: status = %d", err);
-#line 837
+#line 817
                     }
-#line 837
+#line 817
                     for (j = 0; j < nels; j++) {
-#line 837
+#line 817
                         if (inRange3(expect[j],var_type[i],NCT_UINT)
-#line 837
+#line 817
                                 && expect[j] >= uint_min 
-#line 837
+#line 817
 				&& expect[j] <= uint_max) {
-#line 837
+#line 817
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_UINT)){
-#line 837
+#line 817
                                 error("value read not that expected");
-#line 837
+#line 817
                                 if (verbose) {
-#line 837
+#line 817
                                     error("\n");
-#line 837
+#line 817
                                     error("varid: %d, ", i);
-#line 837
+#line 817
                                     error("var_name: %s, ", var_name[i]);
-#line 837
+#line 817
                                     error("element number: %d ", j);
-#line 837
+#line 817
                                     error("expect: %g, ", expect[j]);
-#line 837
+#line 817
                                     error("got: %g", (double) value[j]);
-#line 837
+#line 817
                                 }
-#line 837
+#line 817
                             } else {
-#line 837
+#line 817
                                 nok++;
-#line 837
+#line 817
                             }
-#line 837
+#line 817
                         }
-#line 837
+#line 817
                     }
-#line 837
+#line 817
                 } else {
-#line 837
+#line 817
                     IF (nels > 0 && err != NC_ECHAR)
-#line 837
+#line 817
                         error("wrong type: status = %d", err);
-#line 837
+#line 817
                 }
-#line 837
+#line 817
             }
-#line 837
+#line 817
         }
-#line 837
+#line 817
     }
-#line 837
+#line 817
     err = nc_close(ncid);
-#line 837
+#line 817
     IF (err)
-#line 837
+#line 817
         error("nc_close: %s", nc_strerror(err));
-#line 837
+#line 817
     print_nok(nok);
-#line 837
+#line 817
 }
-#line 837
+#line 817
 
 void
-#line 838
+#line 818
 test_nc_get_varm_longlong(void)
-#line 838
+#line 818
 {
-#line 838
+#line 818
     int ncid;
-#line 838
+#line 818
     int d;
-#line 838
+#line 818
     int i;
-#line 838
+#line 818
     int j;
-#line 838
+#line 818
     int k;
-#line 838
+#line 818
     int m;
-#line 838
+#line 818
     int err;
-#line 838
+#line 818
     int allInExtRange;	/* all values within external range? */
-#line 838
+#line 818
     int allInIntRange;	/* all values within internal range? */
-#line 838
+#line 818
     int nels;
-#line 838
+#line 818
     int nslabs;
-#line 838
+#line 818
     int nstarts;        /* number of different starts */
-#line 838
+#line 818
     int nok = 0;      /* count of valid comparisons */
-#line 838
+#line 818
     size_t start[MAX_RANK];
-#line 838
+#line 818
     size_t edge[MAX_RANK];
-#line 838
+#line 818
     size_t index[MAX_RANK];
-#line 838
+#line 818
     size_t index2[MAX_RANK];
-#line 838
+#line 818
     size_t mid[MAX_RANK];
-#line 838
+#line 818
     size_t count[MAX_RANK];
-#line 838
+#line 818
     size_t sstride[MAX_RANK];
-#line 838
+#line 818
     ptrdiff_t stride[MAX_RANK];
-#line 838
+#line 818
     ptrdiff_t imap[MAX_RANK];
-#line 838
+#line 818
     int canConvert;     /* Both text or both numeric */
-#line 838
+#line 818
     longlong value[MAX_NELS];
-#line 838
+#line 818
     double expect[MAX_NELS];
-#line 838
+#line 818
 
-#line 838
-#ifdef USE_PNETCDF
-#line 838
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 838
-#else
-#line 838
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 838
-#endif
-#line 838
+#line 818
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 818
     IF (err)
-#line 838
+#line 818
         error("nc_open: %s", nc_strerror(err));
-#line 838
+#line 818
     for (i = 0; i < numVars; i++) {
-#line 838
+#line 818
         canConvert = (var_type[i] == NC_CHAR) == (NCT_LONGLONG == NCT_TEXT);
-#line 838
+#line 818
         assert(var_rank[i] <= MAX_RANK);
-#line 838
+#line 818
         assert(var_nels[i] <= MAX_NELS);
-#line 838
+#line 818
         for (j = 0; j < var_rank[i]; j++) {
-#line 838
+#line 818
             start[j] = 0;
-#line 838
+#line 818
             edge[j] = 1;
-#line 838
+#line 818
             stride[j] = 1;
-#line 838
+#line 818
             imap[j] = 1;
-#line 838
+#line 818
         }
-#line 838
+#line 818
         err = nc_get_varm_longlong(BAD_ID, i, start, edge, stride, imap, value);
-#line 838
+#line 818
         IF (err != NC_EBADID)
-#line 838
+#line 818
             error("bad ncid: status = %d", err);
-#line 838
+#line 818
         err = nc_get_varm_longlong(ncid, BAD_VARID, start, edge, stride, imap, value);
-#line 838
+#line 818
         IF (err != NC_ENOTVAR)
-#line 838
+#line 818
             error("bad var id: status = %d", err);
-#line 838
+#line 818
         for (j = 0; j < var_rank[i]; j++) {
-#line 838
+#line 818
             start[j] = var_shape[i][j];
-#line 838
+#line 818
             err = nc_get_varm_longlong(ncid, i, start, edge, stride, imap, value);
-#line 838
+#line 818
 	  if(!canConvert) {
-#line 838
+#line 818
 		IF (err != NC_ECHAR)
-#line 838
+#line 818
                	    error("conversion: status = %d", err);
-#line 838
+#line 818
 	  } else {
-#line 838
+#line 818
 	    IF (err != NC_EINVALCOORDS)
-#line 838
+#line 818
                 error("bad index: status = %d", err);
-#line 838
+#line 818
             start[j] = 0;
-#line 838
+#line 818
             edge[j] = var_shape[i][j] + 1;
-#line 838
+#line 818
             err = nc_get_varm_longlong(ncid, i, start, edge, stride, imap, value);
-#line 838
+#line 818
             IF (err != NC_EEDGE)
-#line 838
+#line 818
                 error("bad edge: status = %d", err);
-#line 838
+#line 818
             edge[j] = 1;
-#line 838
+#line 818
             stride[j] = 0;
-#line 838
+#line 818
             err = nc_get_varm_longlong(ncid, i, start, edge, stride, imap, value);
-#line 838
+#line 818
             IF (err != NC_ESTRIDE)
-#line 838
+#line 818
                 error("bad stride: status = %d", err);
-#line 838
+#line 818
             stride[j] = 1;
-#line 838
+#line 818
            }
-#line 838
+#line 818
         }
-#line 838
+#line 818
             /* Choose a random point dividing each dim into 2 parts */
-#line 838
+#line 818
             /* get 2^rank (nslabs) slabs so defined */
-#line 838
+#line 818
         nslabs = 1;
-#line 838
+#line 818
         for (j = 0; j < var_rank[i]; j++) {
-#line 838
+#line 818
             mid[j] = roll( var_shape[i][j] );
-#line 838
+#line 818
             nslabs *= 2;
-#line 838
+#line 818
         }
-#line 838
+#line 818
             /* bits of k determine whether to get lower or upper part of dim */
-#line 838
+#line 818
             /* choose random stride from 1 to edge */
-#line 838
+#line 818
         for (k = 0; k < nslabs; k++) {
-#line 838
+#line 818
             nstarts = 1;
-#line 838
+#line 818
             for (j = 0; j < var_rank[i]; j++) {
-#line 838
+#line 818
                 if ((k >> j) & 1) {
-#line 838
+#line 818
                     start[j] = 0;
-#line 838
+#line 818
                     edge[j] = mid[j];
-#line 838
+#line 818
                 }else{
-#line 838
+#line 818
                     start[j] = mid[j];
-#line 838
+#line 818
                     edge[j] = var_shape[i][j] - mid[j];
-#line 838
+#line 818
                 }
-#line 838
+#line 818
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 838
+#line 818
                 nstarts *= stride[j];
-#line 838
+#line 818
             }
-#line 838
+#line 818
             for (m = 0; m < nstarts; m++) {
-#line 838
+#line 818
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 838
+#line 818
                 IF (err)
-#line 838
+#line 818
                     error("error in toMixedBase");
-#line 838
+#line 818
                 nels = 1;
-#line 838
+#line 818
                 for (j = 0; j < var_rank[i]; j++) {
-#line 838
+#line 818
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 838
+#line 818
                     nels *= count[j];
-#line 838
+#line 818
                     index[j] += start[j];
-#line 838
+#line 818
                 }
-#line 838
+#line 818
 		    /* Random choice of forward or backward */
-#line 838
+#line 818
 /* TODO
-#line 838
+#line 818
 		if ( roll(2) ) {
-#line 838
+#line 818
 		    for (j = 0; j < var_rank[i]; j++) {
-#line 838
+#line 818
 			index[j] += (count[j] - 1) * stride[j];
-#line 838
+#line 818
 			stride[j] = -stride[j];
-#line 838
+#line 818
 		    }
-#line 838
+#line 818
 		}
-#line 838
+#line 818
  */
-#line 838
+#line 818
 		if (var_rank[i] > 0) {
-#line 838
+#line 818
 		    j = var_rank[i] - 1;
-#line 838
+#line 818
 		    imap[j] = 1;
-#line 838
+#line 818
 		    for (; j > 0; j--)
-#line 838
+#line 818
 			imap[j-1] = imap[j] * count[j];
-#line 838
+#line 818
 		}
-#line 838
+#line 818
                 allInExtRange = allInIntRange = 1;
-#line 838
+#line 818
                 for (j = 0; j < nels; j++) {
-#line 838
+#line 818
                     err = toMixedBase(j, var_rank[i], count, index2);
-#line 838
+#line 818
                     IF (err)
-#line 838
+#line 818
                         error("error in toMixedBase 1");
-#line 838
+#line 818
                     for (d = 0; d < var_rank[i]; d++)
-#line 838
+#line 818
                         index2[d] = index[d] + index2[d] * stride[d];
-#line 838
+#line 818
                     expect[j] = hash4(var_type[i], var_rank[i], index2,
-#line 838
+#line 818
                         NCT_LONGLONG);
-#line 838
+#line 818
                     if (inRange3(expect[j],var_type[i],NCT_LONGLONG)) {
-#line 838
+#line 818
                         allInIntRange = allInIntRange && expect[j] >= longlong_min
-#line 838
+#line 818
                             && expect[j] <= longlong_max;
-#line 838
+#line 818
                     } else {
-#line 838
+#line 818
                         allInExtRange = 0;
-#line 838
+#line 818
                     }
-#line 838
+#line 818
                 }
-#line 838
+#line 818
                 if (var_rank[i] == 0 && i%2 )
-#line 838
+#line 818
                     err = nc_get_varm_longlong(ncid,i,NULL,NULL,NULL,NULL,value);
-#line 838
+#line 818
                 else
-#line 838
+#line 818
                     err = nc_get_varm_longlong(ncid,i,index,count,stride,imap,value);
-#line 838
+#line 818
                 if (canConvert) {
-#line 838
+#line 818
                     if (allInExtRange) {
-#line 838
+#line 818
                         if (allInIntRange) {
-#line 838
+#line 818
                             IF (err)
-#line 838
+#line 818
                                 error("%s", nc_strerror(err));
-#line 838
+#line 818
                         } else {
-#line 838
+#line 818
                             IF (err != NC_ERANGE)
-#line 838
+#line 818
                                 error("Range error: status = %d", err);
-#line 838
+#line 818
                         }
-#line 838
+#line 818
                     } else {
-#line 838
+#line 818
                         IF (err != 0 && err != NC_ERANGE)
-#line 838
+#line 818
                             error("OK or Range error: status = %d", err);
-#line 838
+#line 818
                     }
-#line 838
+#line 818
                     for (j = 0; j < nels; j++) {
-#line 838
+#line 818
                         if (inRange3(expect[j],var_type[i],NCT_LONGLONG)
-#line 838
+#line 818
                                 && expect[j] >= longlong_min 
-#line 838
+#line 818
 				&& expect[j] <= longlong_max) {
-#line 838
+#line 818
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_LONGLONG)){
-#line 838
+#line 818
                                 error("value read not that expected");
-#line 838
+#line 818
                                 if (verbose) {
-#line 838
+#line 818
                                     error("\n");
-#line 838
+#line 818
                                     error("varid: %d, ", i);
-#line 838
+#line 818
                                     error("var_name: %s, ", var_name[i]);
-#line 838
+#line 818
                                     error("element number: %d ", j);
-#line 838
+#line 818
                                     error("expect: %g, ", expect[j]);
-#line 838
+#line 818
                                     error("got: %g", (double) value[j]);
-#line 838
+#line 818
                                 }
-#line 838
+#line 818
                             } else {
-#line 838
+#line 818
                                 nok++;
-#line 838
+#line 818
                             }
-#line 838
+#line 818
                         }
-#line 838
+#line 818
                     }
-#line 838
+#line 818
                 } else {
-#line 838
+#line 818
                     IF (nels > 0 && err != NC_ECHAR)
-#line 838
+#line 818
                         error("wrong type: status = %d", err);
-#line 838
+#line 818
                 }
-#line 838
+#line 818
             }
-#line 838
+#line 818
         }
-#line 838
+#line 818
     }
-#line 838
+#line 818
     err = nc_close(ncid);
-#line 838
+#line 818
     IF (err)
-#line 838
+#line 818
         error("nc_close: %s", nc_strerror(err));
-#line 838
+#line 818
     print_nok(nok);
-#line 838
+#line 818
 }
-#line 838
+#line 818
 
 void
-#line 839
+#line 819
 test_nc_get_varm_ulonglong(void)
-#line 839
+#line 819
 {
-#line 839
+#line 819
     int ncid;
-#line 839
+#line 819
     int d;
-#line 839
+#line 819
     int i;
-#line 839
+#line 819
     int j;
-#line 839
+#line 819
     int k;
-#line 839
+#line 819
     int m;
-#line 839
+#line 819
     int err;
-#line 839
+#line 819
     int allInExtRange;	/* all values within external range? */
-#line 839
+#line 819
     int allInIntRange;	/* all values within internal range? */
-#line 839
+#line 819
     int nels;
-#line 839
+#line 819
     int nslabs;
-#line 839
+#line 819
     int nstarts;        /* number of different starts */
-#line 839
+#line 819
     int nok = 0;      /* count of valid comparisons */
-#line 839
+#line 819
     size_t start[MAX_RANK];
-#line 839
+#line 819
     size_t edge[MAX_RANK];
-#line 839
+#line 819
     size_t index[MAX_RANK];
-#line 839
+#line 819
     size_t index2[MAX_RANK];
-#line 839
+#line 819
     size_t mid[MAX_RANK];
-#line 839
+#line 819
     size_t count[MAX_RANK];
-#line 839
+#line 819
     size_t sstride[MAX_RANK];
-#line 839
+#line 819
     ptrdiff_t stride[MAX_RANK];
-#line 839
+#line 819
     ptrdiff_t imap[MAX_RANK];
-#line 839
+#line 819
     int canConvert;     /* Both text or both numeric */
-#line 839
+#line 819
     ulonglong value[MAX_NELS];
-#line 839
+#line 819
     double expect[MAX_NELS];
-#line 839
+#line 819
 
-#line 839
-#ifdef USE_PNETCDF
-#line 839
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 839
-#else
-#line 839
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 839
-#endif
-#line 839
+#line 819
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 819
     IF (err)
-#line 839
+#line 819
         error("nc_open: %s", nc_strerror(err));
-#line 839
+#line 819
     for (i = 0; i < numVars; i++) {
-#line 839
+#line 819
         canConvert = (var_type[i] == NC_CHAR) == (NCT_ULONGLONG == NCT_TEXT);
-#line 839
+#line 819
         assert(var_rank[i] <= MAX_RANK);
-#line 839
+#line 819
         assert(var_nels[i] <= MAX_NELS);
-#line 839
+#line 819
         for (j = 0; j < var_rank[i]; j++) {
-#line 839
+#line 819
             start[j] = 0;
-#line 839
+#line 819
             edge[j] = 1;
-#line 839
+#line 819
             stride[j] = 1;
-#line 839
+#line 819
             imap[j] = 1;
-#line 839
+#line 819
         }
-#line 839
+#line 819
         err = nc_get_varm_ulonglong(BAD_ID, i, start, edge, stride, imap, value);
-#line 839
+#line 819
         IF (err != NC_EBADID)
-#line 839
+#line 819
             error("bad ncid: status = %d", err);
-#line 839
+#line 819
         err = nc_get_varm_ulonglong(ncid, BAD_VARID, start, edge, stride, imap, value);
-#line 839
+#line 819
         IF (err != NC_ENOTVAR)
-#line 839
+#line 819
             error("bad var id: status = %d", err);
-#line 839
+#line 819
         for (j = 0; j < var_rank[i]; j++) {
-#line 839
+#line 819
             start[j] = var_shape[i][j];
-#line 839
+#line 819
             err = nc_get_varm_ulonglong(ncid, i, start, edge, stride, imap, value);
-#line 839
+#line 819
 	  if(!canConvert) {
-#line 839
+#line 819
 		IF (err != NC_ECHAR)
-#line 839
+#line 819
                	    error("conversion: status = %d", err);
-#line 839
+#line 819
 	  } else {
-#line 839
+#line 819
 	    IF (err != NC_EINVALCOORDS)
-#line 839
+#line 819
                 error("bad index: status = %d", err);
-#line 839
+#line 819
             start[j] = 0;
-#line 839
+#line 819
             edge[j] = var_shape[i][j] + 1;
-#line 839
+#line 819
             err = nc_get_varm_ulonglong(ncid, i, start, edge, stride, imap, value);
-#line 839
+#line 819
             IF (err != NC_EEDGE)
-#line 839
+#line 819
                 error("bad edge: status = %d", err);
-#line 839
+#line 819
             edge[j] = 1;
-#line 839
+#line 819
             stride[j] = 0;
-#line 839
+#line 819
             err = nc_get_varm_ulonglong(ncid, i, start, edge, stride, imap, value);
-#line 839
+#line 819
             IF (err != NC_ESTRIDE)
-#line 839
+#line 819
                 error("bad stride: status = %d", err);
-#line 839
+#line 819
             stride[j] = 1;
-#line 839
+#line 819
            }
-#line 839
+#line 819
         }
-#line 839
+#line 819
             /* Choose a random point dividing each dim into 2 parts */
-#line 839
+#line 819
             /* get 2^rank (nslabs) slabs so defined */
-#line 839
+#line 819
         nslabs = 1;
-#line 839
+#line 819
         for (j = 0; j < var_rank[i]; j++) {
-#line 839
+#line 819
             mid[j] = roll( var_shape[i][j] );
-#line 839
+#line 819
             nslabs *= 2;
-#line 839
+#line 819
         }
-#line 839
+#line 819
             /* bits of k determine whether to get lower or upper part of dim */
-#line 839
+#line 819
             /* choose random stride from 1 to edge */
-#line 839
+#line 819
         for (k = 0; k < nslabs; k++) {
-#line 839
+#line 819
             nstarts = 1;
-#line 839
+#line 819
             for (j = 0; j < var_rank[i]; j++) {
-#line 839
+#line 819
                 if ((k >> j) & 1) {
-#line 839
+#line 819
                     start[j] = 0;
-#line 839
+#line 819
                     edge[j] = mid[j];
-#line 839
+#line 819
                 }else{
-#line 839
+#line 819
                     start[j] = mid[j];
-#line 839
+#line 819
                     edge[j] = var_shape[i][j] - mid[j];
-#line 839
+#line 819
                 }
-#line 839
+#line 819
                 sstride[j] = stride[j] = edge[j] > 0 ? 1+roll(edge[j]) : 1;
-#line 839
+#line 819
                 nstarts *= stride[j];
-#line 839
+#line 819
             }
-#line 839
+#line 819
             for (m = 0; m < nstarts; m++) {
-#line 839
+#line 819
                 err = toMixedBase(m, var_rank[i], sstride, index);
-#line 839
+#line 819
                 IF (err)
-#line 839
+#line 819
                     error("error in toMixedBase");
-#line 839
+#line 819
                 nels = 1;
-#line 839
+#line 819
                 for (j = 0; j < var_rank[i]; j++) {
-#line 839
+#line 819
                     count[j] = 1 + (edge[j] - index[j] - 1) / stride[j];
-#line 839
+#line 819
                     nels *= count[j];
-#line 839
+#line 819
                     index[j] += start[j];
-#line 839
+#line 819
                 }
-#line 839
+#line 819
 		    /* Random choice of forward or backward */
-#line 839
+#line 819
 /* TODO
-#line 839
+#line 819
 		if ( roll(2) ) {
-#line 839
+#line 819
 		    for (j = 0; j < var_rank[i]; j++) {
-#line 839
+#line 819
 			index[j] += (count[j] - 1) * stride[j];
-#line 839
+#line 819
 			stride[j] = -stride[j];
-#line 839
+#line 819
 		    }
-#line 839
+#line 819
 		}
-#line 839
+#line 819
  */
-#line 839
+#line 819
 		if (var_rank[i] > 0) {
-#line 839
+#line 819
 		    j = var_rank[i] - 1;
-#line 839
+#line 819
 		    imap[j] = 1;
-#line 839
+#line 819
 		    for (; j > 0; j--)
-#line 839
+#line 819
 			imap[j-1] = imap[j] * count[j];
-#line 839
+#line 819
 		}
-#line 839
+#line 819
                 allInExtRange = allInIntRange = 1;
-#line 839
+#line 819
                 for (j = 0; j < nels; j++) {
-#line 839
+#line 819
                     err = toMixedBase(j, var_rank[i], count, index2);
-#line 839
+#line 819
                     IF (err)
-#line 839
+#line 819
                         error("error in toMixedBase 1");
-#line 839
+#line 819
                     for (d = 0; d < var_rank[i]; d++)
-#line 839
+#line 819
                         index2[d] = index[d] + index2[d] * stride[d];
-#line 839
+#line 819
                     expect[j] = hash4(var_type[i], var_rank[i], index2,
-#line 839
+#line 819
                         NCT_ULONGLONG);
-#line 839
+#line 819
                     if (inRange3(expect[j],var_type[i],NCT_ULONGLONG)) {
-#line 839
+#line 819
                         allInIntRange = allInIntRange && expect[j] >= ulonglong_min
-#line 839
+#line 819
                             && expect[j] <= ulonglong_max;
-#line 839
+#line 819
                     } else {
-#line 839
+#line 819
                         allInExtRange = 0;
-#line 839
+#line 819
                     }
-#line 839
+#line 819
                 }
-#line 839
+#line 819
                 if (var_rank[i] == 0 && i%2 )
-#line 839
+#line 819
                     err = nc_get_varm_ulonglong(ncid,i,NULL,NULL,NULL,NULL,value);
-#line 839
+#line 819
                 else
-#line 839
+#line 819
                     err = nc_get_varm_ulonglong(ncid,i,index,count,stride,imap,value);
-#line 839
+#line 819
                 if (canConvert) {
-#line 839
+#line 819
                     if (allInExtRange) {
-#line 839
+#line 819
                         if (allInIntRange) {
-#line 839
+#line 819
                             IF (err)
-#line 839
+#line 819
                                 error("%s", nc_strerror(err));
-#line 839
+#line 819
                         } else {
-#line 839
+#line 819
                             IF (err != NC_ERANGE)
-#line 839
+#line 819
                                 error("Range error: status = %d", err);
-#line 839
+#line 819
                         }
-#line 839
+#line 819
                     } else {
-#line 839
+#line 819
                         IF (err != 0 && err != NC_ERANGE)
-#line 839
+#line 819
                             error("OK or Range error: status = %d", err);
-#line 839
+#line 819
                     }
-#line 839
+#line 819
                     for (j = 0; j < nels; j++) {
-#line 839
+#line 819
                         if (inRange3(expect[j],var_type[i],NCT_ULONGLONG)
-#line 839
+#line 819
                                 && expect[j] >= ulonglong_min 
-#line 839
+#line 819
 				&& expect[j] <= ulonglong_max) {
-#line 839
+#line 819
 			    IF (!equal(value[j],expect[j],var_type[i], NCT_ULONGLONG)){
-#line 839
+#line 819
                                 error("value read not that expected");
-#line 839
+#line 819
                                 if (verbose) {
-#line 839
+#line 819
                                     error("\n");
-#line 839
+#line 819
                                     error("varid: %d, ", i);
-#line 839
+#line 819
                                     error("var_name: %s, ", var_name[i]);
-#line 839
+#line 819
                                     error("element number: %d ", j);
-#line 839
+#line 819
                                     error("expect: %g, ", expect[j]);
-#line 839
+#line 819
                                     error("got: %g", (double) value[j]);
-#line 839
+#line 819
                                 }
-#line 839
+#line 819
                             } else {
-#line 839
+#line 819
                                 nok++;
-#line 839
+#line 819
                             }
-#line 839
+#line 819
                         }
-#line 839
+#line 819
                     }
-#line 839
+#line 819
                 } else {
-#line 839
+#line 819
                     IF (nels > 0 && err != NC_ECHAR)
-#line 839
+#line 819
                         error("wrong type: status = %d", err);
-#line 839
+#line 819
                 }
-#line 839
+#line 819
             }
-#line 839
+#line 819
         }
-#line 839
+#line 819
     }
-#line 839
+#line 819
     err = nc_close(ncid);
-#line 839
+#line 819
     IF (err)
-#line 839
+#line 819
         error("nc_close: %s", nc_strerror(err));
-#line 839
+#line 819
     print_nok(nok);
-#line 839
+#line 819
 }
-#line 839
+#line 819
 
 
 
-#line 936
+#line 912
 
 void
-#line 937
+#line 913
 test_nc_get_att_text(void)
-#line 937
+#line 913
 {
-#line 937
+#line 913
     int ncid;
-#line 937
+#line 913
     int i;
-#line 937
+#line 913
     int j;
-#line 937
+#line 913
     size_t k;
-#line 937
+#line 913
     int err;
-#line 937
+#line 913
     int allInExtRange;
-#line 937
+#line 913
     int allInIntRange;
-#line 937
+#line 913
     int canConvert;     /* Both text or both numeric */
-#line 937
+#line 913
     text value[MAX_NELS];
-#line 937
+#line 913
     double expect[MAX_NELS];
-#line 937
+#line 913
     int nok = 0;      /* count of valid comparisons */
-#line 937
+#line 913
 
-#line 937
-#ifdef USE_PNETCDF
-#line 937
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 937
-#else
-#line 937
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 937
-#endif
-#line 937
+#line 913
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 913
     IF (err) 
-#line 937
+#line 913
 	error("nc_open: %s", nc_strerror(err));
-#line 937
+#line 913
 
-#line 937
+#line 913
     for (i = -1; i < numVars; i++) {
-#line 937
+#line 913
         for (j = 0; j < NATTS(i); j++) {
-#line 937
+#line 913
 	    canConvert = (ATT_TYPE(i,j) == NC_CHAR) == (NCT_TEXT == NCT_TEXT);
-#line 937
+#line 913
 	    err = nc_get_att_text(BAD_ID, i, ATT_NAME(i,j), value);
-#line 937
+#line 913
 	    IF (err != NC_EBADID) 
-#line 937
+#line 913
 		error("bad ncid: status = %d", err);
-#line 937
+#line 913
 	    err = nc_get_att_text(ncid, BAD_VARID, ATT_NAME(i,j), value);
-#line 937
+#line 913
 	    IF (err != NC_ENOTVAR) 
-#line 937
+#line 913
 		error("bad var id: status = %d", err);
-#line 937
+#line 913
 	    err = nc_get_att_text(ncid, i, "noSuch", value);
-#line 937
+#line 913
 	    IF (err != NC_ENOTATT) 
-#line 937
+#line 913
 		error("Bad attribute name: status = %d", err);
-#line 937
+#line 913
 	    allInExtRange = allInIntRange = 1;
-#line 937
+#line 913
             for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 937
+#line 913
 		expect[k] = hash4(ATT_TYPE(i,j), -1, &k, NCT_TEXT);
-#line 937
+#line 913
                 if (inRange3(expect[k],ATT_TYPE(i,j),NCT_TEXT)) {
-#line 937
+#line 913
                     allInIntRange = allInIntRange && expect[k] >= text_min
-#line 937
+#line 913
                                 && expect[k] <= text_max;
-#line 937
+#line 913
                 } else {
-#line 937
+#line 913
                     allInExtRange = 0;
-#line 937
+#line 913
                 }
-#line 937
+#line 913
 	    }
-#line 937
+#line 913
 	    err = nc_get_att_text(ncid, i, ATT_NAME(i,j), value);
-#line 937
+#line 913
             if (canConvert || ATT_LEN(i,j) == 0) {
-#line 937
+#line 913
                 if (allInExtRange) {
-#line 937
+#line 913
                     if (allInIntRange) {
-#line 937
+#line 913
                         IF (err)
-#line 937
+#line 913
                             error("%s", nc_strerror(err));
-#line 937
+#line 913
                     } else {
-#line 937
+#line 913
                         IF (err != NC_ERANGE)
-#line 937
+#line 913
                             error("Range error: status = %d", err);
-#line 937
+#line 913
                     }
-#line 937
+#line 913
                 } else {
-#line 937
+#line 913
                     IF (err != 0 && err != NC_ERANGE)
-#line 937
+#line 913
                         error("OK or Range error: status = %d", err);
-#line 937
+#line 913
                 }
-#line 937
+#line 913
 		for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 937
+#line 913
 		    if (inRange3(expect[k],ATT_TYPE(i,j),NCT_TEXT)
-#line 937
+#line 913
                             && expect[k] >= text_min && expect[k] <= text_max) {
-#line 937
+#line 913
 			IF (!equal(value[k],expect[k],ATT_TYPE(i,j), NCT_TEXT)){
-#line 937
+#line 913
 			    error("value read not that expected");
-#line 937
+#line 913
                             if (verbose) {
-#line 937
+#line 913
                                 error("\n");
-#line 937
+#line 913
                                 error("varid: %d, ", i);
-#line 937
+#line 913
                                 error("att_name: %s, ", ATT_NAME(i,j));
-#line 937
+#line 913
                                 error("element number: %d ", k);
-#line 937
+#line 913
                                 error("expect: %g", expect[k]);
-#line 937
+#line 913
                                 error("got: %g", (double) value[k]);
-#line 937
+#line 913
                             }
-#line 937
+#line 913
 			} else {
-#line 937
+#line 913
 			    nok++;
-#line 937
+#line 913
                         }
-#line 937
+#line 913
 		    }
-#line 937
+#line 913
 		}
-#line 937
+#line 913
 	    } else {
-#line 937
+#line 913
 		IF (err != NC_ECHAR)
-#line 937
+#line 913
 		    error("wrong type: status = %d", err);
-#line 937
+#line 913
 	    }
-#line 937
+#line 913
 	}
-#line 937
+#line 913
     }
-#line 937
+#line 913
 
-#line 937
+#line 913
     err = nc_close(ncid);
-#line 937
+#line 913
     IF (err)
-#line 937
+#line 913
 	error("nc_close: %s", nc_strerror(err));
-#line 937
+#line 913
     print_nok(nok);
-#line 937
+#line 913
 }
-#line 937
+#line 913
 
 void
-#line 938
+#line 914
 test_nc_get_att_uchar(void)
-#line 938
+#line 914
 {
-#line 938
+#line 914
     int ncid;
-#line 938
+#line 914
     int i;
-#line 938
+#line 914
     int j;
-#line 938
+#line 914
     size_t k;
-#line 938
+#line 914
     int err;
-#line 938
+#line 914
     int allInExtRange;
-#line 938
+#line 914
     int allInIntRange;
-#line 938
+#line 914
     int canConvert;     /* Both text or both numeric */
-#line 938
+#line 914
     uchar value[MAX_NELS];
-#line 938
+#line 914
     double expect[MAX_NELS];
-#line 938
+#line 914
     int nok = 0;      /* count of valid comparisons */
-#line 938
+#line 914
 
-#line 938
-#ifdef USE_PNETCDF
-#line 938
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 938
-#else
-#line 938
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 938
-#endif
-#line 938
+#line 914
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 914
     IF (err) 
-#line 938
+#line 914
 	error("nc_open: %s", nc_strerror(err));
-#line 938
+#line 914
 
-#line 938
+#line 914
     for (i = -1; i < numVars; i++) {
-#line 938
+#line 914
         for (j = 0; j < NATTS(i); j++) {
-#line 938
+#line 914
 	    canConvert = (ATT_TYPE(i,j) == NC_CHAR) == (NCT_UCHAR == NCT_TEXT);
-#line 938
+#line 914
 	    err = nc_get_att_uchar(BAD_ID, i, ATT_NAME(i,j), value);
-#line 938
+#line 914
 	    IF (err != NC_EBADID) 
-#line 938
+#line 914
 		error("bad ncid: status = %d", err);
-#line 938
+#line 914
 	    err = nc_get_att_uchar(ncid, BAD_VARID, ATT_NAME(i,j), value);
-#line 938
+#line 914
 	    IF (err != NC_ENOTVAR) 
-#line 938
+#line 914
 		error("bad var id: status = %d", err);
-#line 938
+#line 914
 	    err = nc_get_att_uchar(ncid, i, "noSuch", value);
-#line 938
+#line 914
 	    IF (err != NC_ENOTATT) 
-#line 938
+#line 914
 		error("Bad attribute name: status = %d", err);
-#line 938
+#line 914
 	    allInExtRange = allInIntRange = 1;
-#line 938
+#line 914
             for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 938
+#line 914
 		expect[k] = hash4(ATT_TYPE(i,j), -1, &k, NCT_UCHAR);
-#line 938
+#line 914
                 if (inRange3(expect[k],ATT_TYPE(i,j),NCT_UCHAR)) {
-#line 938
+#line 914
                     allInIntRange = allInIntRange && expect[k] >= uchar_min
-#line 938
+#line 914
                                 && expect[k] <= uchar_max;
-#line 938
+#line 914
                 } else {
-#line 938
+#line 914
                     allInExtRange = 0;
-#line 938
+#line 914
                 }
-#line 938
+#line 914
 	    }
-#line 938
+#line 914
 	    err = nc_get_att_uchar(ncid, i, ATT_NAME(i,j), value);
-#line 938
+#line 914
             if (canConvert || ATT_LEN(i,j) == 0) {
-#line 938
+#line 914
                 if (allInExtRange) {
-#line 938
+#line 914
                     if (allInIntRange) {
-#line 938
+#line 914
                         IF (err)
-#line 938
+#line 914
                             error("%s", nc_strerror(err));
-#line 938
+#line 914
                     } else {
-#line 938
+#line 914
                         IF (err != NC_ERANGE)
-#line 938
+#line 914
                             error("Range error: status = %d", err);
-#line 938
+#line 914
                     }
-#line 938
+#line 914
                 } else {
-#line 938
+#line 914
                     IF (err != 0 && err != NC_ERANGE)
-#line 938
+#line 914
                         error("OK or Range error: status = %d", err);
-#line 938
+#line 914
                 }
-#line 938
+#line 914
 		for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 938
+#line 914
 		    if (inRange3(expect[k],ATT_TYPE(i,j),NCT_UCHAR)
-#line 938
+#line 914
                             && expect[k] >= uchar_min && expect[k] <= uchar_max) {
-#line 938
+#line 914
 			IF (!equal(value[k],expect[k],ATT_TYPE(i,j), NCT_UCHAR)){
-#line 938
+#line 914
 			    error("value read not that expected");
-#line 938
+#line 914
                             if (verbose) {
-#line 938
+#line 914
                                 error("\n");
-#line 938
+#line 914
                                 error("varid: %d, ", i);
-#line 938
+#line 914
                                 error("att_name: %s, ", ATT_NAME(i,j));
-#line 938
+#line 914
                                 error("element number: %d ", k);
-#line 938
+#line 914
                                 error("expect: %g", expect[k]);
-#line 938
+#line 914
                                 error("got: %g", (double) value[k]);
-#line 938
+#line 914
                             }
-#line 938
+#line 914
 			} else {
-#line 938
+#line 914
 			    nok++;
-#line 938
+#line 914
                         }
-#line 938
+#line 914
 		    }
-#line 938
+#line 914
 		}
-#line 938
+#line 914
 	    } else {
-#line 938
+#line 914
 		IF (err != NC_ECHAR)
-#line 938
+#line 914
 		    error("wrong type: status = %d", err);
-#line 938
+#line 914
 	    }
-#line 938
+#line 914
 	}
-#line 938
+#line 914
     }
-#line 938
+#line 914
 
-#line 938
+#line 914
     err = nc_close(ncid);
-#line 938
+#line 914
     IF (err)
-#line 938
+#line 914
 	error("nc_close: %s", nc_strerror(err));
-#line 938
+#line 914
     print_nok(nok);
-#line 938
+#line 914
 }
-#line 938
+#line 914
 
 void
-#line 939
+#line 915
 test_nc_get_att_schar(void)
-#line 939
+#line 915
 {
-#line 939
+#line 915
     int ncid;
-#line 939
+#line 915
     int i;
-#line 939
+#line 915
     int j;
-#line 939
+#line 915
     size_t k;
-#line 939
+#line 915
     int err;
-#line 939
+#line 915
     int allInExtRange;
-#line 939
+#line 915
     int allInIntRange;
-#line 939
+#line 915
     int canConvert;     /* Both text or both numeric */
-#line 939
+#line 915
     schar value[MAX_NELS];
-#line 939
+#line 915
     double expect[MAX_NELS];
-#line 939
+#line 915
     int nok = 0;      /* count of valid comparisons */
-#line 939
+#line 915
 
-#line 939
-#ifdef USE_PNETCDF
-#line 939
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 939
-#else
-#line 939
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 939
-#endif
-#line 939
+#line 915
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 915
     IF (err) 
-#line 939
+#line 915
 	error("nc_open: %s", nc_strerror(err));
-#line 939
+#line 915
 
-#line 939
+#line 915
     for (i = -1; i < numVars; i++) {
-#line 939
+#line 915
         for (j = 0; j < NATTS(i); j++) {
-#line 939
+#line 915
 	    canConvert = (ATT_TYPE(i,j) == NC_CHAR) == (NCT_SCHAR == NCT_TEXT);
-#line 939
+#line 915
 	    err = nc_get_att_schar(BAD_ID, i, ATT_NAME(i,j), value);
-#line 939
+#line 915
 	    IF (err != NC_EBADID) 
-#line 939
+#line 915
 		error("bad ncid: status = %d", err);
-#line 939
+#line 915
 	    err = nc_get_att_schar(ncid, BAD_VARID, ATT_NAME(i,j), value);
-#line 939
+#line 915
 	    IF (err != NC_ENOTVAR) 
-#line 939
+#line 915
 		error("bad var id: status = %d", err);
-#line 939
+#line 915
 	    err = nc_get_att_schar(ncid, i, "noSuch", value);
-#line 939
+#line 915
 	    IF (err != NC_ENOTATT) 
-#line 939
+#line 915
 		error("Bad attribute name: status = %d", err);
-#line 939
+#line 915
 	    allInExtRange = allInIntRange = 1;
-#line 939
+#line 915
             for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 939
+#line 915
 		expect[k] = hash4(ATT_TYPE(i,j), -1, &k, NCT_SCHAR);
-#line 939
+#line 915
                 if (inRange3(expect[k],ATT_TYPE(i,j),NCT_SCHAR)) {
-#line 939
+#line 915
                     allInIntRange = allInIntRange && expect[k] >= schar_min
-#line 939
+#line 915
                                 && expect[k] <= schar_max;
-#line 939
+#line 915
                 } else {
-#line 939
+#line 915
                     allInExtRange = 0;
-#line 939
+#line 915
                 }
-#line 939
+#line 915
 	    }
-#line 939
+#line 915
 	    err = nc_get_att_schar(ncid, i, ATT_NAME(i,j), value);
-#line 939
+#line 915
             if (canConvert || ATT_LEN(i,j) == 0) {
-#line 939
+#line 915
                 if (allInExtRange) {
-#line 939
+#line 915
                     if (allInIntRange) {
-#line 939
+#line 915
                         IF (err)
-#line 939
+#line 915
                             error("%s", nc_strerror(err));
-#line 939
+#line 915
                     } else {
-#line 939
+#line 915
                         IF (err != NC_ERANGE)
-#line 939
+#line 915
                             error("Range error: status = %d", err);
-#line 939
+#line 915
                     }
-#line 939
+#line 915
                 } else {
-#line 939
+#line 915
                     IF (err != 0 && err != NC_ERANGE)
-#line 939
+#line 915
                         error("OK or Range error: status = %d", err);
-#line 939
+#line 915
                 }
-#line 939
+#line 915
 		for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 939
+#line 915
 		    if (inRange3(expect[k],ATT_TYPE(i,j),NCT_SCHAR)
-#line 939
+#line 915
                             && expect[k] >= schar_min && expect[k] <= schar_max) {
-#line 939
+#line 915
 			IF (!equal(value[k],expect[k],ATT_TYPE(i,j), NCT_SCHAR)){
-#line 939
+#line 915
 			    error("value read not that expected");
-#line 939
+#line 915
                             if (verbose) {
-#line 939
+#line 915
                                 error("\n");
-#line 939
+#line 915
                                 error("varid: %d, ", i);
-#line 939
+#line 915
                                 error("att_name: %s, ", ATT_NAME(i,j));
-#line 939
+#line 915
                                 error("element number: %d ", k);
-#line 939
+#line 915
                                 error("expect: %g", expect[k]);
-#line 939
+#line 915
                                 error("got: %g", (double) value[k]);
-#line 939
+#line 915
                             }
-#line 939
+#line 915
 			} else {
-#line 939
+#line 915
 			    nok++;
-#line 939
+#line 915
                         }
-#line 939
+#line 915
 		    }
-#line 939
+#line 915
 		}
-#line 939
+#line 915
 	    } else {
-#line 939
+#line 915
 		IF (err != NC_ECHAR)
-#line 939
+#line 915
 		    error("wrong type: status = %d", err);
-#line 939
+#line 915
 	    }
-#line 939
+#line 915
 	}
-#line 939
+#line 915
     }
-#line 939
+#line 915
 
-#line 939
+#line 915
     err = nc_close(ncid);
-#line 939
+#line 915
     IF (err)
-#line 939
+#line 915
 	error("nc_close: %s", nc_strerror(err));
-#line 939
+#line 915
     print_nok(nok);
-#line 939
+#line 915
 }
-#line 939
+#line 915
 
 void
-#line 940
+#line 916
 test_nc_get_att_short(void)
-#line 940
+#line 916
 {
-#line 940
+#line 916
     int ncid;
-#line 940
+#line 916
     int i;
-#line 940
+#line 916
     int j;
-#line 940
+#line 916
     size_t k;
-#line 940
+#line 916
     int err;
-#line 940
+#line 916
     int allInExtRange;
-#line 940
+#line 916
     int allInIntRange;
-#line 940
+#line 916
     int canConvert;     /* Both text or both numeric */
-#line 940
+#line 916
     short value[MAX_NELS];
-#line 940
+#line 916
     double expect[MAX_NELS];
-#line 940
+#line 916
     int nok = 0;      /* count of valid comparisons */
-#line 940
+#line 916
 
-#line 940
-#ifdef USE_PNETCDF
-#line 940
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 940
-#else
-#line 940
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 940
-#endif
-#line 940
+#line 916
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 916
     IF (err) 
-#line 940
+#line 916
 	error("nc_open: %s", nc_strerror(err));
-#line 940
+#line 916
 
-#line 940
+#line 916
     for (i = -1; i < numVars; i++) {
-#line 940
+#line 916
         for (j = 0; j < NATTS(i); j++) {
-#line 940
+#line 916
 	    canConvert = (ATT_TYPE(i,j) == NC_CHAR) == (NCT_SHORT == NCT_TEXT);
-#line 940
+#line 916
 	    err = nc_get_att_short(BAD_ID, i, ATT_NAME(i,j), value);
-#line 940
+#line 916
 	    IF (err != NC_EBADID) 
-#line 940
+#line 916
 		error("bad ncid: status = %d", err);
-#line 940
+#line 916
 	    err = nc_get_att_short(ncid, BAD_VARID, ATT_NAME(i,j), value);
-#line 940
+#line 916
 	    IF (err != NC_ENOTVAR) 
-#line 940
+#line 916
 		error("bad var id: status = %d", err);
-#line 940
+#line 916
 	    err = nc_get_att_short(ncid, i, "noSuch", value);
-#line 940
+#line 916
 	    IF (err != NC_ENOTATT) 
-#line 940
+#line 916
 		error("Bad attribute name: status = %d", err);
-#line 940
+#line 916
 	    allInExtRange = allInIntRange = 1;
-#line 940
+#line 916
             for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 940
+#line 916
 		expect[k] = hash4(ATT_TYPE(i,j), -1, &k, NCT_SHORT);
-#line 940
+#line 916
                 if (inRange3(expect[k],ATT_TYPE(i,j),NCT_SHORT)) {
-#line 940
+#line 916
                     allInIntRange = allInIntRange && expect[k] >= short_min
-#line 940
+#line 916
                                 && expect[k] <= short_max;
-#line 940
+#line 916
                 } else {
-#line 940
+#line 916
                     allInExtRange = 0;
-#line 940
+#line 916
                 }
-#line 940
+#line 916
 	    }
-#line 940
+#line 916
 	    err = nc_get_att_short(ncid, i, ATT_NAME(i,j), value);
-#line 940
+#line 916
             if (canConvert || ATT_LEN(i,j) == 0) {
-#line 940
+#line 916
                 if (allInExtRange) {
-#line 940
+#line 916
                     if (allInIntRange) {
-#line 940
+#line 916
                         IF (err)
-#line 940
+#line 916
                             error("%s", nc_strerror(err));
-#line 940
+#line 916
                     } else {
-#line 940
+#line 916
                         IF (err != NC_ERANGE)
-#line 940
+#line 916
                             error("Range error: status = %d", err);
-#line 940
+#line 916
                     }
-#line 940
+#line 916
                 } else {
-#line 940
+#line 916
                     IF (err != 0 && err != NC_ERANGE)
-#line 940
+#line 916
                         error("OK or Range error: status = %d", err);
-#line 940
+#line 916
                 }
-#line 940
+#line 916
 		for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 940
+#line 916
 		    if (inRange3(expect[k],ATT_TYPE(i,j),NCT_SHORT)
-#line 940
+#line 916
                             && expect[k] >= short_min && expect[k] <= short_max) {
-#line 940
+#line 916
 			IF (!equal(value[k],expect[k],ATT_TYPE(i,j), NCT_SHORT)){
-#line 940
+#line 916
 			    error("value read not that expected");
-#line 940
+#line 916
                             if (verbose) {
-#line 940
+#line 916
                                 error("\n");
-#line 940
+#line 916
                                 error("varid: %d, ", i);
-#line 940
+#line 916
                                 error("att_name: %s, ", ATT_NAME(i,j));
-#line 940
+#line 916
                                 error("element number: %d ", k);
-#line 940
+#line 916
                                 error("expect: %g", expect[k]);
-#line 940
+#line 916
                                 error("got: %g", (double) value[k]);
-#line 940
+#line 916
                             }
-#line 940
+#line 916
 			} else {
-#line 940
+#line 916
 			    nok++;
-#line 940
+#line 916
                         }
-#line 940
+#line 916
 		    }
-#line 940
+#line 916
 		}
-#line 940
+#line 916
 	    } else {
-#line 940
+#line 916
 		IF (err != NC_ECHAR)
-#line 940
+#line 916
 		    error("wrong type: status = %d", err);
-#line 940
+#line 916
 	    }
-#line 940
+#line 916
 	}
-#line 940
+#line 916
     }
-#line 940
+#line 916
 
-#line 940
+#line 916
     err = nc_close(ncid);
-#line 940
+#line 916
     IF (err)
-#line 940
+#line 916
 	error("nc_close: %s", nc_strerror(err));
-#line 940
+#line 916
     print_nok(nok);
-#line 940
+#line 916
 }
-#line 940
+#line 916
 
 void
-#line 941
+#line 917
 test_nc_get_att_int(void)
-#line 941
+#line 917
 {
-#line 941
+#line 917
     int ncid;
-#line 941
+#line 917
     int i;
-#line 941
+#line 917
     int j;
-#line 941
+#line 917
     size_t k;
-#line 941
+#line 917
     int err;
-#line 941
+#line 917
     int allInExtRange;
-#line 941
+#line 917
     int allInIntRange;
-#line 941
+#line 917
     int canConvert;     /* Both text or both numeric */
-#line 941
+#line 917
     int value[MAX_NELS];
-#line 941
+#line 917
     double expect[MAX_NELS];
-#line 941
+#line 917
     int nok = 0;      /* count of valid comparisons */
-#line 941
+#line 917
 
-#line 941
-#ifdef USE_PNETCDF
-#line 941
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 941
-#else
-#line 941
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 941
-#endif
-#line 941
+#line 917
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 917
     IF (err) 
-#line 941
+#line 917
 	error("nc_open: %s", nc_strerror(err));
-#line 941
+#line 917
 
-#line 941
+#line 917
     for (i = -1; i < numVars; i++) {
-#line 941
+#line 917
         for (j = 0; j < NATTS(i); j++) {
-#line 941
+#line 917
 	    canConvert = (ATT_TYPE(i,j) == NC_CHAR) == (NCT_INT == NCT_TEXT);
-#line 941
+#line 917
 	    err = nc_get_att_int(BAD_ID, i, ATT_NAME(i,j), value);
-#line 941
+#line 917
 	    IF (err != NC_EBADID) 
-#line 941
+#line 917
 		error("bad ncid: status = %d", err);
-#line 941
+#line 917
 	    err = nc_get_att_int(ncid, BAD_VARID, ATT_NAME(i,j), value);
-#line 941
+#line 917
 	    IF (err != NC_ENOTVAR) 
-#line 941
+#line 917
 		error("bad var id: status = %d", err);
-#line 941
+#line 917
 	    err = nc_get_att_int(ncid, i, "noSuch", value);
-#line 941
+#line 917
 	    IF (err != NC_ENOTATT) 
-#line 941
+#line 917
 		error("Bad attribute name: status = %d", err);
-#line 941
+#line 917
 	    allInExtRange = allInIntRange = 1;
-#line 941
+#line 917
             for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 941
+#line 917
 		expect[k] = hash4(ATT_TYPE(i,j), -1, &k, NCT_INT);
-#line 941
+#line 917
                 if (inRange3(expect[k],ATT_TYPE(i,j),NCT_INT)) {
-#line 941
+#line 917
                     allInIntRange = allInIntRange && expect[k] >= int_min
-#line 941
+#line 917
                                 && expect[k] <= int_max;
-#line 941
+#line 917
                 } else {
-#line 941
+#line 917
                     allInExtRange = 0;
-#line 941
+#line 917
                 }
-#line 941
+#line 917
 	    }
-#line 941
+#line 917
 	    err = nc_get_att_int(ncid, i, ATT_NAME(i,j), value);
-#line 941
+#line 917
             if (canConvert || ATT_LEN(i,j) == 0) {
-#line 941
+#line 917
                 if (allInExtRange) {
-#line 941
+#line 917
                     if (allInIntRange) {
-#line 941
+#line 917
                         IF (err)
-#line 941
+#line 917
                             error("%s", nc_strerror(err));
-#line 941
+#line 917
                     } else {
-#line 941
+#line 917
                         IF (err != NC_ERANGE)
-#line 941
+#line 917
                             error("Range error: status = %d", err);
-#line 941
+#line 917
                     }
-#line 941
+#line 917
                 } else {
-#line 941
+#line 917
                     IF (err != 0 && err != NC_ERANGE)
-#line 941
+#line 917
                         error("OK or Range error: status = %d", err);
-#line 941
+#line 917
                 }
-#line 941
+#line 917
 		for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 941
+#line 917
 		    if (inRange3(expect[k],ATT_TYPE(i,j),NCT_INT)
-#line 941
+#line 917
                             && expect[k] >= int_min && expect[k] <= int_max) {
-#line 941
+#line 917
 			IF (!equal(value[k],expect[k],ATT_TYPE(i,j), NCT_INT)){
-#line 941
+#line 917
 			    error("value read not that expected");
-#line 941
+#line 917
                             if (verbose) {
-#line 941
+#line 917
                                 error("\n");
-#line 941
+#line 917
                                 error("varid: %d, ", i);
-#line 941
+#line 917
                                 error("att_name: %s, ", ATT_NAME(i,j));
-#line 941
+#line 917
                                 error("element number: %d ", k);
-#line 941
+#line 917
                                 error("expect: %g", expect[k]);
-#line 941
+#line 917
                                 error("got: %g", (double) value[k]);
-#line 941
+#line 917
                             }
-#line 941
+#line 917
 			} else {
-#line 941
+#line 917
 			    nok++;
-#line 941
+#line 917
                         }
-#line 941
+#line 917
 		    }
-#line 941
+#line 917
 		}
-#line 941
+#line 917
 	    } else {
-#line 941
+#line 917
 		IF (err != NC_ECHAR)
-#line 941
+#line 917
 		    error("wrong type: status = %d", err);
-#line 941
+#line 917
 	    }
-#line 941
+#line 917
 	}
-#line 941
+#line 917
     }
-#line 941
+#line 917
 
-#line 941
+#line 917
     err = nc_close(ncid);
-#line 941
+#line 917
     IF (err)
-#line 941
+#line 917
 	error("nc_close: %s", nc_strerror(err));
-#line 941
+#line 917
     print_nok(nok);
-#line 941
+#line 917
 }
-#line 941
+#line 917
 
 void
-#line 942
+#line 918
 test_nc_get_att_long(void)
-#line 942
+#line 918
 {
-#line 942
+#line 918
     int ncid;
-#line 942
+#line 918
     int i;
-#line 942
+#line 918
     int j;
-#line 942
+#line 918
     size_t k;
-#line 942
+#line 918
     int err;
-#line 942
+#line 918
     int allInExtRange;
-#line 942
+#line 918
     int allInIntRange;
-#line 942
+#line 918
     int canConvert;     /* Both text or both numeric */
-#line 942
+#line 918
     long value[MAX_NELS];
-#line 942
+#line 918
     double expect[MAX_NELS];
-#line 942
+#line 918
     int nok = 0;      /* count of valid comparisons */
-#line 942
+#line 918
 
-#line 942
-#ifdef USE_PNETCDF
-#line 942
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 942
-#else
-#line 942
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 942
-#endif
-#line 942
+#line 918
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 918
     IF (err) 
-#line 942
+#line 918
 	error("nc_open: %s", nc_strerror(err));
-#line 942
+#line 918
 
-#line 942
+#line 918
     for (i = -1; i < numVars; i++) {
-#line 942
+#line 918
         for (j = 0; j < NATTS(i); j++) {
-#line 942
+#line 918
 	    canConvert = (ATT_TYPE(i,j) == NC_CHAR) == (NCT_LONG == NCT_TEXT);
-#line 942
+#line 918
 	    err = nc_get_att_long(BAD_ID, i, ATT_NAME(i,j), value);
-#line 942
+#line 918
 	    IF (err != NC_EBADID) 
-#line 942
+#line 918
 		error("bad ncid: status = %d", err);
-#line 942
+#line 918
 	    err = nc_get_att_long(ncid, BAD_VARID, ATT_NAME(i,j), value);
-#line 942
+#line 918
 	    IF (err != NC_ENOTVAR) 
-#line 942
+#line 918
 		error("bad var id: status = %d", err);
-#line 942
+#line 918
 	    err = nc_get_att_long(ncid, i, "noSuch", value);
-#line 942
+#line 918
 	    IF (err != NC_ENOTATT) 
-#line 942
+#line 918
 		error("Bad attribute name: status = %d", err);
-#line 942
+#line 918
 	    allInExtRange = allInIntRange = 1;
-#line 942
+#line 918
             for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 942
+#line 918
 		expect[k] = hash4(ATT_TYPE(i,j), -1, &k, NCT_LONG);
-#line 942
+#line 918
                 if (inRange3(expect[k],ATT_TYPE(i,j),NCT_LONG)) {
-#line 942
+#line 918
                     allInIntRange = allInIntRange && expect[k] >= long_min
-#line 942
+#line 918
                                 && expect[k] <= long_max;
-#line 942
+#line 918
                 } else {
-#line 942
+#line 918
                     allInExtRange = 0;
-#line 942
+#line 918
                 }
-#line 942
+#line 918
 	    }
-#line 942
+#line 918
 	    err = nc_get_att_long(ncid, i, ATT_NAME(i,j), value);
-#line 942
+#line 918
             if (canConvert || ATT_LEN(i,j) == 0) {
-#line 942
+#line 918
                 if (allInExtRange) {
-#line 942
+#line 918
                     if (allInIntRange) {
-#line 942
+#line 918
                         IF (err)
-#line 942
+#line 918
                             error("%s", nc_strerror(err));
-#line 942
+#line 918
                     } else {
-#line 942
+#line 918
                         IF (err != NC_ERANGE)
-#line 942
+#line 918
                             error("Range error: status = %d", err);
-#line 942
+#line 918
                     }
-#line 942
+#line 918
                 } else {
-#line 942
+#line 918
                     IF (err != 0 && err != NC_ERANGE)
-#line 942
+#line 918
                         error("OK or Range error: status = %d", err);
-#line 942
+#line 918
                 }
-#line 942
+#line 918
 		for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 942
+#line 918
 		    if (inRange3(expect[k],ATT_TYPE(i,j),NCT_LONG)
-#line 942
+#line 918
                             && expect[k] >= long_min && expect[k] <= long_max) {
-#line 942
+#line 918
 			IF (!equal(value[k],expect[k],ATT_TYPE(i,j), NCT_LONG)){
-#line 942
+#line 918
 			    error("value read not that expected");
-#line 942
+#line 918
                             if (verbose) {
-#line 942
+#line 918
                                 error("\n");
-#line 942
+#line 918
                                 error("varid: %d, ", i);
-#line 942
+#line 918
                                 error("att_name: %s, ", ATT_NAME(i,j));
-#line 942
+#line 918
                                 error("element number: %d ", k);
-#line 942
+#line 918
                                 error("expect: %g", expect[k]);
-#line 942
+#line 918
                                 error("got: %g", (double) value[k]);
-#line 942
+#line 918
                             }
-#line 942
+#line 918
 			} else {
-#line 942
+#line 918
 			    nok++;
-#line 942
+#line 918
                         }
-#line 942
+#line 918
 		    }
-#line 942
+#line 918
 		}
-#line 942
+#line 918
 	    } else {
-#line 942
+#line 918
 		IF (err != NC_ECHAR)
-#line 942
+#line 918
 		    error("wrong type: status = %d", err);
-#line 942
+#line 918
 	    }
-#line 942
+#line 918
 	}
-#line 942
+#line 918
     }
-#line 942
+#line 918
 
-#line 942
+#line 918
     err = nc_close(ncid);
-#line 942
+#line 918
     IF (err)
-#line 942
+#line 918
 	error("nc_close: %s", nc_strerror(err));
-#line 942
+#line 918
     print_nok(nok);
-#line 942
+#line 918
 }
-#line 942
+#line 918
 
 void
-#line 943
+#line 919
 test_nc_get_att_float(void)
-#line 943
+#line 919
 {
-#line 943
+#line 919
     int ncid;
-#line 943
+#line 919
     int i;
-#line 943
+#line 919
     int j;
-#line 943
+#line 919
     size_t k;
-#line 943
+#line 919
     int err;
-#line 943
+#line 919
     int allInExtRange;
-#line 943
+#line 919
     int allInIntRange;
-#line 943
+#line 919
     int canConvert;     /* Both text or both numeric */
-#line 943
+#line 919
     float value[MAX_NELS];
-#line 943
+#line 919
     double expect[MAX_NELS];
-#line 943
+#line 919
     int nok = 0;      /* count of valid comparisons */
-#line 943
+#line 919
 
-#line 943
-#ifdef USE_PNETCDF
-#line 943
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 943
-#else
-#line 943
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 943
-#endif
-#line 943
+#line 919
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 919
     IF (err) 
-#line 943
+#line 919
 	error("nc_open: %s", nc_strerror(err));
-#line 943
+#line 919
 
-#line 943
+#line 919
     for (i = -1; i < numVars; i++) {
-#line 943
+#line 919
         for (j = 0; j < NATTS(i); j++) {
-#line 943
+#line 919
 	    canConvert = (ATT_TYPE(i,j) == NC_CHAR) == (NCT_FLOAT == NCT_TEXT);
-#line 943
+#line 919
 	    err = nc_get_att_float(BAD_ID, i, ATT_NAME(i,j), value);
-#line 943
+#line 919
 	    IF (err != NC_EBADID) 
-#line 943
+#line 919
 		error("bad ncid: status = %d", err);
-#line 943
+#line 919
 	    err = nc_get_att_float(ncid, BAD_VARID, ATT_NAME(i,j), value);
-#line 943
+#line 919
 	    IF (err != NC_ENOTVAR) 
-#line 943
+#line 919
 		error("bad var id: status = %d", err);
-#line 943
+#line 919
 	    err = nc_get_att_float(ncid, i, "noSuch", value);
-#line 943
+#line 919
 	    IF (err != NC_ENOTATT) 
-#line 943
+#line 919
 		error("Bad attribute name: status = %d", err);
-#line 943
+#line 919
 	    allInExtRange = allInIntRange = 1;
-#line 943
+#line 919
             for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 943
+#line 919
 		expect[k] = hash4(ATT_TYPE(i,j), -1, &k, NCT_FLOAT);
-#line 943
+#line 919
                 if (inRange3(expect[k],ATT_TYPE(i,j),NCT_FLOAT)) {
-#line 943
+#line 919
                     allInIntRange = allInIntRange && expect[k] >= float_min
-#line 943
+#line 919
                                 && expect[k] <= float_max;
-#line 943
+#line 919
                 } else {
-#line 943
+#line 919
                     allInExtRange = 0;
-#line 943
+#line 919
                 }
-#line 943
+#line 919
 	    }
-#line 943
+#line 919
 	    err = nc_get_att_float(ncid, i, ATT_NAME(i,j), value);
-#line 943
+#line 919
             if (canConvert || ATT_LEN(i,j) == 0) {
-#line 943
+#line 919
                 if (allInExtRange) {
-#line 943
+#line 919
                     if (allInIntRange) {
-#line 943
+#line 919
                         IF (err)
-#line 943
+#line 919
                             error("%s", nc_strerror(err));
-#line 943
+#line 919
                     } else {
-#line 943
+#line 919
                         IF (err != NC_ERANGE)
-#line 943
+#line 919
                             error("Range error: status = %d", err);
-#line 943
+#line 919
                     }
-#line 943
+#line 919
                 } else {
-#line 943
+#line 919
                     IF (err != 0 && err != NC_ERANGE)
-#line 943
+#line 919
                         error("OK or Range error: status = %d", err);
-#line 943
+#line 919
                 }
-#line 943
+#line 919
 		for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 943
+#line 919
 		    if (inRange3(expect[k],ATT_TYPE(i,j),NCT_FLOAT)
-#line 943
+#line 919
                             && expect[k] >= float_min && expect[k] <= float_max) {
-#line 943
+#line 919
 			IF (!equal(value[k],expect[k],ATT_TYPE(i,j), NCT_FLOAT)){
-#line 943
+#line 919
 			    error("value read not that expected");
-#line 943
+#line 919
                             if (verbose) {
-#line 943
+#line 919
                                 error("\n");
-#line 943
+#line 919
                                 error("varid: %d, ", i);
-#line 943
+#line 919
                                 error("att_name: %s, ", ATT_NAME(i,j));
-#line 943
+#line 919
                                 error("element number: %d ", k);
-#line 943
+#line 919
                                 error("expect: %g", expect[k]);
-#line 943
+#line 919
                                 error("got: %g", (double) value[k]);
-#line 943
+#line 919
                             }
-#line 943
+#line 919
 			} else {
-#line 943
+#line 919
 			    nok++;
-#line 943
+#line 919
                         }
-#line 943
+#line 919
 		    }
-#line 943
+#line 919
 		}
-#line 943
+#line 919
 	    } else {
-#line 943
+#line 919
 		IF (err != NC_ECHAR)
-#line 943
+#line 919
 		    error("wrong type: status = %d", err);
-#line 943
+#line 919
 	    }
-#line 943
+#line 919
 	}
-#line 943
+#line 919
     }
-#line 943
+#line 919
 
-#line 943
+#line 919
     err = nc_close(ncid);
-#line 943
+#line 919
     IF (err)
-#line 943
+#line 919
 	error("nc_close: %s", nc_strerror(err));
-#line 943
+#line 919
     print_nok(nok);
-#line 943
+#line 919
 }
-#line 943
+#line 919
 
 void
-#line 944
+#line 920
 test_nc_get_att_double(void)
-#line 944
+#line 920
 {
-#line 944
+#line 920
     int ncid;
-#line 944
+#line 920
     int i;
-#line 944
+#line 920
     int j;
-#line 944
+#line 920
     size_t k;
-#line 944
+#line 920
     int err;
-#line 944
+#line 920
     int allInExtRange;
-#line 944
+#line 920
     int allInIntRange;
-#line 944
+#line 920
     int canConvert;     /* Both text or both numeric */
-#line 944
+#line 920
     double value[MAX_NELS];
-#line 944
+#line 920
     double expect[MAX_NELS];
-#line 944
+#line 920
     int nok = 0;      /* count of valid comparisons */
-#line 944
+#line 920
 
-#line 944
-#ifdef USE_PNETCDF
-#line 944
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 944
-#else
-#line 944
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 944
-#endif
-#line 944
+#line 920
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 920
     IF (err) 
-#line 944
+#line 920
 	error("nc_open: %s", nc_strerror(err));
-#line 944
+#line 920
 
-#line 944
+#line 920
     for (i = -1; i < numVars; i++) {
-#line 944
+#line 920
         for (j = 0; j < NATTS(i); j++) {
-#line 944
+#line 920
 	    canConvert = (ATT_TYPE(i,j) == NC_CHAR) == (NCT_DOUBLE == NCT_TEXT);
-#line 944
+#line 920
 	    err = nc_get_att_double(BAD_ID, i, ATT_NAME(i,j), value);
-#line 944
+#line 920
 	    IF (err != NC_EBADID) 
-#line 944
+#line 920
 		error("bad ncid: status = %d", err);
-#line 944
+#line 920
 	    err = nc_get_att_double(ncid, BAD_VARID, ATT_NAME(i,j), value);
-#line 944
+#line 920
 	    IF (err != NC_ENOTVAR) 
-#line 944
+#line 920
 		error("bad var id: status = %d", err);
-#line 944
+#line 920
 	    err = nc_get_att_double(ncid, i, "noSuch", value);
-#line 944
+#line 920
 	    IF (err != NC_ENOTATT) 
-#line 944
+#line 920
 		error("Bad attribute name: status = %d", err);
-#line 944
+#line 920
 	    allInExtRange = allInIntRange = 1;
-#line 944
+#line 920
             for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 944
+#line 920
 		expect[k] = hash4(ATT_TYPE(i,j), -1, &k, NCT_DOUBLE);
-#line 944
+#line 920
                 if (inRange3(expect[k],ATT_TYPE(i,j),NCT_DOUBLE)) {
-#line 944
+#line 920
                     allInIntRange = allInIntRange && expect[k] >= double_min
-#line 944
+#line 920
                                 && expect[k] <= double_max;
-#line 944
+#line 920
                 } else {
-#line 944
+#line 920
                     allInExtRange = 0;
-#line 944
+#line 920
                 }
-#line 944
+#line 920
 	    }
-#line 944
+#line 920
 	    err = nc_get_att_double(ncid, i, ATT_NAME(i,j), value);
-#line 944
+#line 920
             if (canConvert || ATT_LEN(i,j) == 0) {
-#line 944
+#line 920
                 if (allInExtRange) {
-#line 944
+#line 920
                     if (allInIntRange) {
-#line 944
+#line 920
                         IF (err)
-#line 944
+#line 920
                             error("%s", nc_strerror(err));
-#line 944
+#line 920
                     } else {
-#line 944
+#line 920
                         IF (err != NC_ERANGE)
-#line 944
+#line 920
                             error("Range error: status = %d", err);
-#line 944
+#line 920
                     }
-#line 944
+#line 920
                 } else {
-#line 944
+#line 920
                     IF (err != 0 && err != NC_ERANGE)
-#line 944
+#line 920
                         error("OK or Range error: status = %d", err);
-#line 944
+#line 920
                 }
-#line 944
+#line 920
 		for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 944
+#line 920
 		    if (inRange3(expect[k],ATT_TYPE(i,j),NCT_DOUBLE)
-#line 944
+#line 920
                             && expect[k] >= double_min && expect[k] <= double_max) {
-#line 944
+#line 920
 			IF (!equal(value[k],expect[k],ATT_TYPE(i,j), NCT_DOUBLE)){
-#line 944
+#line 920
 			    error("value read not that expected");
-#line 944
+#line 920
                             if (verbose) {
-#line 944
+#line 920
                                 error("\n");
-#line 944
+#line 920
                                 error("varid: %d, ", i);
-#line 944
+#line 920
                                 error("att_name: %s, ", ATT_NAME(i,j));
-#line 944
+#line 920
                                 error("element number: %d ", k);
-#line 944
+#line 920
                                 error("expect: %g", expect[k]);
-#line 944
+#line 920
                                 error("got: %g", (double) value[k]);
-#line 944
+#line 920
                             }
-#line 944
+#line 920
 			} else {
-#line 944
+#line 920
 			    nok++;
-#line 944
+#line 920
                         }
-#line 944
+#line 920
 		    }
-#line 944
+#line 920
 		}
-#line 944
+#line 920
 	    } else {
-#line 944
+#line 920
 		IF (err != NC_ECHAR)
-#line 944
+#line 920
 		    error("wrong type: status = %d", err);
-#line 944
+#line 920
 	    }
-#line 944
+#line 920
 	}
-#line 944
+#line 920
     }
-#line 944
+#line 920
 
-#line 944
+#line 920
     err = nc_close(ncid);
-#line 944
+#line 920
     IF (err)
-#line 944
+#line 920
 	error("nc_close: %s", nc_strerror(err));
-#line 944
+#line 920
     print_nok(nok);
-#line 944
+#line 920
 }
-#line 944
+#line 920
 
 void
-#line 945
+#line 921
 test_nc_get_att_ushort(void)
-#line 945
+#line 921
 {
-#line 945
+#line 921
     int ncid;
-#line 945
+#line 921
     int i;
-#line 945
+#line 921
     int j;
-#line 945
+#line 921
     size_t k;
-#line 945
+#line 921
     int err;
-#line 945
+#line 921
     int allInExtRange;
-#line 945
+#line 921
     int allInIntRange;
-#line 945
+#line 921
     int canConvert;     /* Both text or both numeric */
-#line 945
+#line 921
     ushort value[MAX_NELS];
-#line 945
+#line 921
     double expect[MAX_NELS];
-#line 945
+#line 921
     int nok = 0;      /* count of valid comparisons */
-#line 945
+#line 921
 
-#line 945
-#ifdef USE_PNETCDF
-#line 945
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 945
-#else
-#line 945
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 945
-#endif
-#line 945
+#line 921
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 921
     IF (err) 
-#line 945
+#line 921
 	error("nc_open: %s", nc_strerror(err));
-#line 945
+#line 921
 
-#line 945
+#line 921
     for (i = -1; i < numVars; i++) {
-#line 945
+#line 921
         for (j = 0; j < NATTS(i); j++) {
-#line 945
+#line 921
 	    canConvert = (ATT_TYPE(i,j) == NC_CHAR) == (NCT_USHORT == NCT_TEXT);
-#line 945
+#line 921
 	    err = nc_get_att_ushort(BAD_ID, i, ATT_NAME(i,j), value);
-#line 945
+#line 921
 	    IF (err != NC_EBADID) 
-#line 945
+#line 921
 		error("bad ncid: status = %d", err);
-#line 945
+#line 921
 	    err = nc_get_att_ushort(ncid, BAD_VARID, ATT_NAME(i,j), value);
-#line 945
+#line 921
 	    IF (err != NC_ENOTVAR) 
-#line 945
+#line 921
 		error("bad var id: status = %d", err);
-#line 945
+#line 921
 	    err = nc_get_att_ushort(ncid, i, "noSuch", value);
-#line 945
+#line 921
 	    IF (err != NC_ENOTATT) 
-#line 945
+#line 921
 		error("Bad attribute name: status = %d", err);
-#line 945
+#line 921
 	    allInExtRange = allInIntRange = 1;
-#line 945
+#line 921
             for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 945
+#line 921
 		expect[k] = hash4(ATT_TYPE(i,j), -1, &k, NCT_USHORT);
-#line 945
+#line 921
                 if (inRange3(expect[k],ATT_TYPE(i,j),NCT_USHORT)) {
-#line 945
+#line 921
                     allInIntRange = allInIntRange && expect[k] >= ushort_min
-#line 945
+#line 921
                                 && expect[k] <= ushort_max;
-#line 945
+#line 921
                 } else {
-#line 945
+#line 921
                     allInExtRange = 0;
-#line 945
+#line 921
                 }
-#line 945
+#line 921
 	    }
-#line 945
+#line 921
 	    err = nc_get_att_ushort(ncid, i, ATT_NAME(i,j), value);
-#line 945
+#line 921
             if (canConvert || ATT_LEN(i,j) == 0) {
-#line 945
+#line 921
                 if (allInExtRange) {
-#line 945
+#line 921
                     if (allInIntRange) {
-#line 945
+#line 921
                         IF (err)
-#line 945
+#line 921
                             error("%s", nc_strerror(err));
-#line 945
+#line 921
                     } else {
-#line 945
+#line 921
                         IF (err != NC_ERANGE)
-#line 945
+#line 921
                             error("Range error: status = %d", err);
-#line 945
+#line 921
                     }
-#line 945
+#line 921
                 } else {
-#line 945
+#line 921
                     IF (err != 0 && err != NC_ERANGE)
-#line 945
+#line 921
                         error("OK or Range error: status = %d", err);
-#line 945
+#line 921
                 }
-#line 945
+#line 921
 		for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 945
+#line 921
 		    if (inRange3(expect[k],ATT_TYPE(i,j),NCT_USHORT)
-#line 945
+#line 921
                             && expect[k] >= ushort_min && expect[k] <= ushort_max) {
-#line 945
+#line 921
 			IF (!equal(value[k],expect[k],ATT_TYPE(i,j), NCT_USHORT)){
-#line 945
+#line 921
 			    error("value read not that expected");
-#line 945
+#line 921
                             if (verbose) {
-#line 945
+#line 921
                                 error("\n");
-#line 945
+#line 921
                                 error("varid: %d, ", i);
-#line 945
+#line 921
                                 error("att_name: %s, ", ATT_NAME(i,j));
-#line 945
+#line 921
                                 error("element number: %d ", k);
-#line 945
+#line 921
                                 error("expect: %g", expect[k]);
-#line 945
+#line 921
                                 error("got: %g", (double) value[k]);
-#line 945
+#line 921
                             }
-#line 945
+#line 921
 			} else {
-#line 945
+#line 921
 			    nok++;
-#line 945
+#line 921
                         }
-#line 945
+#line 921
 		    }
-#line 945
+#line 921
 		}
-#line 945
+#line 921
 	    } else {
-#line 945
+#line 921
 		IF (err != NC_ECHAR)
-#line 945
+#line 921
 		    error("wrong type: status = %d", err);
-#line 945
+#line 921
 	    }
-#line 945
+#line 921
 	}
-#line 945
+#line 921
     }
-#line 945
+#line 921
 
-#line 945
+#line 921
     err = nc_close(ncid);
-#line 945
+#line 921
     IF (err)
-#line 945
+#line 921
 	error("nc_close: %s", nc_strerror(err));
-#line 945
+#line 921
     print_nok(nok);
-#line 945
+#line 921
 }
-#line 945
+#line 921
 
 void
-#line 946
+#line 922
 test_nc_get_att_uint(void)
-#line 946
+#line 922
 {
-#line 946
+#line 922
     int ncid;
-#line 946
+#line 922
     int i;
-#line 946
+#line 922
     int j;
-#line 946
+#line 922
     size_t k;
-#line 946
+#line 922
     int err;
-#line 946
+#line 922
     int allInExtRange;
-#line 946
+#line 922
     int allInIntRange;
-#line 946
+#line 922
     int canConvert;     /* Both text or both numeric */
-#line 946
+#line 922
     uint value[MAX_NELS];
-#line 946
+#line 922
     double expect[MAX_NELS];
-#line 946
+#line 922
     int nok = 0;      /* count of valid comparisons */
-#line 946
+#line 922
 
-#line 946
-#ifdef USE_PNETCDF
-#line 946
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 946
-#else
-#line 946
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 946
-#endif
-#line 946
+#line 922
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 922
     IF (err) 
-#line 946
+#line 922
 	error("nc_open: %s", nc_strerror(err));
-#line 946
+#line 922
 
-#line 946
+#line 922
     for (i = -1; i < numVars; i++) {
-#line 946
+#line 922
         for (j = 0; j < NATTS(i); j++) {
-#line 946
+#line 922
 	    canConvert = (ATT_TYPE(i,j) == NC_CHAR) == (NCT_UINT == NCT_TEXT);
-#line 946
+#line 922
 	    err = nc_get_att_uint(BAD_ID, i, ATT_NAME(i,j), value);
-#line 946
+#line 922
 	    IF (err != NC_EBADID) 
-#line 946
+#line 922
 		error("bad ncid: status = %d", err);
-#line 946
+#line 922
 	    err = nc_get_att_uint(ncid, BAD_VARID, ATT_NAME(i,j), value);
-#line 946
+#line 922
 	    IF (err != NC_ENOTVAR) 
-#line 946
+#line 922
 		error("bad var id: status = %d", err);
-#line 946
+#line 922
 	    err = nc_get_att_uint(ncid, i, "noSuch", value);
-#line 946
+#line 922
 	    IF (err != NC_ENOTATT) 
-#line 946
+#line 922
 		error("Bad attribute name: status = %d", err);
-#line 946
+#line 922
 	    allInExtRange = allInIntRange = 1;
-#line 946
+#line 922
             for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 946
+#line 922
 		expect[k] = hash4(ATT_TYPE(i,j), -1, &k, NCT_UINT);
-#line 946
+#line 922
                 if (inRange3(expect[k],ATT_TYPE(i,j),NCT_UINT)) {
-#line 946
+#line 922
                     allInIntRange = allInIntRange && expect[k] >= uint_min
-#line 946
+#line 922
                                 && expect[k] <= uint_max;
-#line 946
+#line 922
                 } else {
-#line 946
+#line 922
                     allInExtRange = 0;
-#line 946
+#line 922
                 }
-#line 946
+#line 922
 	    }
-#line 946
+#line 922
 	    err = nc_get_att_uint(ncid, i, ATT_NAME(i,j), value);
-#line 946
+#line 922
             if (canConvert || ATT_LEN(i,j) == 0) {
-#line 946
+#line 922
                 if (allInExtRange) {
-#line 946
+#line 922
                     if (allInIntRange) {
-#line 946
+#line 922
                         IF (err)
-#line 946
+#line 922
                             error("%s", nc_strerror(err));
-#line 946
+#line 922
                     } else {
-#line 946
+#line 922
                         IF (err != NC_ERANGE)
-#line 946
+#line 922
                             error("Range error: status = %d", err);
-#line 946
+#line 922
                     }
-#line 946
+#line 922
                 } else {
-#line 946
+#line 922
                     IF (err != 0 && err != NC_ERANGE)
-#line 946
+#line 922
                         error("OK or Range error: status = %d", err);
-#line 946
+#line 922
                 }
-#line 946
+#line 922
 		for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 946
+#line 922
 		    if (inRange3(expect[k],ATT_TYPE(i,j),NCT_UINT)
-#line 946
+#line 922
                             && expect[k] >= uint_min && expect[k] <= uint_max) {
-#line 946
+#line 922
 			IF (!equal(value[k],expect[k],ATT_TYPE(i,j), NCT_UINT)){
-#line 946
+#line 922
 			    error("value read not that expected");
-#line 946
+#line 922
                             if (verbose) {
-#line 946
+#line 922
                                 error("\n");
-#line 946
+#line 922
                                 error("varid: %d, ", i);
-#line 946
+#line 922
                                 error("att_name: %s, ", ATT_NAME(i,j));
-#line 946
+#line 922
                                 error("element number: %d ", k);
-#line 946
+#line 922
                                 error("expect: %g", expect[k]);
-#line 946
+#line 922
                                 error("got: %g", (double) value[k]);
-#line 946
+#line 922
                             }
-#line 946
+#line 922
 			} else {
-#line 946
+#line 922
 			    nok++;
-#line 946
+#line 922
                         }
-#line 946
+#line 922
 		    }
-#line 946
+#line 922
 		}
-#line 946
+#line 922
 	    } else {
-#line 946
+#line 922
 		IF (err != NC_ECHAR)
-#line 946
+#line 922
 		    error("wrong type: status = %d", err);
-#line 946
+#line 922
 	    }
-#line 946
+#line 922
 	}
-#line 946
+#line 922
     }
-#line 946
+#line 922
 
-#line 946
+#line 922
     err = nc_close(ncid);
-#line 946
+#line 922
     IF (err)
-#line 946
+#line 922
 	error("nc_close: %s", nc_strerror(err));
-#line 946
+#line 922
     print_nok(nok);
-#line 946
+#line 922
 }
-#line 946
+#line 922
 
 void
-#line 947
+#line 923
 test_nc_get_att_longlong(void)
-#line 947
+#line 923
 {
-#line 947
+#line 923
     int ncid;
-#line 947
+#line 923
     int i;
-#line 947
+#line 923
     int j;
-#line 947
+#line 923
     size_t k;
-#line 947
+#line 923
     int err;
-#line 947
+#line 923
     int allInExtRange;
-#line 947
+#line 923
     int allInIntRange;
-#line 947
+#line 923
     int canConvert;     /* Both text or both numeric */
-#line 947
+#line 923
     longlong value[MAX_NELS];
-#line 947
+#line 923
     double expect[MAX_NELS];
-#line 947
+#line 923
     int nok = 0;      /* count of valid comparisons */
-#line 947
+#line 923
 
-#line 947
-#ifdef USE_PNETCDF
-#line 947
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 947
-#else
-#line 947
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 947
-#endif
-#line 947
+#line 923
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 923
     IF (err) 
-#line 947
+#line 923
 	error("nc_open: %s", nc_strerror(err));
-#line 947
+#line 923
 
-#line 947
+#line 923
     for (i = -1; i < numVars; i++) {
-#line 947
+#line 923
         for (j = 0; j < NATTS(i); j++) {
-#line 947
+#line 923
 	    canConvert = (ATT_TYPE(i,j) == NC_CHAR) == (NCT_LONGLONG == NCT_TEXT);
-#line 947
+#line 923
 	    err = nc_get_att_longlong(BAD_ID, i, ATT_NAME(i,j), value);
-#line 947
+#line 923
 	    IF (err != NC_EBADID) 
-#line 947
+#line 923
 		error("bad ncid: status = %d", err);
-#line 947
+#line 923
 	    err = nc_get_att_longlong(ncid, BAD_VARID, ATT_NAME(i,j), value);
-#line 947
+#line 923
 	    IF (err != NC_ENOTVAR) 
-#line 947
+#line 923
 		error("bad var id: status = %d", err);
-#line 947
+#line 923
 	    err = nc_get_att_longlong(ncid, i, "noSuch", value);
-#line 947
+#line 923
 	    IF (err != NC_ENOTATT) 
-#line 947
+#line 923
 		error("Bad attribute name: status = %d", err);
-#line 947
+#line 923
 	    allInExtRange = allInIntRange = 1;
-#line 947
+#line 923
             for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 947
+#line 923
 		expect[k] = hash4(ATT_TYPE(i,j), -1, &k, NCT_LONGLONG);
-#line 947
+#line 923
                 if (inRange3(expect[k],ATT_TYPE(i,j),NCT_LONGLONG)) {
-#line 947
+#line 923
                     allInIntRange = allInIntRange && expect[k] >= longlong_min
-#line 947
+#line 923
                                 && expect[k] <= longlong_max;
-#line 947
+#line 923
                 } else {
-#line 947
+#line 923
                     allInExtRange = 0;
-#line 947
+#line 923
                 }
-#line 947
+#line 923
 	    }
-#line 947
+#line 923
 	    err = nc_get_att_longlong(ncid, i, ATT_NAME(i,j), value);
-#line 947
+#line 923
             if (canConvert || ATT_LEN(i,j) == 0) {
-#line 947
+#line 923
                 if (allInExtRange) {
-#line 947
+#line 923
                     if (allInIntRange) {
-#line 947
+#line 923
                         IF (err)
-#line 947
+#line 923
                             error("%s", nc_strerror(err));
-#line 947
+#line 923
                     } else {
-#line 947
+#line 923
                         IF (err != NC_ERANGE)
-#line 947
+#line 923
                             error("Range error: status = %d", err);
-#line 947
+#line 923
                     }
-#line 947
+#line 923
                 } else {
-#line 947
+#line 923
                     IF (err != 0 && err != NC_ERANGE)
-#line 947
+#line 923
                         error("OK or Range error: status = %d", err);
-#line 947
+#line 923
                 }
-#line 947
+#line 923
 		for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 947
+#line 923
 		    if (inRange3(expect[k],ATT_TYPE(i,j),NCT_LONGLONG)
-#line 947
+#line 923
                             && expect[k] >= longlong_min && expect[k] <= longlong_max) {
-#line 947
+#line 923
 			IF (!equal(value[k],expect[k],ATT_TYPE(i,j), NCT_LONGLONG)){
-#line 947
+#line 923
 			    error("value read not that expected");
-#line 947
+#line 923
                             if (verbose) {
-#line 947
+#line 923
                                 error("\n");
-#line 947
+#line 923
                                 error("varid: %d, ", i);
-#line 947
+#line 923
                                 error("att_name: %s, ", ATT_NAME(i,j));
-#line 947
+#line 923
                                 error("element number: %d ", k);
-#line 947
+#line 923
                                 error("expect: %g", expect[k]);
-#line 947
+#line 923
                                 error("got: %g", (double) value[k]);
-#line 947
+#line 923
                             }
-#line 947
+#line 923
 			} else {
-#line 947
+#line 923
 			    nok++;
-#line 947
+#line 923
                         }
-#line 947
+#line 923
 		    }
-#line 947
+#line 923
 		}
-#line 947
+#line 923
 	    } else {
-#line 947
+#line 923
 		IF (err != NC_ECHAR)
-#line 947
+#line 923
 		    error("wrong type: status = %d", err);
-#line 947
+#line 923
 	    }
-#line 947
+#line 923
 	}
-#line 947
+#line 923
     }
-#line 947
+#line 923
 
-#line 947
+#line 923
     err = nc_close(ncid);
-#line 947
+#line 923
     IF (err)
-#line 947
+#line 923
 	error("nc_close: %s", nc_strerror(err));
-#line 947
+#line 923
     print_nok(nok);
-#line 947
+#line 923
 }
-#line 947
+#line 923
 
 void
-#line 948
+#line 924
 test_nc_get_att_ulonglong(void)
-#line 948
+#line 924
 {
-#line 948
+#line 924
     int ncid;
-#line 948
+#line 924
     int i;
-#line 948
+#line 924
     int j;
-#line 948
+#line 924
     size_t k;
-#line 948
+#line 924
     int err;
-#line 948
+#line 924
     int allInExtRange;
-#line 948
+#line 924
     int allInIntRange;
-#line 948
+#line 924
     int canConvert;     /* Both text or both numeric */
-#line 948
+#line 924
     ulonglong value[MAX_NELS];
-#line 948
+#line 924
     double expect[MAX_NELS];
-#line 948
+#line 924
     int nok = 0;      /* count of valid comparisons */
-#line 948
+#line 924
 
-#line 948
-#ifdef USE_PNETCDF
-#line 948
-    err = nc_open_par(testfile, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#line 948
-#else
-#line 948
-    err = nc_open(testfile, NC_NOWRITE, &ncid);
-#line 948
-#endif
-#line 948
+#line 924
+    err = file_open(testfile, NC_NOWRITE, &ncid);
+#line 924
     IF (err) 
-#line 948
+#line 924
 	error("nc_open: %s", nc_strerror(err));
-#line 948
+#line 924
 
-#line 948
+#line 924
     for (i = -1; i < numVars; i++) {
-#line 948
+#line 924
         for (j = 0; j < NATTS(i); j++) {
-#line 948
+#line 924
 	    canConvert = (ATT_TYPE(i,j) == NC_CHAR) == (NCT_ULONGLONG == NCT_TEXT);
-#line 948
+#line 924
 	    err = nc_get_att_ulonglong(BAD_ID, i, ATT_NAME(i,j), value);
-#line 948
+#line 924
 	    IF (err != NC_EBADID) 
-#line 948
+#line 924
 		error("bad ncid: status = %d", err);
-#line 948
+#line 924
 	    err = nc_get_att_ulonglong(ncid, BAD_VARID, ATT_NAME(i,j), value);
-#line 948
+#line 924
 	    IF (err != NC_ENOTVAR) 
-#line 948
+#line 924
 		error("bad var id: status = %d", err);
-#line 948
+#line 924
 	    err = nc_get_att_ulonglong(ncid, i, "noSuch", value);
-#line 948
+#line 924
 	    IF (err != NC_ENOTATT) 
-#line 948
+#line 924
 		error("Bad attribute name: status = %d", err);
-#line 948
+#line 924
 	    allInExtRange = allInIntRange = 1;
-#line 948
+#line 924
             for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 948
+#line 924
 		expect[k] = hash4(ATT_TYPE(i,j), -1, &k, NCT_ULONGLONG);
-#line 948
+#line 924
                 if (inRange3(expect[k],ATT_TYPE(i,j),NCT_ULONGLONG)) {
-#line 948
+#line 924
                     allInIntRange = allInIntRange && expect[k] >= ulonglong_min
-#line 948
+#line 924
                                 && expect[k] <= ulonglong_max;
-#line 948
+#line 924
                 } else {
-#line 948
+#line 924
                     allInExtRange = 0;
-#line 948
+#line 924
                 }
-#line 948
+#line 924
 	    }
-#line 948
+#line 924
 	    err = nc_get_att_ulonglong(ncid, i, ATT_NAME(i,j), value);
-#line 948
+#line 924
             if (canConvert || ATT_LEN(i,j) == 0) {
-#line 948
+#line 924
                 if (allInExtRange) {
-#line 948
+#line 924
                     if (allInIntRange) {
-#line 948
+#line 924
                         IF (err)
-#line 948
+#line 924
                             error("%s", nc_strerror(err));
-#line 948
+#line 924
                     } else {
-#line 948
+#line 924
                         IF (err != NC_ERANGE)
-#line 948
+#line 924
                             error("Range error: status = %d", err);
-#line 948
+#line 924
                     }
-#line 948
+#line 924
                 } else {
-#line 948
+#line 924
                     IF (err != 0 && err != NC_ERANGE)
-#line 948
+#line 924
                         error("OK or Range error: status = %d", err);
-#line 948
+#line 924
                 }
-#line 948
+#line 924
 		for (k = 0; k < ATT_LEN(i,j); k++) {
-#line 948
+#line 924
 		    if (inRange3(expect[k],ATT_TYPE(i,j),NCT_ULONGLONG)
-#line 948
+#line 924
                             && expect[k] >= ulonglong_min && expect[k] <= ulonglong_max) {
-#line 948
+#line 924
 			IF (!equal(value[k],expect[k],ATT_TYPE(i,j), NCT_ULONGLONG)){
-#line 948
+#line 924
 			    error("value read not that expected");
-#line 948
+#line 924
                             if (verbose) {
-#line 948
+#line 924
                                 error("\n");
-#line 948
+#line 924
                                 error("varid: %d, ", i);
-#line 948
+#line 924
                                 error("att_name: %s, ", ATT_NAME(i,j));
-#line 948
+#line 924
                                 error("element number: %d ", k);
-#line 948
+#line 924
                                 error("expect: %g", expect[k]);
-#line 948
+#line 924
                                 error("got: %g", (double) value[k]);
-#line 948
+#line 924
                             }
-#line 948
+#line 924
 			} else {
-#line 948
+#line 924
 			    nok++;
-#line 948
+#line 924
                         }
-#line 948
+#line 924
 		    }
-#line 948
+#line 924
 		}
-#line 948
+#line 924
 	    } else {
-#line 948
+#line 924
 		IF (err != NC_ECHAR)
-#line 948
+#line 924
 		    error("wrong type: status = %d", err);
-#line 948
+#line 924
 	    }
-#line 948
+#line 924
 	}
-#line 948
+#line 924
     }
-#line 948
+#line 924
 
-#line 948
+#line 924
     err = nc_close(ncid);
-#line 948
+#line 924
     IF (err)
-#line 948
+#line 924
 	error("nc_close: %s", nc_strerror(err));
-#line 948
+#line 924
     print_nok(nok);
-#line 948
+#line 924
 }
-#line 948
+#line 924
 
 

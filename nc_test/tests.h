@@ -555,6 +555,10 @@ void check_atts(int  ncid);
 
 void check_file(char *filename);
 
+int file_create(const char *filename, int cmode, int *ncid);
+
+int file_open(const char *filename, int omode, int *ncid);
+
 #ifdef __cplusplus
 }
 #endif

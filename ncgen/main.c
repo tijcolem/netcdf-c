@@ -97,11 +97,12 @@ struct Kvalues legalkinds[NKVALUES] = {
     {"enhanced-nc3", NC_FORMAT_NETCDF4_CLASSIC},
 
     /* CDF-5 format */
-    {"5", 5},
-    {"64-bit-data", 5},
-    {"64-bit data", 5},
-    {"nc5", 5},
-    {"cdf5", 5},
+    {"5", NC_FORMAT_64BIT_DATA},
+    {"64-bit-data", NC_FORMAT_64BIT_DATA},
+    {"64-bit data", NC_FORMAT_64BIT_DATA},
+    {"nc5", NC_FORMAT_64BIT_DATA},
+    {"cdf5", NC_FORMAT_64BIT_DATA},
+    {"cdf-5", NC_FORMAT_64BIT_DATA},
 
     /* null terminate*/
     {NULL,0}

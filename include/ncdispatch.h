@@ -86,12 +86,12 @@
 /* Define an alias for int to indicate an error return */
 typedef int NCerror;
 
-#ifndef HDF5_PARALLEL
+#if !defined HDF5_PARALLEL && !defined USE_PNETCDF
 typedef int MPI_Comm;
 typedef int MPI_Info;
 #define MPI_COMM_WORLD 0
 #define MPI_INFO_NULL 0
-#endif /* HDF5_PARALLEL */
+#endif
 
 /* Define a struct to hold the MPI info so it can be passed down the
  * call stack. This is used internally by the netCDF library. It

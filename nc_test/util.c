@@ -857,14 +857,9 @@ put_vars(int ncid)
 void
 write_file(char *filename) 
 {
-    int  ncid;			/* netCDF id */
-    int  err;		/* status */
-
-#ifdef USE_PNETCDF
-    err = nc_create_par(filename, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#else
-    err = nc_create(filename, NC_CLOBBER, &ncid);
-#endif
+    int  ncid; /* netCDF id */
+    int  err;  /* status */
+    err = file_create(filename, NC_CLOBBER, &ncid);
     IF (err) 
 	error("nc_create: %s", nc_strerror(err));
 
@@ -874,6 +869,18 @@ write_file(char *filename)
     err = nc_enddef(ncid);
     IF (err) 
 	error("nc_enddef: %s", nc_strerror(err));
+
+#ifdef USE_PNETCDF
+    { int i,format;
+    nc_inq_format_extended(ncid, &format, NULL);
+    if (format == NC_FORMATX_PNETCDF) {
+        for (i = 0; i < numVars; i++) {
+            err = nc_var_par_access(ncid, i, NC_COLLECTIVE);
+	    IF (err) error("nc_var_par_access: %s", nc_strerror(err));
+        }
+    }}
+#endif
+
     put_vars(ncid);
 
     err = nc_close (ncid);
@@ -1063,11 +1070,7 @@ check_file(char *filename)
     int  ncid;		/* netCDF id */
     int  err;		/* status */
 
-#ifdef USE_PNETCDF
-    err = nc_open_par(filename, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#else
-    err = nc_open(filename, NC_NOWRITE, &ncid);
-#endif
+    err = file_open(filename, NC_NOWRITE, &ncid);
     IF (err) {
         error("nc_open: %s", nc_strerror(err));
     } else {
@@ -1098,4 +1101,49 @@ s_nc_type(nc_type type)
         case NC_UINT64: return "NC_UINT64";
 	}
 	return "";
+}
+
+
+int file_create(const char *filename, int cmode, int *ncid)
+{
+    int err;
+
+    /* get the default file format */
+    int default_format;
+    nc_set_default_format(NC_FORMAT_CLASSIC, &default_format);
+    /* set it back to the default */
+    nc_set_default_format(default_format, NULL);
+
+#ifdef USE_PNETCDF
+    if (default_format == NC_FORMAT_CLASSIC ||
+        default_format == NC_FORMAT_64BIT_OFFSET ||
+        default_format == NC_FORMAT_64BIT_DATA)
+        err = nc_create_par(filename, cmode|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, ncid);
+    else
+#endif
+        err = nc_create(filename, cmode, ncid);
+
+    return err;
+}
+
+int file_open(const char *filename, int omode, int *ncid)
+{
+    int err;
+
+    /* get the default file format */
+    int default_format;
+    err = nc_set_default_format(NC_FORMAT_CLASSIC, &default_format);
+    /* set it back to the default */
+    err = nc_set_default_format(default_format, NULL);
+
+#ifdef USE_PNETCDF
+    if (default_format == NC_FORMAT_CLASSIC ||
+        default_format == NC_FORMAT_64BIT_OFFSET ||
+        default_format == NC_FORMAT_64BIT_DATA)
+        err = nc_open_par(filename, omode|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, ncid);
+    else
+#endif
+        err = nc_open(filename, omode, ncid);
+
+    return err;
 }

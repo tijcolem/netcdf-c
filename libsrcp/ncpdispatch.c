@@ -1,4 +1,5 @@
-/********************************************************************* *   Copyright 1993, UCAR/Unidata
+/*********************************************************************
+ *   Copyright 1993, UCAR/Unidata
  *   See netcdf/COPYRIGHT file for copying and redistribution conditions.
  *********************************************************************/
 
@@ -86,8 +87,6 @@ NCP_create(const char *path, int cmode,
     /* Fix up the cmode by keeping only essential flags;
        these are the flags that are the same in netcf.h and pnetcdf.h
     */
-    cmode &= (NC_WRITE | NC_NOCLOBBER | NC_LOCK | NC_SHARE );
-
     /* It turns out that pnetcdf.h defines a flag called
        NC_64BIT_DATA (not to be confused with NC_64BIT_OFFSET).
        This flag is essential to getting ncmpi_create to create
@@ -191,6 +190,7 @@ NCP__enddef(int ncid, size_t h_minfree, size_t v_align, size_t v_minfree, size_t
 
     /* causes implicitly defined warning; may be because of old installed pnetcdf? */
 #if 0
+    /* In PnetCDF ncmpi__enddef() is only implemented in v1.5.0 and later */
     status = ncmpi__enddef(nc->int_ncid, mpi_h_minfree, mpi_v_align,
                            mpi_v_minfree, mpi_r_align);
 #else

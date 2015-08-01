@@ -7,12 +7,12 @@ if test $# != 0 ; then
 cmds=$@
 fi
 
-HDF5=1
+#HDF5=1
 DAP=1
+PNETCDF=1
+#PAR4=1
 #HDF4=1
-#PNETCDF=1
 
-#RPC=1
 #PGI=1
 #M32=1
 #M64=1
@@ -127,7 +127,10 @@ FLAGS="$FLAGS --enable-dap-auth-tests"
 #valgrind => not shared
 #FLAGS="$FLAGS --enable-valgrind-tests"
 FLAGS="$FLAGS --enable-jna"
+
+if test "x$PAR4" != x1 ; then
 FLAGS="$FLAGS --disable-parallel4"
+fi
 
 if test "x${DB}" = x1 ; then
 FLAGS="$FLAGS --disable-shared"
@@ -144,14 +147,8 @@ fi
 if test "x$DAP" = "x" ; then
 FLAGS="$FLAGS --disable-dap"
 fi
-if test "x$CDMR" = "x1" ; then
-FLAGS="$FLAGS --enable-cdmremote"
-fi
-if test "x$RPC" = "x1" ; then
-FLAGS="$FLAGS --enable-rpc"
-fi
 
-if test "x$PNETCDF" = x1 ; then
+if test "x$PNETCDF" = x1 -o "x$PAR4" = x1 ; then
 if test -f /machine/local_mpich2 ; then
 MPI1=/machine/local_mpich2
 MPI2=/machine/local_par7

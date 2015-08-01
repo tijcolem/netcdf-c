@@ -98,11 +98,7 @@ check_vars_$1(const char *filename)
     int canConvert;     /* Both text or both numeric */
     int nok = 0;      /* count of valid comparisons */
 
-#ifdef USE_PNETCDF
-    err = nc_open_par(filename, NC_NOWRITE|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#else
-    err = nc_open(filename, NC_NOWRITE, &ncid);
-#endif
+    err = file_open(filename, NC_NOWRITE, &ncid);
     IF (err)
         error("nc_open: %s", nc_strerror(err));
 
@@ -287,11 +283,7 @@ test_nc_put_var1_$1(void)
     int canConvert;	/* Both text or both numeric */
     $1 value = 5;	/* any value would do - only for error cases */
 
-#ifdef USE_PNETCDF
-    err = nc_create_par(scratch, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#else
-    err = nc_create(scratch, NC_CLOBBER, &ncid);
-#endif
+    err = file_create(scratch, NC_CLOBBER, &ncid);
     IF (err) {
         error("nc_create: %s", nc_strerror(err));
         return;
@@ -301,6 +293,20 @@ test_nc_put_var1_$1(void)
     err = nc_enddef(ncid);
     IF (err)
         error("nc_enddef: %s", nc_strerror(err));
+
+#ifdef USE_PNETCDF
+    {
+    int format;
+    nc_inq_format_extended(ncid, &format, NULL);
+    if (format == NC_FORMATX_PNETCDF) {
+        for (i = 0; i < numVars; i++) {
+            err = nc_var_par_access(ncid, i, NC_COLLECTIVE);
+	    IF (err)
+	        error("nc_var_par_access: %s", nc_strerror(err));
+        }
+    }
+    }
+#endif
 
     for (i = 0; i < numVars; i++) {
 	canConvert = (var_type[i] == NC_CHAR) == (NCT_ITYPE($1) == NCT_TEXT);
@@ -393,11 +399,7 @@ test_nc_put_var_$1(void)
     int allInExtRange;	/* all values within external range? */
     $1 value[MAX_NELS];
 
-#ifdef USE_PNETCDF
-    err = nc_create_par(scratch, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#else
-    err = nc_create(scratch, NC_CLOBBER, &ncid);
-#endif
+    err = file_create(scratch, NC_CLOBBER, &ncid);
     IF (err) {
         error("nc_create: %s", nc_strerror(err));
         return;
@@ -407,6 +409,20 @@ test_nc_put_var_$1(void)
     err = nc_enddef(ncid);
     IF (err)
         error("nc_enddef: %s", nc_strerror(err));
+
+#ifdef USE_PNETCDF
+    {
+    int format;
+    nc_inq_format_extended(ncid, &format, NULL);
+    if (format == NC_FORMATX_PNETCDF) {
+        for (i = 0; i < numVars; i++) {
+            err = nc_var_par_access(ncid, i, NC_COLLECTIVE);
+	    IF (err)
+	        error("nc_var_par_access: %s", nc_strerror(err));
+        }
+    }
+    }
+#endif
 
     for (i = 0; i < numVars; i++) {
 	canConvert = (var_type[i] == NC_CHAR) == (NCT_ITYPE($1) == NCT_TEXT);
@@ -544,11 +560,7 @@ test_nc_put_vara_$1(void)
     int allInExtRange;	/* all values within external range? */
     $1 value[MAX_NELS];
 
-#ifdef USE_PNETCDF
-    err = nc_create_par(scratch, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#else
-    err = nc_create(scratch, NC_CLOBBER, &ncid);
-#endif
+    err = file_create(scratch, NC_CLOBBER, &ncid);
     IF (err) {
         error("nc_create: %s", nc_strerror(err));
         return;
@@ -558,6 +570,20 @@ test_nc_put_vara_$1(void)
     err = nc_enddef(ncid);
     IF (err)
         error("nc_enddef: %s", nc_strerror(err));
+
+#ifdef USE_PNETCDF
+    {
+    int format;
+    nc_inq_format_extended(ncid, &format, NULL);
+    if (format == NC_FORMATX_PNETCDF) {
+        for (i = 0; i < numVars; i++) {
+            err = nc_var_par_access(ncid, i, NC_COLLECTIVE);
+	    IF (err)
+	        error("nc_var_par_access: %s", nc_strerror(err));
+        }
+    }
+    }
+#endif
 
     value[0] = 0;
     for (i = 0; i < numVars; i++) {
@@ -729,11 +755,7 @@ test_nc_put_vars_$1(void)
     int allInExtRange;	/* all values within external range? */
     $1 value[MAX_NELS];
 
-#ifdef USE_PNETCDF
-    err = nc_create_par(scratch, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#else
-    err = nc_create(scratch, NC_CLOBBER, &ncid);
-#endif
+    err = file_create(scratch, NC_CLOBBER, &ncid);
     IF (err) {
 	error("nc_create: %s", nc_strerror(err));
 	return;
@@ -743,6 +765,20 @@ test_nc_put_vars_$1(void)
     err = nc_enddef(ncid);
     IF (err)
 	error("nc_enddef: %s", nc_strerror(err));
+
+#ifdef USE_PNETCDF
+    {
+    int format;
+    nc_inq_format_extended(ncid, &format, NULL);
+    if (format == NC_FORMATX_PNETCDF) {
+        for (i = 0; i < numVars; i++) {
+            err = nc_var_par_access(ncid, i, NC_COLLECTIVE);
+	    IF (err)
+	        error("nc_var_par_access: %s", nc_strerror(err));
+        }
+    }
+    }
+#endif
 
     for (i = 0; i < numVars; i++) {
 	canConvert = (var_type[i] == NC_CHAR) == (NCT_ITYPE($1) == NCT_TEXT);
@@ -911,11 +947,7 @@ test_nc_put_varm_$1(void)
     int allInExtRange;	/* all values within external range? */
     $1 value[MAX_NELS];
 
-#ifdef USE_PNETCDF
-    err = nc_create_par(scratch, NC_CLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#else
-    err = nc_create(scratch, NC_CLOBBER, &ncid);
-#endif
+    err = file_create(scratch, NC_CLOBBER, &ncid);
     IF (err) {
 	error("nc_create: %s", nc_strerror(err));
 	return;
@@ -925,6 +957,20 @@ test_nc_put_varm_$1(void)
     err = nc_enddef(ncid);
     IF (err)
 	error("nc_enddef: %s", nc_strerror(err));
+
+#ifdef USE_PNETCDF
+    {
+    int format;
+    nc_inq_format_extended(ncid, &format, NULL);
+    if (format == NC_FORMATX_PNETCDF) {
+        for (i = 0; i < numVars; i++) {
+            err = nc_var_par_access(ncid, i, NC_COLLECTIVE);
+	    IF (err)
+	        error("nc_var_par_access: %s", nc_strerror(err));
+        }
+    }
+    }
+#endif
 
     for (i = 0; i < numVars; i++) {
 	canConvert = (var_type[i] == NC_CHAR) == (NCT_ITYPE($1) == NCT_TEXT);
@@ -1080,11 +1126,7 @@ test_nc_put_att_text(void)
     int err;
     text value[MAX_NELS];
 
-#ifdef USE_PNETCDF
-    err = nc_create_par(scratch, NC_NOCLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#else
-    err = nc_create(scratch, NC_NOCLOBBER, &ncid);
-#endif
+    err = file_create(scratch, NC_NOCLOBBER, &ncid);
     IF (err) {
         error("nc_create: %s", nc_strerror(err));
         return;
@@ -1150,11 +1192,7 @@ test_nc_put_att_$1(void)
     $1 value[MAX_NELS];
     int allInExtRange;  /* all values within external range? */
 
-#ifdef USE_PNETCDF
-    err = nc_create_par(scratch, NC_NOCLOBBER|NC_PNETCDF, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid);
-#else
-    err = nc_create(scratch, NC_NOCLOBBER, &ncid);
-#endif
+    err = file_create(scratch, NC_NOCLOBBER, &ncid);
     IF (err) {
         error("nc_create: %s", nc_strerror(err));
         return;

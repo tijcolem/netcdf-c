@@ -22,7 +22,7 @@
 #include <string.h>
 #include <assert.h>
 #include <netcdf.h>
-#ifdef USE_PARALLEL
+#ifdef USE_PNETCDF
 #include <netcdf_par.h>
 #endif
 
@@ -473,9 +473,7 @@ main(int argc, char *argv[])
  */
         omode = NC_NOWRITE;
 #ifdef USE_PNETCDF
-        omode = NC_NOWRITE | NC_PNETCDF;
-	ret = nc_open_par(fname,omode, MPI_COMM_WORLD, MPI_INFO_NULL, &id);
-#elif defined USE_PARALLEL
+        omode |= NC_PNETCDF;
 	ret = nc_open_par(fname,omode, MPI_COMM_WORLD, MPI_INFO_NULL, &id);
 #else
 	ret = nc__open(fname,omode, &chunksz, &id);
@@ -672,7 +670,7 @@ main(int argc, char *argv[])
 	ret = nc_close(id);
 	/* (void) printf("re nc_close ret = %d\n", ret); */
 
-#ifdef USE_PARALLEL
+#ifdef USE_PNETCDF
 	MPI_Finalize();
 #endif
 	return 0;

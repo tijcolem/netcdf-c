@@ -926,12 +926,15 @@ fi
 #    b. do want to use it for netcdf4
 
 # Should we suppress parallel io for netcdf-4?
-AC_MSG_CHECKING([whether parallel I/O is enabled for netcdf-4])
-AC_ARG_ENABLE([parallel4], [AS_HELP_STRING([--disable-parallel4],
+if test "x$enable_netcdf_4" = xyes ; then
+  AC_MSG_CHECKING([whether parallel I/O is enabled for netcdf-4])
+  AC_ARG_ENABLE([parallel4], [AS_HELP_STRING([--disable-parallel4],
                 [disable parallel I/O for netcdf-4, even if possible])])
-test "x$enable_parallel4" = xno || enable_parallel4=yes
-AC_MSG_RESULT($enable_parallel4)
-
+  test "x$enable_parallel4" = xno || enable_parallel4=yes
+  AC_MSG_RESULT($enable_parallel4)
+else
+  enable_parallel4=no
+fi
 if test "x$hdf5_parallel" = xno; then
   # hdf5 does not support parallel io, so disable parallel4
   enable_parallel4=no

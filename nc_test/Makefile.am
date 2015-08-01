@@ -6,6 +6,7 @@
 
 # Put together AM_CPPFLAGS and AM_LDFLAGS.
 include $(top_srcdir)/lib_flags.am
+AM_CPPFLAGS += -I$(top_srcdir)/libsrc
 
 # These files are created by the tests.
 CLEANFILES = nc_test_classic.nc nc_test_64bit.nc nc_test_netcdf4.nc	\
@@ -105,9 +106,6 @@ EXTRA_DIST += ref_tst_diskless2.cdl CMakeLists.txt tst_swap4b.c
 # Only clean these on mainatiner-clean, because they require m4 to
 # regenerate.
 #MAINTAINERCLEANFILES = test_get.c test_put.c
-
-all:
-	cp $(top_builddir)/libsrc/ncx.c .
 
 # This rule tells make how to turn our .m4 files into .c files.
 .m4.c:

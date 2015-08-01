@@ -1658,10 +1658,9 @@ NC_create(const char *path, int cmode, size_t initialsz,
 	model = NC_FORMATX_PNETCDF;
       else
 #endif
-	model = NC_FORMATX_NC3;
-   }
-
-   if(model == NC_FORMATX_UNDEFINED) {
+	{}
+    }
+    if(model == NC_FORMATX_UNDEFINED) {
       /* Check default format (not formatx) */
       int format = nc_get_default_format();
       switch (format) {
@@ -1819,13 +1818,27 @@ NC_open(const char *path, int cmode,
       cmode |= NC_NETCDF4;
    else if(model == NC_FORMATX_NC3) {
       cmode &= ~NC_NETCDF4; /* must be netcdf-3 (CDF-1, CDF-2, CDF-5) */
+      /* User may want to open file using the pnetcdf library */
+      if(cmode & NC_PNETCDF) {
+         /* dispatch is determined by cmode, rather than file format */
+         model = NC_FORMATX_PNETCDF;
+      }
+      /* For opening an existing file, flags NC_64BIT_OFFSET and NC_64BIT_DATA
+       * will be ignored, as the file is already in either CDF-1, 2, or 5
+       * format. However, below we add the file format info to cmode so the
+       * internal netcdf file open subroutine knows what file format to open.
+       * The mode will be saved in ncp->mode, to be used by
+       * nc_inq_format_extended() to report the file format.
+       * See NC3_inq_format_extended() in libsrc/nc3internal.c for example.
+       */
       if(version == 2) cmode |= NC_64BIT_OFFSET;
       else if(version == 5) {
 	cmode |= NC_64BIT_DATA;
 	cmode &= ~(NC_64BIT_OFFSET); /*NC_64BIT_DATA=>NC_64BIT_OFFSET*/
      }
    } else if(model == NC_FORMATX_PNETCDF) {
-      cmode &= ~(NC_NETCDF4);
+      cmode &= ~(NC_NETCDF4|NC_64BIT_OFFSET);
+      cmode |= NC_64BIT_DATA;
    }
 
    if((cmode & NC_MPIIO && cmode & NC_MPIPOSIX))
