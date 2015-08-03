@@ -925,6 +925,7 @@ if test "x$enable_pnetcdf" = xyes; then
   AC_CHECK_LIB([pnetcdf], [ncmpi_create], [],[pnetcdf_conflict=yes])
 
   # Pnetcdf did not support utf-8 until 1.6.0
+
   # Save/restore CFLAGS
   SAVELIBS=$LIBS
   LIBS="$LIBS -lpnetcdf"

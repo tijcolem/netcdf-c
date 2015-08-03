@@ -682,7 +682,7 @@ downconvert(unsigned long long uint64, int isneg, int tag, int hasU)
 	if(!isneg && !hasU && bit64) {
 	    uint64_val = uint64;
 	    return NC_UINT64;
-	} else {
+	} else if(!bit64) {
 	    int64_val = int64;
 	    return NC_INT64;
 	}
@@ -757,7 +757,7 @@ downconvert(unsigned long long uint64, int isneg, int tag, int hasU)
 	    }
 	    break;
         case 'L': case 'l':
-            if((int64 >= NC_MIN_INT64) && (int64 <= NC_MAX_INT64)) {
+            if((uint64 <= NC_MAX_INT64)) {
 	        nct = NC_INT64;
 	        int64_val = int64;
 	    } else {/* force to unsigned value */
