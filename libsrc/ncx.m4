@@ -38,6 +38,8 @@ dnl
  * An external data representation interface.
  */
 
+#pragma GCC diagnostic ignored "-Wdeprecated"
+
 #include "ncx.h"
 #include "nc3dispatch.h"
 #include <string.h>
@@ -2201,8 +2203,7 @@ define(`NCX_GETN',dnl
 int
 ncx_getn_$1_$2(const void **xpp, size_t nelems, $2 *tp)
 {
-#if _SX && \
-           Xsizeof($1) == Isizeof($1)
+`#'if _SX && Xsizeof($1) == Isizeof($1)
 
  /* basic algorithm is:
   *   - ensure sane alignment of input data
@@ -2418,8 +2419,7 @@ define(`NCX_PUTN',dnl
 int
 ncx_putn_$1_$2(void **xpp, size_t nelems, const $2 *tp)
 {
-#if _SX && \
-           Xsizeof($1) == Isizeof($1)
+`#'if _SX && Xsizeof($1) == Isizeof($1)
 
  /* basic algorithm is:
   *   - ensure sane alignment of output data

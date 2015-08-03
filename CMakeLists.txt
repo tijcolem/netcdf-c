@@ -836,6 +836,26 @@ ENDIF()
 # Options to enable parallel IO, tests.
 SET(STATUS_PNETCDF "OFF")
 OPTION(ENABLE_PNETCDF "Build with parallel I/O for classic and 64-bit offset files using parallel-netcdf." OFF)
+
+# Check to see if version > 1.6.0
+IF(ENABLE_PNETCDF)
+  CHECK_C_SOURCE_RUNS("
+      #include <stdio.h>
+      #include <pnetcdf.h>
+      int main() {
+      int major = PNETCDF_VERSION_MAJOR;
+      int minor = PNETCDF_VERSION_MINOR;
+      int version = major*1000 + minor;
+      int ok = (version >= (1*1000 + 6));
+      return ok?0:1;}"
+      HAVE_PNETCDF_16)
+
+    IF(HAVE_PNETCDF_16)
+      SET(ENABLE_PNETCDF "OFF")
+      MESSAGE("ENABLE_PNETCDF requires version 1.6.0 or later; disabled")
+    ENDIF()
+ENDIF()
+
 IF(ENABLE_PNETCDF)
   # Check for ncmpi_create in libpnetcdf, define USE_PNETCDF
   # Does the user want to turn on PNETCDF read ability?

@@ -284,16 +284,6 @@ AC_ARG_ENABLE([logging],
 test "x$enable_logging" = xyes || enable_logging=no
 AC_MSG_RESULT([$enable_logging])
 
-# Capture the state of the --enable-cdmremote flag
-AC_MSG_CHECKING([whether cdmremote client is to be built])
-AC_ARG_ENABLE([cdmremote],
-                 [AS_HELP_STRING([--enable-cdmremote],
-                                 [build with cdmremote client support.])])
-test "x$enable_cdmremote" = xyes || enable_cdmremote=no
-# CDMREMOTE requires netCDF-4
-if test "x$enable_netcdf_4" = "xno" ; then enable_cdmremote=no ; fi
-AC_MSG_RESULT($enable_cdmremote)
-
 ## Capture the state of the --enable-dap flag
 AC_MSG_CHECKING([whether DAP client is to be built])
 AC_ARG_ENABLE([dap],
@@ -302,21 +292,10 @@ AC_ARG_ENABLE([dap],
 test "x$enable_dap" = xno || enable_dap=yes
 AC_MSG_RESULT($enable_dap)
 
-# OC now has its own version of rpc (really xdr), so no longer need the library
-## Capture the state of the --enable-rpc flag
-#AC_MSG_CHECKING([whether rpc client and server are to be built])
-#AC_ARG_ENABLE([rpc],
-#                 [AS_HELP_STRING([--enable-rpc],
-#                                 [build with rpc client and server support.])])
-#test "x$enable_rpc" = xyes || enable_rpc=no
-#AC_MSG_RESULT($enable_rpc)
-
 # Curl support is required if and only if any of these flags are set:
 # 1. --enable-dap
-# 2. --enable-cdmremote
-# 3. --enable-rpc
 
-if test "x$enable_dap" = "xyes" -o "x$enable_cdmremote" = "xyes" -o "x$enable_rpc" = "xyes" ; then
+if test "x$enable_dap" = "xyes" ; then
 require_curl=yes
 else
 require_curl=no
@@ -335,8 +314,6 @@ if test $require_curl = yes ; then
   if test $found_curl = no ; then
     AC_MSG_NOTICE([libcurl not found; disabling remote protocol(s) support])
     enable_dap=no
-    enable_cdmremote=no
-    enable_rpc=no
   elif test $found_curl = yes ; then
     # Redo the check lib to actually add -lcurl
     #AC_CHECK_LIB([curl], [curl_easy_setopt])
@@ -394,14 +371,6 @@ fi
 
 if test "x$enable_dap_remote_tests" = xyes; then
    AC_DEFINE([ENABLE_DAP_REMOTE_TESTS], [1], [if true, do remote tests])
-fi
-
-if test "x$enable_cdmremote" = xyes; then
-   AC_DEFINE([USE_CDMREMOTE], [1], [if true, build CDMREMOTE Client])
-fi
-
-if test "x$enable_rpc" = xyes; then
-   AC_DEFINE([BUILD_RPC], [1], [if true, build RPC Client and Server])
 fi
 
 AC_MSG_CHECKING([whether the time-consuming dap tests should be enabled (default off)])
@@ -765,16 +734,14 @@ AC_ARG_ENABLE([diskless],
               [AS_HELP_STRING([--disable-diskless],
                               [disable support for in-memory (NC_DISKLESS) files])])
 test "x$enable_diskless" = xno || enable_diskless=yes
-
-
-# Check for enable DAP
-if test "x$enable_dap" = "xyes" -o "x$enable_cdmremote" = "xyes" -o "x$enable_rpc" = "xyes" ; then
-enable_diskless=yes
-AC_MSG_NOTICE([--enable-dap requires --enable-diskless])
-fi
-
 AC_MSG_RESULT($enable_diskless)
 
+# Check for enable DAP
+if test "x$enable_dap" = "xyes"; then
+enable_diskless=yes
+AC_MSG_NOTICE([--enable-dap requires --enable-diskless])
+AC_MSG_NOTICE([dap support disabled])
+fi
 
 # check for useful, but not essential, memio support
 AC_CHECK_FUNCS([memmove getpagesize sysconf])
@@ -950,12 +917,36 @@ AC_ARG_ENABLE([pnetcdf], [AS_HELP_STRING([--enable-pnetcdf],
 test "x$enable_pnetcdf" = xyes || enable_pnetcdf=no
 AC_MSG_RESULT($enable_pnetcdf)
 
-# See if the pnetcdf lib is available
-# to use for classic parallel I/O?
+# See if the pnetcdf lib is available and of the
+# right version (1.6.0 or later)
+
 if test "x$enable_pnetcdf" = xyes; then
   pnetcdf_conflict=no
   AC_CHECK_LIB([pnetcdf], [ncmpi_create], [],[pnetcdf_conflict=yes])
+
+  # Pnetcdf did not support utf-8 until 1.6.0
+  # Save/restore CFLAGS
+  SAVELIBS=$LIBS
+  LIBS="$LIBS -lpnetcdf"
+  AC_RUN_IFELSE([AC_LANG_PROGRAM([#include <pnetcdf.h>],
+                 [[
+                   int major = PNETCDF_VERSION_MAJOR;
+                   int minor = PNETCDF_VERSION_MINOR;
+                   int version = major*1000 + minor;
+                   int ok = (version >= (1*1000 + 6));
+                   return (ok?0:1);]])],
+                 [pnetcdf16=yes],
+                 [pnetcdf16=no])
+  CFLAGS="$SAVECFLAGS"
+  LIBS="$SAVELIBS"
+  AC_MSG_CHECKING([Is libpnetcdf version 1.6.0 or later?])
+  AC_MSG_RESULT([$pnetcdf16])
+  if test x$pnetcdf16 = xno; then
+    AC_MSG_WARN([--enable-pnetcdf requires version 1.6.0 or later; disabling])
+    pnetcdf_conflict=yes  
+  fi
 fi
+
 if test "x$pnetcdf_conflict" = xyes ; then
   AC_MSG_WARN([Cannot link to pnetcdf library, --enable-pnetcdf disabled.])
   enable_pnetcdf=no

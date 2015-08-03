@@ -132,7 +132,7 @@ tst_*.nc tst_floats2_*.cdl tst_ints2_*.cdl tst_shorts2_*.cdl		\
 tst_elena_*.cdl tst_simple*.cdl tst_chunks.cdl pr_A1.* tauu_A1.*	\
 usi_01.* thetau_01.* tst_*.nc tst_*.h5                                  \
 tst_grp_rename.cdl tst_grp_rename.nc tst_grp_rename.dmp ref_grp_rename.cdl \
-foo1.nc tst_interops2.h4 tst_h5_endians.nc tst_h4_lendian.h4
+foo1.nc tst_interops2.h4 tst_h5_endians.nc tst_h4_lendian.h4 test.nc
 
 if USE_HDF4_FILE_TESTS
 DISTCLEANFILES = AMSR_E_L2_Rain_V10_200905312326_A.hdf	\
