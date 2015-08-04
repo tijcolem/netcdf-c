@@ -2,6 +2,7 @@
 #NB=1
 DB=1
 #X=-x
+FAST=1
 
 if test $# != 0 ; then
 cmds=$@
@@ -184,7 +185,9 @@ if test -z "$NB" ; then
 if autoreconf -i --force ; then ok=1; else exit ; fi
 fi
 
+if test "x$FAST" != x1 ; then
 if test -f Makefile ; then ${MAKE} distclean >/dev/null 2>&1 ; fi
+fi
 sh $X ./configure ${FLAGS}
 for c in $cmds; do
   ${MAKE} ${FORCE} $c
