@@ -32,7 +32,7 @@ main(int argc, char **argv)
   /*EXTERNL int ncopts;	*/	/* netCDF error options */
     char *testfiles[] = {"nonesuch", "nctest_classic.nc", 
 			 "nctest_64bit_offset.nc", "nctest_netcdf4.nc"};
-    char *testfile;
+    char *testfile = NULL;
     int i, nerrs = 0;
 
     ncopts &= ~NC_FATAL;	/* make errors nonfatal */
