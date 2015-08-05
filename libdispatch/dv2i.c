@@ -864,6 +864,7 @@ ncvarputg(
     const void* value
 )
 {
+	int ndims = 0;
 	if(map == NULL)
 		return ncvarputs(ncid, varid, start, count, stride, value);
 	/* else */
@@ -872,7 +873,7 @@ ncvarputg(
 	if (map != NULL) {
 		int ret = NC_NOERR;
 		/* make map[ndims-1] number of elements instead of bytes */
-		int i, ndims, el_size;
+		int i, el_size;
 		nc_type type;
 		ret = nc_inq_varndims(ncid, varid, &ndims);
 		if(ret) return ret;
@@ -920,6 +921,7 @@ ncvargetg(
     void*	value
 )
 {
+	int ndims = 0;
 	if(map == NULL)
 		return ncvargets(ncid, varid, start, count, stride, value);
 	/* else */
@@ -928,7 +930,7 @@ ncvargetg(
 	if (map != NULL) {
 		int ret = NC_NOERR;
 		/* make map[ndims-1] number of elements instead of bytes */
-		int i, ndims, el_size;
+		int i, el_size;
 		nc_type type;
 		ret = nc_inq_varndims(ncid, varid, &ndims);
 		if(ret) return ret;
