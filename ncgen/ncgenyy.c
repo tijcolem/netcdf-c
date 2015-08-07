@@ -1345,7 +1345,7 @@ static int input (void );
 /* This used to be an fputs(), but since the string might contain NUL's,
  * we now use fwrite().
  */
-#define ECHO fwrite( ncgtext, ncgleng, 1, ncgout )
+#define ECHO do { if (fwrite( ncgtext, ncgleng, 1, ncgout )) {} } while (0)
 #endif
 
 /* Gets input and stuffs it into "buf".  number of characters read, or YY_NULL,
@@ -1356,7 +1356,7 @@ static int input (void );
 	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
 		int c = '*'; \
-		int n; \
+		unsigned n; \
 		for ( n = 0; n < max_size && \
 			     (c = getc( ncgin )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
@@ -3178,7 +3178,7 @@ downconvert(unsigned long long uint64, int isneg, int tag, int hasU)
 	if(!isneg && !hasU && bit64) {
 	    uint64_val = uint64;
 	    return NC_UINT64;
-	} else {
+	} else if(!bit64) {
 	    int64_val = int64;
 	    return NC_INT64;
 	}
@@ -3253,7 +3253,7 @@ downconvert(unsigned long long uint64, int isneg, int tag, int hasU)
 	    }
 	    break;
         case 'L': case 'l':
-            if((int64 >= NC_MIN_INT64) && (int64 <= NC_MAX_INT64)) {
+            if((uint64 <= NC_MAX_INT64)) {
 	        nct = NC_INT64;
 	        int64_val = int64;
 	    } else {/* force to unsigned value */

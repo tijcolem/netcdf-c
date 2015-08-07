@@ -864,18 +864,22 @@ ncvarputg(
     const void* value
 )
 {
+	int ndims = 0;
 	if(map == NULL)
 		return ncvarputs(ncid, varid, start, count, stride, value);
 	/* else */
 	{
 	long *imp=NULL;
 	if (map != NULL) {
+		int ret = NC_NOERR;
 		/* make map[ndims-1] number of elements instead of bytes */
-		int i, ndims, el_size;
+		int i, el_size;
 		nc_type type;
-		nc_inq_varndims(ncid, varid, &ndims);
-		nc_inq_vartype(ncid, varid, &type);
-		el_size = nctypelen(type);
+		ret = nc_inq_varndims(ncid, varid, &ndims);
+		if(ret) return ret;
+		ret = nc_inq_vartype(ncid, varid, &type);
+		if(ret) return ret;
+				el_size = nctypelen(type);
 		imp = (long*) malloc(ndims * sizeof(long));
 		for (i=0; i<ndims; i++) imp[i] = map[i] / el_size;
 	}
@@ -917,17 +921,21 @@ ncvargetg(
     void*	value
 )
 {
+	int ndims = 0;
 	if(map == NULL)
 		return ncvargets(ncid, varid, start, count, stride, value);
 	/* else */
 	{
 	long *imp=NULL;
 	if (map != NULL) {
+		int ret = NC_NOERR;
 		/* make map[ndims-1] number of elements instead of bytes */
-		int i, ndims, el_size;
+		int i, el_size;
 		nc_type type;
-		nc_inq_varndims(ncid, varid, &ndims);
-		nc_inq_vartype(ncid, varid, &type);
+		ret = nc_inq_varndims(ncid, varid, &ndims);
+		if(ret) return ret;
+		ret = nc_inq_vartype(ncid, varid, &type);
+		if(ret) return ret;
 		el_size = nctypelen(type);
 		imp = (long*) malloc(ndims * sizeof(long));
 		for (i=0; i<ndims; i++) imp[i] = map[i] / el_size;

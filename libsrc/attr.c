@@ -155,7 +155,7 @@ dup_NC_attr(const NC_attr *rattrp)
 void
 free_NC_attrarrayV0(NC_attrarray *ncap)
 {
-	assert(ncap != NULL);
+	assert(ncap != NULL);
 
 	if(ncap->nelems == 0)
 		return;
@@ -1425,7 +1425,7 @@ NC3_put_att(
 
     attrpp = NC_findattr(ncap, name);
 
-    /* 4 cases: exists X indef */
+    /* 4 cases: exists X indef */
 
     if(attrpp != NULL) { /* name in use */
         if(!NC_indef(ncp)) {

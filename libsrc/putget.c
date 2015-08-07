@@ -732,6 +732,7 @@ NCcoordck(NC3_INFO* ncp, const NC_var *varp, const size_t *coord)
 		return NC_NOERR;	/* 'scalar' variable */
 
 	if(IS_RECVAR(varp))
+
 	{
 		if(*coord > X_UINT_MAX) /* rkr: bug fix from previous X_INT_MAX */
 			return NC_EINVALCOORDS; /* sanity check */
@@ -1068,6 +1069,7 @@ putNCvx_schar_int(NC3_INFO* ncp, const NC_var *varp,
 			/* not fatal to the loop */
 			status = lstatus;
 		}
+
 
 		(void) ncio_rel(ncp->nciop, offset,
 				 RGN_MODIFIED);	
@@ -1555,6 +1557,7 @@ putNCvx_short_float(NC3_INFO* ncp, const NC_var *varp,
 
 		int lstatus = ncio_get(ncp->nciop, offset, extent,
 				 RGN_WRITE, &xp);	
+
 		if(lstatus != NC_NOERR)
 			return lstatus;
 		
@@ -2187,6 +2190,7 @@ putNCvx_int_uint(NC3_INFO* ncp, const NC_var *varp,
 		int lstatus = ncio_get(ncp->nciop, offset, extent,
 				 RGN_WRITE, &xp);	
 		if(lstatus != NC_NOERR)
+
 			return lstatus;
 		
 		lstatus = ncx_putn_int_uint(&xp, nput, value);
@@ -2431,6 +2435,7 @@ putNCvx_float_int(NC3_INFO* ncp, const NC_var *varp,
 		offset += extent;
 		value += nput;
 
+
 	}
 
 	return status;
@@ -2674,6 +2679,7 @@ putNCvx_float_ulonglong(NC3_INFO* ncp, const NC_var *varp,
 		return NC_NOERR;
 
 	assert(value != NULL);
+
 
 	for(;;)
 	{
@@ -3012,6 +3018,7 @@ putNCvx_double_longlong(NC3_INFO* ncp, const NC_var *varp,
 				 RGN_MODIFIED);	
 
 		remaining -= extent;
+
 		if(remaining == 0)
 			break; /* normal loop exit */
 		offset += extent;
@@ -3593,6 +3600,7 @@ putNCvx_uchar_ulonglong(NC3_INFO* ncp, const NC_var *varp,
 			/* not fatal to the loop */
 			status = lstatus;
 		}
+
 
 		(void) ncio_rel(ncp->nciop, offset,
 				 RGN_MODIFIED);	
@@ -4225,6 +4233,7 @@ putNCvx_uint_int(NC3_INFO* ncp, const NC_var *varp,
 			/* not fatal to the loop */
 			status = lstatus;
 		}
+
 
 		(void) ncio_rel(ncp->nciop, offset,
 				 RGN_MODIFIED);	
@@ -5291,6 +5300,7 @@ putNCvx_ulonglong_ushort(NC3_INFO* ncp, const NC_var *varp,
 
 	assert(value != NULL);
 
+
 	for(;;)
 	{
 		size_t extent = MIN(remaining, ncp->chunk);
@@ -5568,6 +5578,7 @@ getNCvx_schar_int(const NC3_INFO* ncp, const NC_var *varp,
 		remaining -= extent;
 		if(remaining == 0)
 			break; /* normal loop exit */
+
 		offset += extent;
 		value += nget;
 	}
@@ -6106,6 +6117,7 @@ getNCvx_short_longlong(const NC3_INFO* ncp, const NC_var *varp,
 	const void *xp;
 
 	if(nelems == 0)
+
 		return NC_NOERR;
 
 	assert(value != NULL);
@@ -6329,6 +6341,7 @@ getNCvx_int_uchar(const NC3_INFO* ncp, const NC_var *varp,
 
 		remaining -= extent;
 		if(remaining == 0)
+
 			break; /* normal loop exit */
 		offset += extent;
 		value += nget;
@@ -6421,6 +6434,7 @@ static int
 getNCvx_int_float(const NC3_INFO* ncp, const NC_var *varp,
 		 const size_t *start, size_t nelems, float *value)
 {
+
 	off_t offset = NC_varoffset(ncp, varp, start);
 	size_t remaining = varp->xsz * nelems;
 	int status = NC_NOERR;
@@ -7447,6 +7461,7 @@ getNCvx_double_ushort(const NC3_INFO* ncp, const NC_var *varp,
 		if(lstatus != NC_NOERR && status == NC_NOERR)
 			status = lstatus;
 
+
 		(void) ncio_rel(ncp->nciop, offset, 0);	
 
 		remaining -= extent;
@@ -7584,6 +7599,7 @@ static int
 getNCvx_uchar_int(const NC3_INFO* ncp, const NC_var *varp,
 		 const size_t *start, size_t nelems, int *value)
 {
+
 	off_t offset = NC_varoffset(ncp, varp, start);
 	size_t remaining = varp->xsz * nelems;
 	int status = NC_NOERR;
@@ -7676,6 +7692,7 @@ getNCvx_uchar_double(const NC3_INFO* ncp, const NC_var *varp,
 
 	for(;;)
 	{
+
 		size_t extent = MIN(remaining, ncp->chunk);
 		size_t nget = ncx_howmany(varp->type, extent);
 
@@ -9923,6 +9940,7 @@ writeNCv(NC3_INFO* ncp, const NC_var* varp, const size_t* start,
         return putNCvx_short_short(ncp,varp,start,nelems,(short*)value);
     case CASE(NC_SHORT,NC_INT):
         return putNCvx_short_int(ncp,varp,start,nelems,(int*)value);
+
     case CASE(NC_SHORT,NC_FLOAT):
         return putNCvx_short_float(ncp,varp,start,nelems,(float*)value);
     case CASE(NC_SHORT,NC_DOUBLE):
@@ -10300,6 +10318,7 @@ NC3_put_vara(int ncid, int varid,
     status = NCedgeck(nc3, varp, start, edges);
     if(status != NC_NOERR)
         return status;
+
 
     if(varp->ndims == 0) /* scalar variable */
     {
