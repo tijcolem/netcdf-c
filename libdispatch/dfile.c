@@ -470,10 +470,6 @@ int
 nc__create(const char *path, int cmode, size_t initialsz,
 	   size_t *chunksizehintp, int *ncidp)
 {
-   /* this API is for non-parallel access: TODO check for illegal cmode
-    * flags, such as NC_PNETCDF, NC_MPIIO, or NC_MPIPOSIX, before entering
-    * NC_create()? Note nc_create_par() also calls NC_create().
-    */
    return NC_create(path, cmode, initialsz, 0, 
 		    chunksizehintp, 0, NULL, ncidp);
 
@@ -611,10 +607,6 @@ if (status != NC_NOERR) handle_error(status);
 int
 nc_open(const char *path, int mode, int *ncidp)
 {
-   /* this API is for non-parallel access; TODO: check for illegal cmode
-    * flags, such as NC_PNETCDF, NC_MPIIO, or NC_MPIPOSIX, before entering
-    * NC_open()? Note nc_open_par() also calls NC_open().
-    */
    return NC_open(path, mode, 0, NULL, 0, NULL, ncidp);
 }
 
