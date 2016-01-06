@@ -25,7 +25,7 @@ echo "*** Generate: tst_dimsize_classic.nc tst_dimsize_64offset.nc tst_dimsize_6
 echo "*** Verify that ncdump can read dimsizes"
 
 rm -fr ./tmp
-if test ../ncdump/ncdump -h tst_dimsize_classic.nc > ./tmp ; then
+if ../ncdump/ncdump -h tst_dimsize_classic.nc > ./tmp ; then
 echo "*** PASS: ncdump tst_dimsize_classic.nc"
 else
 echo "*** FAIL: ncdump tst_dimsize_classic.nc"
@@ -33,7 +33,7 @@ RETURN=1
 fi
 
 rm -fr ./tmp
-if test ../ncdump/ncdump -h tst_dimsize_64offset.nc > ./tmp ; then
+if ../ncdump/ncdump -h tst_dimsize_64offset.nc > ./tmp ; then
 echo "*** PASS: ncdump tst_dimsize_64offset.nc"
 else
 echo "*** FAIL: ncdump tst_dimsize_64offset.nc"
@@ -41,7 +41,7 @@ RETURN=1
 fi
 
 rm -fr ./tmp
-if test ../ncdump/ncdump -h tst_dimsize_64data.nc > ./tmp ; then
+if ../ncdump/ncdump -h tst_dimsize_64data.nc > ./tmp ; then
 echo "*** PASS: ncdump tst_dimsize_64data.nc"
 else
 echo "*** FAIL: ncdump tst_dimsize_64data.nc"

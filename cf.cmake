@@ -1,11 +1,10 @@
 # Is visual studio being used?
-VS=yes
-
+#VS=yes
 #CYGWIN=yes
 
 if test "x$VS" = x ; then
-#CC=mpicc
-CC=gcc
+CC=mpicc
+#CC=gcc
 fi
 
 export CC
@@ -58,4 +57,4 @@ cd build
 
 cmake $FLAGS ${ZLIB} ${HDF5} ${CURL} ..
 cmake --build .
-cmake --build . --target test
+CTEST_OUTPUT_ON_FAILURE=1 cmake --build . --target test
