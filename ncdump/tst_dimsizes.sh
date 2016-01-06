@@ -1,5 +1,9 @@
 #!/bin/sh
+
+echo "*** Test Maximum dimension sizes X mode"
+
 set -x
+
 if test "x$SETX" = x1 ; then echo "file=$0"; set -x ; fi
 # This shell script tests max dimension sizes X mode
 
