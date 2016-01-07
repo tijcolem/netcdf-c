@@ -255,7 +255,8 @@ Generate type definitions
 static void
 genbin_deftype(Symbol* tsym)
 {
-    int i,stat;
+    unsigned long i;
+    int stat;
 
     ASSERT(tsym->objectclass == NC_TYPE);
     switch (tsym->subclass) {
@@ -321,7 +322,7 @@ genbin_deftype(Symbol* tsym)
 				efield->typ.basetype->ncid);
 	    } else {
 		int j;
-		int dimsizes[NC_MAX_VAR_DIMS];
+		size_t dimsizes[NC_MAX_VAR_DIMS];
 		/* Generate the field dimension constants*/
 		for(j=0;j<efield->typ.dimset.ndims;j++) {
 		     unsigned int size = efield->typ.dimset.dimsyms[j]->dim.declsize;
