@@ -45,8 +45,8 @@ int cdf5_flag; /* 1 => cdf5 | maybe netcdf-4 */
 int specials_flag; /* 1=> special attributes are present */
 int usingclassic;
 int cmode_modifier;
-
 int diskless;
+int ncloglevel;
 
 char* binary_ext = ".nc";
 
@@ -236,15 +236,15 @@ main(
     enhanced_flag = 0;
     cdf5_flag = 0;
     specials_flag = 0;
-
     diskless = 0;
+    ncloglevel = NC_TURN_OFF_LOGGING;
 
 #if _CRAYMPP && 0
     /* initialize CRAY MPP parallel-I/O library */
     (void) par_io_init(32, 32);
 #endif
 
-    while ((c = getopt(argc, argv, "134567bB:cdD:fhHk:l:M:no:Pv:x")) != EOF)
+    while ((c = getopt(argc, argv, "134567bB:cdD:fhHk:l:M:no:Pv:xL:")) != EOF)
       switch(c) {
 	case 'd':
 	  debug = 1;
@@ -304,6 +304,9 @@ main(
               return(1);
 	    }
 	}; break;
+	case 'L':
+	    ncloglevel = atoi(optarg);
+	    break;
 	case 'n':		/* old version of -b, uses ".cdf" extension */
 	  if(l_flag != 0) {
 	    fprintf(stderr,"Please specify only one language\n");
