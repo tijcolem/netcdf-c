@@ -48,7 +48,7 @@ gen_netcdf(const char *filename)
 #endif /*USE_NETCDF4*/
 
     /* Turn on logging */
-#ifdef USE_NETCDF4
+#ifdef LOGGING
     nc_set_log_level(ncloglevel);
 #endif
 
