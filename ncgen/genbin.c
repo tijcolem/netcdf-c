@@ -47,6 +47,11 @@ gen_netcdf(const char *filename)
     ngrps = listlength(grpdefs);
 #endif /*USE_NETCDF4*/
 
+    /* Turn on logging */
+#ifdef LOGGING
+    nc_set_log_level(ncloglevel);
+#endif
+
     /* create netCDF file, uses NC_CLOBBER mode */
     cmode_modifier |= NC_CLOBBER;
 #ifdef USE_NETCDF4
@@ -322,7 +327,7 @@ genbin_deftype(Symbol* tsym)
 				efield->typ.basetype->ncid);
 	    } else {
 		int j;
-		size_t dimsizes[NC_MAX_VAR_DIMS];
+		int dimsizes[NC_MAX_VAR_DIMS]; /* int because inside compound */
 		/* Generate the field dimension constants*/
 		for(j=0;j<efield->typ.dimset.ndims;j++) {
 		     unsigned int size = efield->typ.dimset.dimsyms[j]->dim.declsize;
