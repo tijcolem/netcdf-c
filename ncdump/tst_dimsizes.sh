@@ -40,16 +40,18 @@ echo "*** FAIL: ncdump tst_dimsize_64offset.nc"
 RETURN=1
 fi
 
-rm -fr ./tmp
-if ../ncdump/ncdump -h tst_dimsize_64data.nc > ./tmp ; then
-echo "*** PASS: ncdump tst_dimsize_64data.nc"
-else
-echo "*** FAIL: ncdump tst_dimsize_64data.nc"
-RETURN=1
+if test -f tst_dimsize_64data.nc ; then
+  rm -fr ./tmp
+  if ../ncdump/ncdump -h tst_dimsize_64data.nc > ./tmp ; then
+    echo "*** PASS: ncdump tst_dimsize_64data.nc"
+  else
+    echo "*** FAIL: ncdump tst_dimsize_64data.nc"
+  RETURN=1
+  fi
 fi
 
 # Cleanup
-rm -f tst_dimsize_classic.nc tst_dimsize_64offset.nc tst_dimsize_64data.nc
+rm -f tmp tst_dimsize_classic.nc tst_dimsize_64offset.nc tst_dimsize_64data.nc
 
 exit $RETURN
 
