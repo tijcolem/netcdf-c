@@ -237,8 +237,11 @@ main(
     cdf5_flag = 0;
     specials_flag = 0;
     diskless = 0;
+#ifdef USE_NETCDF4
     ncloglevel = NC_TURN_OFF_LOGGING;
-
+#else
+    ncloglevel = -1;
+#endif
 #if _CRAYMPP && 0
     /* initialize CRAY MPP parallel-I/O library */
     (void) par_io_init(32, 32);
@@ -468,7 +471,7 @@ main(
 		return 1;
 	    case '\xEF':
 		/* skip the BOM */
-	        fread(bom,1,1,fp);
+	        (void)fread(bom,1,1,fp);
 	        break;
 	    default: /* legal printable char, presumably; rewind */
 	        rewind(fp);
