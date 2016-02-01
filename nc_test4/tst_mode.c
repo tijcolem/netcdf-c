@@ -4,18 +4,20 @@
  *
  */
 
-#include "tests.h"
+#include "nc_tests.h"
 #include "netcdf_par.h"
 
 #define FILE_NAME "tst_mode.nc"
 
 int
-main()
+main(int argc, char** argv)
 {
    int ncid,varid;
    int retval; 
 
    printf("\n*** Testing illegal mode combinations\n");
+
+   MPI_Init(&argc,&argv);
 
    printf("*** Testing create + MPIO + fletcher32\n");
    if ((retval = nc_create_par(FILE_NAME, NC_CLOBBER|NC_NETCDF4|NC_MPIIO, MPI_COMM_WORLD, MPI_INFO_NULL, &ncid))) ERR;
@@ -31,8 +33,9 @@ main()
    if(retval != NC_EINVAL) ERR;
    if ((retval = nc_abort(ncid))) ERR;
 
-   SUMMARIZE_ERR;
+   MPI_Finalize();
 
+   SUMMARIZE_ERR;
    FINAL_RESULTS;
 }
 
