@@ -87,7 +87,8 @@ various C global variables
 #define _ENDIAN_FLAG        0x020
 #define _NOFILL_FLAG        0x040
 #define _FILLVALUE_FLAG     0x080
-#define _FORMAT_FLAG        0x100
+#define _NETCDF4_FLAG       0x100
+#define _FORMAT_FLAG        0x200
 
 /* Define an enumeration of supported languages */
 typedef enum Language {
@@ -118,6 +119,7 @@ typedef struct Specialdata {
     int           _Shuffle;      /* 0 => false, 1 => true*/
     int           _Endianness;   /* 1 =>little, 2 => big*/
     int           _Fill ;        /* 0 => false, 1 => true WATCHOUT: this is inverse of NOFILL*/
+    int           _Netcdf4 ;     /* 0 => false, 1 => true */
 } Specialdata;
 
 /* Track a set of dimensions*/
@@ -143,7 +145,7 @@ typedef struct Typeinfo {
 	nc_type         typecode;
         unsigned long   offset;   /* fields in struct*/
         unsigned long   alignment;/* fields in struct*/
-        NCConstant        econst;   /* for enum values*/
+        NCConstant      econst;   /* for enum values*/
         Dimset          dimset;     /* for NC_VAR/NC_FIELD/NC_ATT*/
         size_t   size;     /* for opaque, compound, etc.*/
         size_t   nelems;   /* size in terms of # of datalist constants

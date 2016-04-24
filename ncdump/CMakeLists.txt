@@ -59,6 +59,11 @@ IF(ENABLE_TESTS)
   TARGET_LINK_LIBRARIES(bom netcdf)
   TARGET_LINK_LIBRARIES(tst_dimsizes netcdf)
 
+IF(ENABLE_PROPERTIES_ATTRIBUTE)
+  ADD_EXECUTABLE(tst_ncproperties tst_ncproperties.c)
+  TARGET_LINK_LIBRARIES(tst_ncproperties netcdf)
+ENDIF()
+
 IF(MSVC)
   SET_TARGET_PROPERTIES(rewrite-scalar PROPERTIES RUNTIME_OUTPUT_DIRECTORY
     ${CMAKE_CURRENT_BINARY_DIR})
@@ -79,6 +84,8 @@ IF(MSVC)
   SET_TARGET_PROPERTIES(tst_dimsizes PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG
     ${CMAKE_CURRENT_BINARY_DIR})
   SET_TARGET_PROPERTIES(tst_dimsizes PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE
+    ${CMAKE_CURRENT_BINARY_DIR})
+  SET_TARGET_PROPERTIES(tst_ncproperties PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE
     ${CMAKE_CURRENT_BINARY_DIR})
 ENDIF()
 
@@ -175,6 +182,8 @@ ENDIF()
     add_sh_test(ncdump tst_grp_spec)
     add_sh_test(ncdump tst_mud)
     add_sh_test(ncdump_shell tst_h_scalar)
+
+    add_bin_test(ncdump tst_ncproperties)
 
   ENDIF()
 

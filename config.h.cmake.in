@@ -102,6 +102,7 @@ are set when opening a binary file on Windows. */
 #cmakedefine USE_PARALLEL4 1
 #cmakedefine USE_PNETCDF 1
 #cmakedefine USE_MMAP 1
+#cmakedefine ENABLE_PROPATTR 1
 #cmakedefine TEST_PARALLEL ${TEST_PARALLEL}
 #cmakedefine BUILD_RPC 1
 #cmakedefine USE_DISKLESS 1

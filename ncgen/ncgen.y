@@ -14,6 +14,7 @@ static char SccsId[] = "$Id: ncgen.y,v 1.42 2010/05/18 21:32:46 dmh Exp $";
 */
 #include        "includes.h"
 #include        "offsets.h"
+#include        "ncprops.h"
 
 /* Following are in ncdump (for now)*/
 /* Need some (unused) definitions to get it to compile */
@@ -112,6 +113,7 @@ static Symbol* makespecial(int tag, Symbol* vsym, Symbol* tsym, void* data, int 
 static int containsfills(Datalist* list);
 static void datalistextend(Datalist* dl, NCConstant* con);
 static void vercheck(int ncid);
+static long long extractint(NCConstant con);
 
 int yylex(void);
 
@@ -185,6 +187,7 @@ NCConstant       constant;
         _ENDIANNESS
         _NOFILL
         _FLETCHER32
+	_NETCDF4
 	DATASETID
 
 %type <sym> ident typename primtype dimd varspec
@@ -438,9 +441,9 @@ dimdeclist:     dimdecl
                 ;
 
 dimdecl:
-	  dimd '=' UINT64_CONST
+	  dimd '=' constint
               {
-		$1->dim.declsize = (size_t)uint64_val;
+		$1->dim.declsize = (size_t)extractint($3);
 #ifdef GENDEBUG1
 fprintf(stderr,"dimension: %s = %llu\n",$1->name,(unsigned long long)$1->dim.declsize);
 #endif
@@ -728,6 +731,8 @@ attrdecl:
 	    {$$ = makespecial(_ENDIAN_FLAG,$1,NULL,(void*)&$5,1);}
 	| type_var_ref ':' _NOFILL '=' constbool
 	    {$$ = makespecial(_NOFILL_FLAG,$1,NULL,(void*)&$5,1);}
+	| type_var_ref ':' _NETCDF4 '=' constbool
+	    {$$ = makespecial(_NETCDF4_FLAG,$1,NULL,(void*)&$5,1);}
 	| ':' _FORMAT '=' conststring
 	    {$$ = makespecial(_FORMAT_FLAG,NULL,NULL,(void*)&$4,1);}
 	;
@@ -1112,6 +1117,7 @@ specialname(int flag)
     case _SHUFFLE_FLAG: return "_Shuffle";
     case _ENDIAN_FLAG: return "_Endianness";
     case _NOFILL_FLAG: return "_NoFill";
+    case _NETCDF4_FLAG: return "_NetCDF4";
     default: break;
     }
     return "<unknown>";
@@ -1180,6 +1186,7 @@ makespecial(int tag, Symbol* vsym, Symbol* tsym, void* data, int isconst)
     switch (tag) {
     case _FLETCHER32_FLAG:
     case _SHUFFLE_FLAG:
+    case _NETCDF4_FLAG:
     case _NOFILL_FLAG:
 	iconst.nctype = (con->nctype == NC_STRING?NC_STRING:NC_INT);
 	convert1(con,&iconst);
@@ -1289,6 +1296,10 @@ makespecial(int tag, Symbol* vsym, Symbol* tsym, void* data, int isconst)
                 derror("_Endianness: illegal value: %s",sdata);
               special->flags |= _ENDIAN_FLAG;
               break;
+          case _NETCDF4_FLAG:
+                special->_Netcdf4 = (1 - tf); /* negate */
+                special->flags |= _NETCDF4_FLAG;
+                break;
           case _NOFILL_FLAG:
                 special->_Fill = (1 - tf); /* negate */
                 special->flags |= _NOFILL_FLAG;
@@ -1327,17 +1338,21 @@ makeattribute(Symbol* asym,
 {
     asym->objectclass = NC_ATT;
     asym->data = data;
-    addtogroup(asym);
     switch (kind) {
     case ATTRVAR:
         asym->att.var = vsym;
         asym->typ.basetype = tsym;
         listpush(attdefs,(void*)asym);
+        addtogroup(asym);
 	break;
     case ATTRGLOBAL:
         asym->att.var = NULL; /* NULL => NC_GLOBAL*/
         asym->typ.basetype = tsym;
-        listpush(gattdefs,(void*)asym);
+	// If we are adding NCPROPS to root group, then don't.
+        if(strcmp(NCPROPS,asym->name)!=0 || !currentgroup()->grp.is_root) {
+            addtogroup(asym);
+            listpush(gattdefs,(void*)asym);
+	}
 	break;
     default: PANIC1("unexpected attribute type: %d",kind);
     }
@@ -1346,6 +1361,24 @@ makeattribute(Symbol* asym,
 	derror("Attribute data may not contain fill values (i.e. _ ): %s",asym->name);
     }
     return asym;
+}
+
+static long long
+extractint(NCConstant con)
+{
+    switch (con.nctype) {
+    case NC_BYTE: return (long long)(con.value.int8v);
+    case NC_SHORT: return (long long)(con.value.int16v);
+    case NC_INT: return (long long)(con.value.int32v);
+    case NC_UBYTE: return (long long)(con.value.uint8v);
+    case NC_USHORT: return (long long)(con.value.uint16v);
+    case NC_UINT: return (long long)(con.value.uint32v);
+    case NC_INT64: return (long long)(con.value.int64v);
+    default:
+	derror("Not a signed integer type: %d",con.nctype);
+	break;
+    }
+    return 0;
 }
 
 static int

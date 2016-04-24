@@ -1,5 +1,5 @@
 # Test c output
-T=tst_mode
+T=tst_xplatform
 #CMD=valgrind --leak-check=full
 CMD=gdb --args
 

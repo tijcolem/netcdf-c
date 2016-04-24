@@ -48,6 +48,8 @@ typedef int ssize_t;
 #include "indent.h"
 #include "isnan.h"
 #include "cdl.h"
+#include "nc.h" /* to get name of the special properties file */
+#include "ncprops.h"
 
 #define XML_VERSION "1.0"
 
@@ -116,6 +118,7 @@ usage(void)
   [-g grp1[,...]]  Data and metadata for group(s) <grp1>,... only\n\
   [-w]             With client-side caching of variables for DAP URLs\n\
   [-x]             Output XML (NcML) instead of CDL\n\
+  [-Xp]            Unconditionally suppress output of the properties attribute\n\
   file             Name of netCDF file (or URL if DAP access enabled)\n"
 
     (void) fprintf(stderr,
@@ -757,6 +760,10 @@ pr_att(
     ncatt_t att;			/* attribute */
 
     NC_CHECK( nc_inq_attname(ncid, varid, ia, att.name) );
+    if (ncid == getrootid(ncid)
+        && varid == NC_GLOBAL
+        && strcmp(att.name,NCPROPS)==0)
+	return; /* will be printed elsewere */
     NC_CHECK( nc_inq_att(ncid, varid, att.name, &att.type, &att.len) );
     att.tinfo = get_typeinfo(att.type);
 
@@ -952,6 +959,32 @@ pr_att_global_format(
     printf (" ;\n");
 }
 
+/*
+ * Print special _NCProperties global attribute, otherwise hidden.
+ */
+static void
+pr_att_global_properties(
+    int ncid,
+    int kind
+    )
+{
+#ifdef ENABLE_PROPATTR
+    int stat;
+    size_t len;
+    char propdata[NCPROPS_LENGTH];
+    /* Always look for the NCPROPS attribute */
+    stat = nc_inq_att(ncid,NC_GLOBAL,NCPROPS,NULL,&len);
+    if(stat == NC_NOERR && len < sizeof(propdata)) {
+	stat = nc_get_att_text(ncid,NC_GLOBAL,NCPROPS,propdata);
+	if(stat == NC_NOERR) {
+	    pr_att_name(ncid, "", NCPROPS);
+	    /* make sure its null terminated */
+	    propdata[NCPROPS_LENGTH-1] = '\0';
+	    printf(" = \"%s\" ;\n",propdata);
+	}
+    }
+#endif
+}
 
 #ifdef USE_NETCDF4
 /*
@@ -1078,6 +1111,13 @@ pr_attx(
     int attvalslen = 0;
 
     NC_CHECK( nc_inq_attname(ncid, varid, ia, att.name) );
+    if (ncid == getrootid(ncid)
+	&& varid == NC_GLOBAL
+        && strcmp(att.name,NCPROPS)==0
+        && (!formatting_specs.special_atts
+            || !formatting_specs.xopt_props)
+	)
+	return;
     NC_CHECK( nc_inq_att(ncid, varid, att.name, &att.type, &att.len) );
 
     /* Put attribute values into a single string, with blanks in between */
@@ -1325,8 +1365,11 @@ print_ud_type(int ncid, nc_type typeid) {
 		    printf(" ;\n");
 		}
             indent_out();
-/* 	    printf("}; // %s\n", type_name); */
+#if 0
+ 	    printf("}; // %s\n", type_name);
+#else
 	    printf("}; // ");
+#endif
 	    print_type_name(ncid, typeid);
 	    printf("\n");
 	}
@@ -1667,7 +1710,12 @@ do_ncdump_rec(int ncid, const char *path)
    }
 
    /* get global attributes */
-   if (ngatts > 0 || formatting_specs.special_atts) {
+   if (is_root
+       && ngatts == 0
+       && !formatting_specs.special_atts
+      ) {
+	/* do nothing */
+   } else if (ngatts > 0 || formatting_specs.special_atts) {
       printf ("\n");
       indent_out();
       if (is_root)
@@ -1681,7 +1729,9 @@ do_ncdump_rec(int ncid, const char *path)
    if (is_root && formatting_specs.special_atts) { /* output special attribute
 					   * for format variant */
        pr_att_global_format(ncid, kind);
+       pr_att_global_properties(ncid, kind);
    }
+   fflush(stdout);
 
    /* output variable data, unless "-h" option specified header only
     * or this group is not in list of groups specified by "-g"
@@ -2019,6 +2069,7 @@ main(int argc, char *argv[])
     bool_t xml_out = false;    /* if true, output NcML instead of CDL */
     bool_t kind_out = false;	/* if true, just output kind of netCDF file */
     bool_t kind_out_extended = false;	/* output inq_format vs inq_format_extended */
+    int Xp_flag = 0;    /* indicate that -Xp flag was set */
 
 #if defined(WIN32) || defined(msdos) || defined(WIN64)
     putenv("PRINTF_EXPONENT_DIGITS=2"); /* Enforce unix/linux style exponent formatting. */
@@ -2132,6 +2183,9 @@ main(int argc, char *argv[])
 	    case 'm':
 	      formatting_specs.xopt_inmemory = 1;
 	      break;
+	    case 'p': /* suppress the properties attribute */
+	      Xp_flag = 1; /* record that this flag was set */
+	      break;
 	    default:
 	      error("invalid value for -X option: %s", optarg);
 	      break;
@@ -2141,6 +2195,16 @@ main(int argc, char *argv[])
 	  usage();
 	  exit(EXIT_FAILURE);
       }
+
+    /* Decide xopt_props */
+    if(formatting_specs.special_atts && Xp_flag == 1)
+        formatting_specs.xopt_props = 0;
+    else if(formatting_specs.special_atts && Xp_flag == 0)
+        formatting_specs.xopt_props = 1;
+    else if(!formatting_specs.special_atts)
+	formatting_specs.xopt_props = 0;
+    else
+	formatting_specs.xopt_props = 0;
 
     set_max_len(max_len);
 
