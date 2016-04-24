@@ -12,7 +12,6 @@ COPYRIGHT file for copying and redistribution conditions.
 #include "config.h"
 #include <errno.h>  /* netcdf functions sometimes return system errors */
 
-
 #include "nc.h"
 #include "nc4internal.h"
 #include "nc4dispatch.h"
@@ -37,13 +36,6 @@ extern int num_spaces;
 
 #define MIN_DEFLATE_LEVEL 0
 #define MAX_DEFLATE_LEVEL 9
-
-/* These are the special attributes added by the HDF5 dimension scale
- * API. They will be ignored by netCDF-4. */
-#define REFERENCE_LIST "REFERENCE_LIST"
-#define CLASS "CLASS"
-#define DIMENSION_LIST "DIMENSION_LIST"
-#define NAME "NAME"
 
 /* Define the illegal mode flags */
 static const int ILLEGAL_OPEN_FLAGS = (NC_MMAP|NC_64BIT_OFFSET);
@@ -79,6 +71,18 @@ typedef struct NC4_rec_read_metadata_ud
 static int NC4_enddef(int ncid);
 static int nc4_rec_read_metadata(NC_GRP_INFO_T *grp);
 static int close_netcdf4_file(NC_HDF5_FILE_INFO_T *h5, int abort);
+
+/* Define the names of attributes to ignore */
+/* These are the special attributes added by the HDF5 dimension scale
+ * API. They will be ignored by netCDF-4. */
+static const char* IGNORE_LIST[] = {
+"REFERENCE_LIST",
+"CLASS",
+"DIMENSION_LIST",
+"NAME",
+NCPROPS,
+NULL
+};
 
 /* These are the default chunk cache sizes for HDF5 files created or
  * opened with netCDF-4. */
@@ -314,7 +318,7 @@ nc4_create_file(const char *path, int cmode, MPI_Comm comm, MPI_Info info,
 	return NC_NOERR;
 #endif
 
-   /* Need this access plist to control how HDF5 handles open onjects
+   /* Need this access plist to control how HDF5 handles open objects
     * on file close. (Setting H5F_CLOSE_SEMI will cause H5Fclose to
     * fail if there are any open objects in the file. */
    if ((fapl_id = H5Pcreate(H5P_FILE_ACCESS)) < 0)
@@ -435,6 +439,12 @@ nc4_create_file(const char *path, int cmode, MPI_Comm comm, MPI_Info info,
    /* Define mode gets turned on automatically on create. */
    nc4_info->flags |= NC_INDEF;
 
+#ifdef ENABLE_PROPATTR
+   nc4_info->properties = globalncproperties; /* Initialize */
+   nc4_info->properties.flags |= NCP_CREATE;   
+   NC_put_ncproperties(nc4_info);
+#endif  
+
    return NC_NOERR;
 
 exit: /*failure exit*/
@@ -474,6 +484,7 @@ NC4_create(const char* path, int cmode, size_t initialsz, int basepe,
    MPI_Comm comm = MPI_COMM_WORLD;
    MPI_Info info = MPI_INFO_NULL;
    int res;
+   NC* nc;
 
    assert(nc_file && path);
 
@@ -1490,6 +1501,7 @@ read_var(NC_GRP_INFO_T *grp, hid_t datasetid, const char *obj_name,
    hid_t access_pid = 0;
    int incr_id_rc = 0;          /* Whether the dataset ID's ref count has been incremented */
    int natts, a, d;
+   const char** ignore;
 
    NC_ATT_INFO_T *att;
    hid_t attid = 0;
@@ -1758,13 +1770,10 @@ read_var(NC_GRP_INFO_T *grp, hid_t datasetid, const char *obj_name,
       LOG((4, "%s:: a %d att_name %s", __func__, a, att_name));
 
       /* Should we ignore this attribute? */
-      if (strcmp(att_name, REFERENCE_LIST) &&
-	  strcmp(att_name, CLASS) &&
-	  strcmp(att_name, DIMENSION_LIST) &&
-	  strcmp(att_name, NAME) &&
-	  strcmp(att_name, COORDINATES) &&
-	  strcmp(att_name, NC_DIMID_ATT_NAME))
-      {
+      for(ignore=IGNORE_LIST;*ignore;ignore++) {
+          if (strcmp(att_name, *ignore)==0) break;
+      }
+      if(*ignore == NULL) {
 	 /* Add to the end of the list of atts for this var. */
 	 if ((retval = nc4_att_list_add(&var->att, &att)))
 	    BAIL(retval);
@@ -2323,6 +2332,10 @@ nc4_open_file(const char *path, int mode, void* parameters, NC *nc)
    num_plists--;
 #endif
 
+#ifdef ENABLE_PROPATTR
+    NC_get_ncproperties(nc4_info);
+#endif
+
    return NC_NOERR;
 
 exit:
@@ -2834,7 +2847,6 @@ NC4_open(const char *path, int mode, int basepe, size_t *chunksizehintp,
 #endif /* USE_HDF4 */
    else
          assert(0); /* should never happen */
-
    return res;
 }
 

@@ -9,21 +9,25 @@
 #ifndef _NC4INTERNAL_
 #define _NC4INTERNAL_
 
-#include <config.h>
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdarg.h>
 #include <string.h>
 #include <hdf5.h>
-#include <ncdimscale.h>
-#include <nc_logging.h>
+#include "ncdimscale.h"
+#include "nc_logging.h"
 
 #ifdef USE_PARALLEL
-#include <netcdf_par.h>
+#include "netcdf_par.h"
 #endif /* USE_PARALLEL */
-#include <netcdf.h>
-#include <netcdf_f.h>
+#include "netcdf.h"
+#include "netcdf_f.h"
+
+#ifdef ENABLE_PROPATTR
+#include "ncprops.h"
+#endif
 
 /* Always needed */
 #include "nc.h"
@@ -314,6 +318,9 @@ typedef struct  NC_HDF5_FILE_INFO
    nc_bool_t hdf4;              /* True for HDF4 file */
    int sdid;
 #endif /* USE_HDF4 */
+#ifdef ENABLE_PROPATTR
+   struct NCProperties properties;
+#endif
 } NC_HDF5_FILE_INFO_T;
 
 

@@ -193,6 +193,20 @@ enable_netcdf_4=no
 fi
 AC_MSG_RESULT([$enable_netcdf_4])
 
+####
+# We do not actually provide a direct flag for killing the properties attribute
+if test "x$enable_netcdf_4" = xyes ; then
+enable_properties_attribute=yes
+else
+enable_properties_attribute=no
+fi
+AC_MSG_CHECKING([If properties attribute is enabled])
+AC_MSG_RESULT([$enable_properties_attribute])
+if test "x$enable_properties_attribute" = xyes ; then
+AC_DEFINE([ENABLE_PROPATTR], [1], [properties attribute])
+fi
+AM_CONDITIONAL(ENABLE_PROPATTR, [test x$enable_properties_attribute = xyes])
+
 # Does the user require dynamic loading?
 # This is only for those hdf5 installs that support it.
 AC_MSG_CHECKING([do we require hdf5 dynamic-loading support])

@@ -3848,3 +3848,19 @@ nc4_get_typeclass(const NC_HDF5_FILE_INFO_T *h5, nc_type xtype, int *type_class)
  exit:
   return retval;
 }
+
+int
+NC4_test_netcdf4(void)
+{
+    return NC_NOERR;
+}
+
+#ifdef ENABLE_PROPATTR
+int
+NC4_hdf5get_libversion(unsigned* major,unsigned* minor,unsigned* release)
+{
+    if(H5get_libversion(major,minor,release) < 0)
+	return NC_EHDFERR;
+    return NC_NOERR;
+}
+#endif

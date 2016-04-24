@@ -29,10 +29,15 @@ if BUILD_TESTSETS
 #if !BUILD_DLL
 # These tests are run for both netCDF-4 and non-netCDF-4 builds.
 check_PROGRAMS = rewrite-scalar ctest ctest64 ncdump tst_utf8 bom tst_dimsizes
+
 TESTS = tst_inttags.sh run_tests.sh tst_64bit.sh ctest ctest64 tst_output.sh	\
 tst_lengths.sh tst_calendars.sh tst_utf8 run_utf8_tests.sh      \
 tst_nccopy3.sh tst_charfill.sh tst_iter.sh tst_formatx3.sh tst_bom.sh \
 tst_dimsizes.sh
+
+if ENABLE_PROPATTR
+TESTS += tst_ncproperties
+endif
 
 if LARGE_FILE_TESTS
 TESTS += tst_iter.sh
@@ -114,7 +119,8 @@ tst_nc_test_netcdf4_4_0.cdl tst_mud4.nc tst_mud4.cdl tst_mud4-bc.cdl    \
 tst_ncf213.cdl tst_ncf213.nc tst_h_scalar.cdl tst_h_scalar.nc           \
 tst_mud4_chars.cdl tst_mud4_chars.nc                                    \
 inttags.nc inttags4.nc tst_inttags.cdl tst_inttags4.cdl                 \
-tst_dimsize_classic.nc tst_dimsize_64offset.nc tst_dimsize_64data.nc
+tst_dimsize_classic.nc tst_dimsize_64offset.nc tst_dimsize_64data.nc    \
+nc4_ncproperties.nc nc3_ncproperties.nc
 
 # These files all have to be included with the distribution.
 EXTRA_DIST = run_tests.sh tst_64bit.sh tst_output.sh test0.cdl		\

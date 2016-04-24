@@ -44,9 +44,9 @@ nc4_get_att(int ncid, NC *nc, int varid, const char *name,
    int i;
    int retval = NC_NOERR;
 
-   if (attnum)
+   if (attnum) {
       my_attnum = *attnum;
-   assert(nc && NC4_DATA(nc));
+   }
 
    LOG((3, "%s: ncid 0x%x varid %d name %s attnum %d mem_type %d",
 	__func__, ncid, varid, name, my_attnum, mem_type));
@@ -84,8 +84,9 @@ nc4_get_att(int ncid, NC *nc, int varid, const char *name,
       *lenp = att->len;
    if (xtype)
       *xtype = att->nc_typeid;
-   if (attnum)
+   if (attnum) {
       *attnum = att->attnum;
+   }
 
    /* Zero len attributes are easy to read! */
    if (!att->len)
@@ -246,6 +247,7 @@ nc4_put_att(int ncid, NC *nc, int varid, const char *name,
       if (!var)
 	 return NC_ENOTVAR;
    }
+
    for (att = *attlist; att; att = att->l.next)
       if (!strcmp(att->name, norm_name))
 	 break;

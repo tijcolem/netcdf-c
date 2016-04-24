@@ -46,6 +46,8 @@
 #include "genlib.h"
 #include "util.h"
 #include "debug.h"
+#include "nc.h"
+#include "ncprops.h"
 
 extern int specialconstants;
 
