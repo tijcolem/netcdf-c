@@ -42,6 +42,9 @@ static const int ILLEGAL_OPEN_FLAGS = (NC_MMAP|NC_64BIT_OFFSET);
 
 static const int ILLEGAL_CREATE_FLAGS = (NC_NOWRITE|NC_MMAP|NC_INMEMORY|NC_64BIT_OFFSET|NC_CDF5);
 
+extern void reportopenobjectsT(hid_t,int,unsigned int*);
+extern void reportopenobjects(hid_t);
+
 /*! Struct to track information about objects in a group, for nc4_rec_read_metadata()
 
  \internal
@@ -71,16 +74,34 @@ typedef struct NC4_rec_read_metadata_ud
 static int NC4_enddef(int ncid);
 static int nc4_rec_read_metadata(NC_GRP_INFO_T *grp);
 static int close_netcdf4_file(NC_HDF5_FILE_INFO_T *h5, int abort);
+static void checkcreate(NC* nc, const char* path);
 
-/* Define the names of attributes to ignore */
-/* These are the special attributes added by the HDF5 dimension scale
- * API. They will be ignored by netCDF-4. */
-static const char* IGNORE_LIST[] = {
-"REFERENCE_LIST",
-"CLASS",
-"DIMENSION_LIST",
-"NAME",
+/* Define the names of attributes to ignore
+ * added by the HDF5 dimension scale; these
+ * attached to variables.
+ * They cannot be modified thru the netcdf-4 API.
+ */
+const char* NC_RESERVED_VARATT_LIST[] = {
+NC_ATT_REFERENCE_LIST,
+NC_ATT_CLASS,
+NC_ATT_DIMENSION_LIST,
+NC_ATT_NAME,
+NC_ATT_COORDINATES,
+NC_DIMID_ATT_NAME,
+};
+
+/* Define the names of attributes to ignore
+ * because they are "hidden" global attributes.
+ * They can be read, but not modified thru the netcdf-4 API.
+ */
+const char* NC_RESERVED_ATT_LIST[] = {
+NC_ATT_FORMAT,
+NC3_STRICT_ATT_NAME,
+#ifdef ENABLE_FILEINFO
 NCPROPS,
+ISNETCDF4ATT,
+SUPERBLOCKATT,
+#endif
 NULL
 };
 
@@ -417,6 +438,7 @@ nc4_create_file(const char *path, int cmode, MPI_Comm comm, MPI_Info info,
       BAIL(NC_EHDFERR);
 
    /* Create the file. */
+   checkcreate(nc,path);
    if ((nc4_info->hdfid = H5Fcreate(path, flags, fcpl_id, fapl_id)) < 0)
         /*Change the return error from NC_EFILEMETADATA to
           System error EACCES because that is the more likely problem */
@@ -439,10 +461,13 @@ nc4_create_file(const char *path, int cmode, MPI_Comm comm, MPI_Info info,
    /* Define mode gets turned on automatically on create. */
    nc4_info->flags |= NC_INDEF;
 
-#ifdef ENABLE_PROPATTR
-   nc4_info->properties = globalncproperties; /* Initialize */
+#ifdef ENABLE_FILEINFO
+#if 0
    nc4_info->properties.flags |= NCP_CREATE;   
-   NC_put_ncproperties(nc4_info);
+#endif
+   nc4_info->fileinfo.propattr = globalpropinfo; /* Initialize */
+   NC_get_fileinfo(nc4_info);
+   NC_put_propattr(nc4_info);
 #endif  
 
    return NC_NOERR;
@@ -1501,7 +1526,7 @@ read_var(NC_GRP_INFO_T *grp, hid_t datasetid, const char *obj_name,
    hid_t access_pid = 0;
    int incr_id_rc = 0;          /* Whether the dataset ID's ref count has been incremented */
    int natts, a, d;
-   const char** ignore;
+   const char** reserved;
 
    NC_ATT_INFO_T *att;
    hid_t attid = 0;
@@ -1770,10 +1795,10 @@ read_var(NC_GRP_INFO_T *grp, hid_t datasetid, const char *obj_name,
       LOG((4, "%s:: a %d att_name %s", __func__, a, att_name));
 
       /* Should we ignore this attribute? */
-      for(ignore=IGNORE_LIST;*ignore;ignore++) {
-          if (strcmp(att_name, *ignore)==0) break;
+      for(reserved=NC_RESERVED_VARATT_LIST;*reserved;reserved++) {
+          if (strcmp(att_name, *reserved)==0) break;
       }
-      if(*ignore == NULL) {
+      if(*reserved == NULL) {
 	 /* Add to the end of the list of atts for this var. */
 	 if ((retval = nc4_att_list_add(&var->att, &att)))
 	    BAIL(retval);
@@ -1841,6 +1866,7 @@ read_grp_atts(NC_GRP_INFO_T *grp)
    char obj_name[NC_MAX_HDF5_NAME + 1];
    int max_len;
    int retval = NC_NOERR;
+   int hidden = 0;
 
    num_obj = H5Aget_num_attrs(grp->hdf_grpid);
    for (i = 0; i < num_obj; i++)
@@ -1856,14 +1882,22 @@ read_grp_atts(NC_GRP_INFO_T *grp)
          BAIL(NC_EATTMETA);
       LOG((3, "reading attribute of _netCDF group, named %s", obj_name));
 
+      /* See if this a hidden attribute */
+      if(grp->nc4_info->root_grp == grp) {
+	const char** reserved = NC_RESERVED_ATT_LIST;
+	hidden = 0;
+	for(;*reserved;reserved++) {
+	    if(strcmp(*reserved,obj_name)==0) {hidden = 1; break;}
+	}
+      }
+
       /* This may be an attribute telling us that strict netcdf-3
        * rules are in effect. If so, we will make note of the fact,
        * but not add this attribute to the metadata. It's not a user
        * attribute, but an internal netcdf-4 one. */
-      if (!strcmp(obj_name, NC3_STRICT_ATT_NAME))
-         grp->nc4_info->cmode |= NC_CLASSIC_MODEL;
-      else
-      {
+      if(strcmp(obj_name, NC3_STRICT_ATT_NAME)==0)
+             grp->nc4_info->cmode |= NC_CLASSIC_MODEL;
+      else if(!hidden) {
          /* Add an att struct at the end of the list, and then go to it. */
          if ((retval = nc4_att_list_add(&grp->att, &att)))
             BAIL(retval);
@@ -2332,8 +2366,8 @@ nc4_open_file(const char *path, int mode, void* parameters, NC *nc)
    num_plists--;
 #endif
 
-#ifdef ENABLE_PROPATTR
-    NC_get_ncproperties(nc4_info);
+#ifdef ENABLE_FILEINFO
+    NC_get_fileinfo(nc4_info);
 #endif
 
    return NC_NOERR;
@@ -3114,8 +3148,9 @@ close_netcdf4_file(NC_HDF5_FILE_INFO_T *h5, int abort)
 	  * print out some info on to help the poor programmer figure it
 	  * out. */
          LOG((0, "There are %d HDF5 objects open!", nobjs));
+	 /* Print them out */
+	 reportopenobjects(h5->hdfid);
 #endif
-         BAIL_QUIET(NC_EHDFERR);
 	}
       }
    }
@@ -3347,3 +3382,10 @@ nc_use_parallel_enabled()
    return 0;
 }
 #endif /* USE_PARALLEL4 */
+
+static void
+checkcreate(NC* nc0, const char* path)
+{
+    unsigned int FT[1] = {H5F_OBJ_FILE};
+    reportopenobjectsT(H5F_OBJ_ALL,1,FT);
+}

@@ -105,7 +105,18 @@ test_small_atts(const char *testfile)
 	 strncpy(att, source, t);
 	 
 	 /* Create a file with one attribute. */
+#if 1
+if(strcmp(testfile,"tst_small_netcdf4_classic.nc")==0) {
+int x=0;
+}
+{
+if(file_create(testfile, NC_CLOBBER, &ncid)) {
+    ERR;
+}
+}
+#else
 	 if (file_create(testfile, NC_CLOBBER, &ncid)) ERR;
+#endif
 	 if (nc_put_att_text(ncid, NC_GLOBAL, ATT_NAME, t + 1, att)) ERR;
 	 if (f && nc_set_fill(ncid, NC_NOFILL, NULL)) ERR;
 	 if (nc_close(ncid)) ERR;

@@ -1,5 +1,5 @@
 # Test c output
-T=tst_ncproperties
+T=tst_fileinfo
 #CMD=valgrind --leak-check=full
 CMD=gdb --args
 

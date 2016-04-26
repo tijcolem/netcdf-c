@@ -92,8 +92,10 @@ extern int ncgdebug;
     _ENDIANNESS = 302,
     _NOFILL = 303,
     _FLETCHER32 = 304,
-    _NETCDF4 = 305,
-    DATASETID = 306
+    _NCPROPS = 305,
+    _ISNETCDF4 = 306,
+    _SUPERBLOCK = 307,
+    DATASETID = 308
   };
 #endif
 
@@ -102,7 +104,7 @@ extern int ncgdebug;
 
 union YYSTYPE
 {
-#line 133 "ncgen.y" /* yacc.c:1909  */
+#line 134 "ncgen.y" /* yacc.c:1909  */
 
 Symbol* sym;
 unsigned long  size; /* allow for zero size to indicate e.g. UNLIMITED*/
@@ -111,7 +113,7 @@ int            nctype; /* for tracking attribute list type*/
 Datalist*      datalist;
 NCConstant       constant;
 
-#line 115 "ncgeny.h" /* yacc.c:1909  */
+#line 117 "ncgeny.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

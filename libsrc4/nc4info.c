@@ -18,70 +18,71 @@
 #define HCHECK(expr) {if((expr)<0) {ncstat = NC_EHDFERR; goto done;}}
 
 /* Global */
-struct NCProperties globalncproperties;
+struct NCPROPINFO globalpropinfo;
 
 struct NCdata {
 };
 
 int
-NC_properties_init(void)
+NC_fileinfo_init(void)
 {
     int stat = NC_NOERR;
     unsigned major,minor,release;
+    int super;
     size_t total = 0;
 
     /* Build nc properties */
-    memset((void*)&globalncproperties,0,sizeof(globalncproperties));
-    globalncproperties.version = NCPROPS_VERSION;
-    globalncproperties.netcdflibver[0] = '\0';
-    globalncproperties.hdf5libver[0] = '\0';
+    memset((void*)&globalpropinfo,0,sizeof(globalpropinfo));
+    globalpropinfo.version = NCPROPS_VERSION;
+    globalpropinfo.netcdfver[0] = '\0';
+    globalpropinfo.hdf5ver[0] = '\0';
 
     stat = NC4_hdf5get_libversion(&major,&minor,&release);
     if(stat) goto done;
-    snprintf(globalncproperties.hdf5libver,sizeof(globalncproperties.hdf5libver),
+    snprintf(globalpropinfo.hdf5ver,sizeof(globalpropinfo.hdf5ver),
 		 "%1u.%1u.%1u",major,minor,release);
-    strncpy(globalncproperties.netcdflibver,PACKAGE_VERSION,sizeof(globalncproperties.netcdflibver));
+    strncpy(globalpropinfo.netcdfver,PACKAGE_VERSION,sizeof(globalpropinfo.netcdfver));
     /* Now build actual attribute text */
     total = 0;
     total += strlen(NCPVERSION);
     total += strlen("=00000000|");
     total += strlen(NCPNCLIBVERSION);
-    total += strlen(globalncproperties.netcdflibver);
+    total += strlen(globalpropinfo.netcdfver);
     total += strlen("=|");
     total += strlen(NCPHDF5LIBVERSION);
-    total += strlen(globalncproperties.hdf5libver);
+    total += strlen(globalpropinfo.hdf5ver);
     total += strlen("="); /* Last pair has no trailing '|' */
-    if(total >= sizeof(globalncproperties.text)) {
+    if(total >= sizeof(globalpropinfo.text)) {
         fprintf(stderr,"%s size is too small\n",NCPROPS);
         goto done;
     }
-    globalncproperties.text[0] = '\0';
-    snprintf(globalncproperties.text,sizeof(globalncproperties.text),
+    globalpropinfo.text[0] = '\0';
+    snprintf(globalpropinfo.text,sizeof(globalpropinfo.text),
 		"%s=%d|%s=%s|%s=%s",
-	        NCPVERSION,globalncproperties.version,
-	        NCPNCLIBVERSION,globalncproperties.netcdflibver,
-	        NCPHDF5LIBVERSION,globalncproperties.hdf5libver);
+	        NCPVERSION,globalpropinfo.version,
+	        NCPNCLIBVERSION,globalpropinfo.netcdfver,
+	        NCPHDF5LIBVERSION,globalpropinfo.hdf5ver);
 done:
     return stat;
 }
 
 static int
-NC_properties_parse(struct NCProperties* ncprops)
+NC_properties_parse(struct NCPROPINFO* ncprops)
 {
     size_t len;
     char propdata[NCPROPS_LENGTH]; /* match nc.h struct NCProperties */
     char* p;
 
     ncprops->version = 0;
-    ncprops->hdf5libver[0] = '\0';
-    ncprops->netcdflibver[0] = '\0';
+    ncprops->hdf5ver[0] = '\0';
+    ncprops->netcdfver[0] = '\0';
 
     strncpy(propdata,ncprops->text,sizeof(propdata)-1);
     propdata[sizeof(propdata)-1] = '\0';
     len = strlen(propdata);
     if(len == 0) return NC_NOERR;
 
-    /* Walk and fill in ncprops */
+    /* Walk and fill in ncinfo */
     p = propdata;
     while(*p) {
 	char* name = p;
@@ -100,20 +101,20 @@ NC_properties_parse(struct NCProperties* ncprops)
 		if(v < 0) v = 0;
 		ncprops->version = v;
 	    } else if(strcmp(name,NCPNCLIBVERSION) == 0)
-	        strncpy(ncprops->netcdflibver,value,sizeof(ncprops->netcdflibver)-1);
+	        strncpy(ncprops->netcdfver,value,sizeof(ncprops->netcdfver)-1);
 	    else if(strcmp(name,NCPHDF5LIBVERSION) == 0)
-	        strncpy(ncprops->hdf5libver,value,sizeof(ncprops->hdf5libver)-1);
+	        strncpy(ncprops->hdf5ver,value,sizeof(ncprops->hdf5ver)-1);
 	    /* else ignore */
 	}
     }
     /* Guarantee null term */
-    ncprops->netcdflibver[sizeof(ncprops->netcdflibver)-1] = '\0';
-    ncprops->hdf5libver[sizeof(ncprops->hdf5libver)-1] = '\0';
+    ncprops->netcdfver[sizeof(ncprops->netcdfver)-1] = '\0';
+    ncprops->hdf5ver[sizeof(ncprops->hdf5ver)-1] = '\0';
     return NC_NOERR;
 }
 
-int
-NC_get_ncproperties(NC_HDF5_FILE_INFO_T* info)
+static int
+NC_get_propattr(NC_HDF5_FILE_INFO_T* h5)
 {
     int ncstat = NC_NOERR;
     size_t size;
@@ -124,12 +125,14 @@ NC_get_ncproperties(NC_HDF5_FILE_INFO_T* info)
     hid_t aspace = -1;
     hid_t atype = -1;
     hid_t ntype = -1;
+    herr_t herr = 0;
 
     /* Get root group */
-    grp = H5Gopen(info->hdfid,"/"); /* get root group */
+    grp = H5Gopen(h5->hdfid,"/"); /* get root group */
     /* Try to extract the NCPROPS attribute */
     attid = H5Aopen_by_name(grp, ".", NCPROPS, H5P_DEFAULT, H5P_DEFAULT);
     if(attid >= 0) {
+	herr = -1;
 	aspace = H5Aget_space(attid); /* dimensions of attribute data */
         atype = H5Aget_type(attid);
 	/* Verify that atype and size */
@@ -140,49 +143,71 @@ NC_get_ncproperties(NC_HDF5_FILE_INFO_T* info)
         HCHECK((ntype = H5Tget_native_type(atype, H5T_DIR_ASCEND)));
         HCHECK((H5Aread(attid, ntype, text)));
 	/* Try to parse text */
-	strncpy(info->properties.text,text,NCPROPS_LENGTH);
-	info->properties.text[NCPROPS_LENGTH-1] = '\0';
-	ncstat = NC_properties_parse(&info->properties);
+	strncpy(h5->fileinfo.propattr.text,text,NCPROPS_LENGTH);
+	h5->fileinfo.propattr.text[NCPROPS_LENGTH-1] = '\0';
+	ncstat = NC_properties_parse(&h5->fileinfo.propattr);
+	herr = 0;
     }    
 done:
-    if(aspace >= 0) HCHECK((H5Sclose(aspace)));
-    if(ntype >= 0) HCHECK((H5Tclose(ntype)));
-    if(atype >= 0) HCHECK((H5Tclose(atype)));
-    if(attid >= 0) HCHECK((H5Aclose(attid)));
-    if(grp >= 0) HCHECK((H5Gclose(grp)));
+    herr = 0;
+    if(aspace >= 0) herr = H5Sclose(aspace);
+    if(ntype >= 0) herr = H5Tclose(ntype);
+    if(atype >= 0) herr = H5Tclose(atype);
+    if(attid >= 0) herr = H5Aclose(attid);
+    if(grp >= 0) herr = H5Gclose(grp);
     return ncstat;
 }
 
 int
-NC_put_ncproperties(NC_HDF5_FILE_INFO_T* info)
+NC_get_fileinfo(NC_HDF5_FILE_INFO_T* h5)
+{
+    int ncstat = NC_NOERR;
+    /* Get superblock version */
+    NCHECK((ncstat = NC4_hdf5get_superblock(h5,&h5->fileinfo.superblockversion)));
+    /* Get properties attribute if not already defined */
+    if(h5->fileinfo.propattr.version == 0) {
+        NCHECK((ncstat = NC_get_propattr(h5)));
+    }
+done:
+    return ncstat;    
+}
+
+int
+NC_put_propattr(NC_HDF5_FILE_INFO_T* h5)
 {
     int ncstat = NC_NOERR;
     char text[NCPROPS_LENGTH+1];
     H5T_class_t t_class;	
     size_t size;
     hid_t grp = -1;
+    hid_t exists = -1;
     hid_t attid = -1;
     hid_t aspace = -1;
     hid_t atype = -1;
+    herr_t herr = 0;
 
     /* Get root group */
-    grp = H5Gopen(info->hdfid,"/"); /* get root group */
+    HCHECK((grp = H5Gopen(h5->hdfid,"/"))); /* get root group */
     /* See if the NCPROPS attribute exists */
-    attid = H5Aopen_by_name(grp, ".", NCPROPS, H5P_DEFAULT, H5P_DEFAULT);
-    HCHECK((H5Aclose(attid)));
-    if(attid < 0) {/* Does not exist */
+    exists = H5Aopen_by_name(grp, ".", NCPROPS, H5P_DEFAULT, H5P_DEFAULT);
+    if(exists < 0) {/* Does not exist */
+	herr = -1;
         /* Create a datatype to refer to. */
         HCHECK((atype = H5Tcopy(H5T_C_S1)));
+	HCHECK((H5Tset_cset(atype, H5T_CSET_UTF8)));
         HCHECK((H5Tset_size(atype, NCPROPS_LENGTH)));
 	HCHECK((aspace = H5Screate(H5S_SCALAR)));
 	HCHECK((attid = H5Acreate(grp, NCPROPS, atype, aspace, H5P_DEFAULT)));
-        HCHECK((H5Awrite(attid, atype, info->properties.text)));
+        HCHECK((H5Awrite(attid, atype, h5->fileinfo.propattr.text)));
+	herr = 0;
     }
 done:
-    if(aspace >= 0) HCHECK((H5Sclose(aspace)));
-    if(atype >= 0) HCHECK((H5Tclose(atype)));
-    if(attid >= 0) HCHECK((H5Aclose(attid)));
-    if(grp >= 0) HCHECK((H5Gclose(grp)));
+    herr = 0;
+    if(aspace >= 0) herr = H5Sclose(aspace);
+    if(atype >= 0) herr = H5Tclose(atype);
+    if(attid >= 0) herr = H5Aclose(attid);
+    if(exists >= 0) herr = H5Aclose(exists);
+    if(grp >= 0) herr = H5Gclose(grp);
     return ncstat;
 }
 
@@ -245,6 +270,7 @@ scan_group(hid_t gid, struct NCdata* data)
      */
     err = H5Gget_num_objs(gid, &nobj);
     for(i = 0; i < nobj; i++) {
+	
         /*
          *  For each object in the group, get the name and
          *   what type of object it is.

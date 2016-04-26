@@ -3,11 +3,20 @@
  *      See netcdf/COPYRIGHT file for copying and redistribution conditions.
  */
 
-#ifndef _NCPROPS_H_
-#define _NCPROPS_H_
+#ifndef _NCINFO_H_
+#define _NCINFO_H_
 
 #include "config.h"
 #include "netcdf.h"
+
+/**
+For netcdf4 files, capture state information about the following:
+1. Global: netcdf library version
+2. Global: hdf5 library version
+3. Per file: superblock version
+4. Per File: was it created by netcdf-4?
+5. Per file: _NCProperties attribute
+*/
 
 /**************************************************/
 /**
@@ -66,8 +75,8 @@ fact may be changed if we can (over time) modify our test cases.
 
 */
 
-#define NCPROPS_VERSION (1)
 #define NCPROPS "_NCProperties"
+#define NCPROPS_VERSION (1)
 #define NCPROPSSEP  '|'
 #define NCPROPS_LENGTH (8192)
 
@@ -76,26 +85,44 @@ fact may be changed if we can (over time) modify our test cases.
 #define NCPHDF5LIBVERSION "hdf5libversion"
 #define NCPNCLIBVERSION "netcdflibversion"
 
+/* Other hidden attributes */
+#define ISNETCDF4ATT "_IsNetcdf4"
+#define SUPERBLOCKATT "_SuperblockVersion"
+
 /**************************************************/
-struct  NCProperties {
-	    int flags;
-#		define NCP_CREATE 1
-	    int version; /* > 0; 0 => file has no NCPROPS attribute */
-	    char hdf5libver[NC_MAX_NAME+1];
-	    char netcdflibver[NC_MAX_NAME+1];
-	    char text[NCPROPS_LENGTH+1];
+
+struct NCPROPINFO {
+    int version;
+    char hdf5ver[NC_MAX_NAME+1];
+    char netcdfver[NC_MAX_NAME+1];
+    char text[NCPROPS_LENGTH+1]; /* Value of the NCPROPS attribute */
 };
 
-extern struct NCProperties globalncproperties;
+struct NCFILEINFO {
+    int isnetcdf4; /* Does this file appear to have been created by netcdf4 */ 
+    int superblockversion;
+#if 0
+    int flags;
+#	define NCP_CREATE 1
+#endif
+    /* Following is filled from NCPROPS attribute or from global version */
+    struct NCPROPINFO propattr;
+};
+
+/**************************************************/
+
+extern struct NCPROPINFO globalpropinfo;
 
 /*Forward*/
 struct NC_HDF5_FILE_INFO;
 
-extern int NC_properties_init(void);
-extern int NC_get_ncproperties(struct NC_HDF5_FILE_INFO* info);
-extern int NC_put_ncproperties(struct NC_HDF5_FILE_INFO* info);
+extern int NC_fileinfo_init(void); /*libsrc4/ncinfo.c*/
+extern int NC_get_fileinfo(struct NC_HDF5_FILE_INFO* info); /*libsrc4/ncinfo.c*/
+extern int NC_put_propattr(struct NC_HDF5_FILE_INFO* info); /*libsrc4/ncinfo.c*/
+extern int NC_isnetcdf4(struct NC_HDF5_FILE_INFO*, int*);/*libsrc4/ncinfo.c*/
 
-/* ENABLE_PROPATTR => ENABLE_NETCDF4 */
+/* ENABLE_FILEINFO => ENABLE_NETCDF4 */
 extern int NC4_hdf5get_libversion(unsigned*,unsigned*,unsigned*);/*libsrc4/nc4hdf.c*/
+extern int NC4_hdf5get_superblock(struct NC_HDF5_FILE_INFO*, int*);/*libsrc4/nc4hdf.c*/
 
-#endif /* _NCPROPS_H_ */
+#endif /* _NCINFO_H_ */
