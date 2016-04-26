@@ -49,7 +49,7 @@ typedef int ssize_t;
 #include "isnan.h"
 #include "cdl.h"
 #include "nc.h" /* to get name of the special properties file */
-#include "ncprops.h"
+#include "ncinfo.h"
 
 #define XML_VERSION "1.0"
 
@@ -959,33 +959,6 @@ pr_att_global_format(
     printf (" ;\n");
 }
 
-/*
- * Print special _NCProperties global attribute, otherwise hidden.
- */
-static void
-pr_att_global_properties(
-    int ncid,
-    int kind
-    )
-{
-#ifdef ENABLE_PROPATTR
-    int stat;
-    size_t len;
-    char propdata[NCPROPS_LENGTH];
-    /* Always look for the NCPROPS attribute */
-    stat = nc_inq_att(ncid,NC_GLOBAL,NCPROPS,NULL,&len);
-    if(stat == NC_NOERR && len < sizeof(propdata)) {
-	stat = nc_get_att_text(ncid,NC_GLOBAL,NCPROPS,propdata);
-	if(stat == NC_NOERR) {
-	    pr_att_name(ncid, "", NCPROPS);
-	    /* make sure its null terminated */
-	    propdata[NCPROPS_LENGTH-1] = '\0';
-	    printf(" = \"%s\" ;\n",propdata);
-	}
-    }
-#endif
-}
-
 #ifdef USE_NETCDF4
 /*
  * Print special reserved variable attributes, such as _Chunking,
@@ -1087,6 +1060,7 @@ pr_att_specials(
 	    printf(" = \"true\" ;\n");
 	}
     }
+
     /* TODO: handle _Nbit when inquire function is available */
 
     /* TODO: handle _ScaleOffset when inquire is available */
@@ -1095,6 +1069,56 @@ pr_att_specials(
 }
 #endif /* USE_NETCDF4 */
 
+#ifdef ENABLE_FILEINFO /*=>NETCDF4*/
+static void
+pr_att_hidden(
+    int ncid,
+    int kind
+    )
+{
+    int stat;
+    size_t len;
+    char propdata[NCPROPS_LENGTH];
+
+    /* No special variable attributes for classic or 64-bit offset data */
+    if(kind == 1 || kind == 2)
+	return;
+    /* Print out Selected hidden attributes */
+    /* NCPROPS */
+    stat = nc_inq_att(ncid,NC_GLOBAL,NCPROPS,NULL,&len);
+    if(stat == NC_NOERR && len < sizeof(propdata)) {
+        stat = nc_get_att_text(ncid,NC_GLOBAL,NCPROPS,propdata);
+        if(stat == NC_NOERR) {
+            pr_att_name(ncid, "", NCPROPS);
+            /* make sure its null terminated */
+            propdata[NCPROPS_LENGTH-1] = '\0';
+            printf(" = \"%s\" ;\n",propdata);
+        }
+    }
+    /* _SuperblockVersion */
+    stat = nc_inq_att(ncid,NC_GLOBAL,SUPERBLOCKATT,NULL,&len);
+    if(stat == NC_NOERR && len == 1) {
+        int sbversion;
+        stat = nc_get_att_int(ncid,NC_GLOBAL,SUPERBLOCKATT,&sbversion);
+        if(stat == NC_NOERR) {
+            pr_att_name(ncid, "", SUPERBLOCKATT);
+            printf(" = %d ;\n",sbversion);
+        }
+    }
+#if 0
+    /* _Netcdf4 */
+    stat = nc_inq_att(ncid,NC_GLOBAL,NETCDF4ATT,NULL,&len);
+    if(stat == NC_NOERR && len == 1) {
+        int isnc4;
+        stat = nc_get_att_int(ncid,NC_GLOBAL,NETCDF4ATT,&isnc4);
+        if(stat == NC_NOERR) {
+            pr_att_name(ncid, "", NETCDF4ATT);
+            printf(" = \"%s\" ;\n",isnc4?"true":"false");
+        }
+    }
+#endif
+}
+#endif /* ENABLE_FILEINFO */
 
 /*
  * Print a variable attribute for NcML
@@ -1709,13 +1733,7 @@ do_ncdump_rec(int ncid, const char *path)
 #endif /* USE_NETCDF4 */
    }
 
-   /* get global attributes */
-   if (is_root
-       && ngatts == 0
-       && !formatting_specs.special_atts
-      ) {
-	/* do nothing */
-   } else if (ngatts > 0 || formatting_specs.special_atts) {
+   if (ngatts > 0 || formatting_specs.special_atts) {
       printf ("\n");
       indent_out();
       if (is_root)
@@ -1728,9 +1746,10 @@ do_ncdump_rec(int ncid, const char *path)
    }
    if (is_root && formatting_specs.special_atts) { /* output special attribute
 					   * for format variant */
+       pr_att_hidden(ncid, kind);
        pr_att_global_format(ncid, kind);
-       pr_att_global_properties(ncid, kind);
    }
+
    fflush(stdout);
 
    /* output variable data, unless "-h" option specified header only

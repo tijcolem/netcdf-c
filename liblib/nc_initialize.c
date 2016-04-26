@@ -11,7 +11,7 @@
 
 #include "ncdispatch.h"
 #include "nc4internal.h"
-#include "ncprops.h"
+#include "ncinfo.h"
 
 extern int NC3_initialize(void);
 extern int NC3_finalize(void);
@@ -70,8 +70,8 @@ nc_initialize()
     if((stat = NC4_initialize())) goto done;
 #endif /* USE_NETCDF4 */
 
-#ifdef ENABLE_PROPATTR
-    stat = NC_properties_init();
+#ifdef ENABLE_FILEINFO
+    stat = NC_fileinfo_init();
 #endif
 
 done:

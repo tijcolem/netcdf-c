@@ -3855,7 +3855,7 @@ NC4_test_netcdf4(void)
     return NC_NOERR;
 }
 
-#ifdef ENABLE_PROPATTR
+#ifdef ENABLE_FILEINFO
 int
 NC4_hdf5get_libversion(unsigned* major,unsigned* minor,unsigned* release)
 {
@@ -3863,4 +3863,83 @@ NC4_hdf5get_libversion(unsigned* major,unsigned* minor,unsigned* release)
 	return NC_EHDFERR;
     return NC_NOERR;
 }
+
+int
+NC4_hdf5get_superblock(struct NC_HDF5_FILE_INFO* h5, int* idp)
+{
+    int stat = NC_NOERR;
+    unsigned super;
+    hid_t plist = -1;
+    if((plist = H5Fget_create_plist(h5->hdfid)))
+	{stat = NC_EHDFERR; goto done;}
+    if(H5Pget_version(plist, &super, NULL, NULL, NULL) < 0) 
+	{stat = NC_EHDFERR; goto done;}
+    if(idp) *idp = (int)super;
+done:
+    if(plist >= 0) H5Pclose(plist);
+    return stat;
+}
+
+
 #endif
+
+void
+reportobject(hid_t id, unsigned int type)
+{
+#   define MAXNAME 1024
+    char name[MAXNAME];
+    ssize_t len;
+       
+    len = H5Iget_name(id, name, MAXNAME);
+    if(len < 0) return;
+    name[len] = '\0';
+
+    switch (type) {
+    case H5F_OBJ_FILE:
+	LOG((0,"Type = File(%8u) name='%s'",id,name));
+	break;
+    case H5F_OBJ_DATASET:
+	LOG((0,"Type = Dataset(%8u) name='%s'",id,name));
+	break;
+    case H5F_OBJ_GROUP:
+	LOG((0,"Type = Group(%8u) name='%s'",id,name));
+	break;
+    case H5F_OBJ_DATATYPE:
+	LOG((0,"Type = Datatype(%8u) name='%s'",id,name));
+	break;
+    case H5F_OBJ_ATTR:
+	len = H5Aget_name(id, MAXNAME, name);
+        if(len < 0) return;
+        name[len] = '\0';
+	LOG((0,"Type = Attribute(%8u) name='%s'",id,name));
+	break;
+    default: return;
+    }
+}
+
+static unsigned int OTYPES[5] = {H5F_OBJ_FILE, H5F_OBJ_DATASET, H5F_OBJ_GROUP, H5F_OBJ_DATATYPE, H5F_OBJ_ATTR};
+
+void
+reportopenobjectsT(hid_t fid, int ntypes, unsigned int* otypes)
+{
+    int t,i;
+    ssize_t ocount;
+    size_t maxobjs = 100;
+    hid_t idlist[100];
+
+    for(t=0;t<ntypes;t++) {    
+	unsigned int ot = otypes[t];
+	if(ot < 0) break;
+        ocount = H5Fget_obj_ids(fid,ot,maxobjs,idlist);
+	for(i=0;i<ocount;i++) {
+	    hid_t o = idlist[i];
+	    reportobject(o,ot);
+	}
+    }
+}
+
+void
+reportopenobjects(hid_t fid)
+{
+    reportopenobjectsT(fid,5,OTYPES);
+}

@@ -4,7 +4,7 @@
  *   Copyright 1993, UCAR/Unidata
  *   See netcdf/COPYRIGHT file for copying and redistribution conditions.
  *   $Header: /upc/share/CVS/netcdf-3/ncgen/ncgen.h,v 1.18 2010/06/01 15:34:53 ed Exp $
- *********************************************************************/
+*********************************************************************/
 
 #ifdef _MSC_VER
 #include <float.h>
@@ -71,7 +71,7 @@ typedef nc_type nc_subclass;
 
 /*
 Define data structure
-to hold special attribute values
+xto hold special attribute values
 for a given variable.
 Global values are kept as
 various C global variables
@@ -79,6 +79,7 @@ various C global variables
 
 /* Define a bit set for indicating which*/
 /* specials were explicitly specified*/
+/* See also: ncgen.y.tag2name */
 #define _STORAGE_FLAG       0x001
 #define _CHUNKSIZES_FLAG    0x002
 #define _FLETCHER32_FLAG    0x004
@@ -87,8 +88,16 @@ various C global variables
 #define _ENDIAN_FLAG        0x020
 #define _NOFILL_FLAG        0x040
 #define _FILLVALUE_FLAG     0x080
-#define _NETCDF4_FLAG       0x100
-#define _FORMAT_FLAG        0x200
+#define _NCPROPS_FLAG       0x100
+#define _ISNETCDF4_FLAG     0x200
+#define _SUPERBLOCK_FLAG    0x400
+#define _FORMAT_FLAG        0x800
+
+extern struct Specialtoken {
+    char* name;
+    int   token;
+    int   tag;
+} specials[];
 
 /* Define an enumeration of supported languages */
 typedef enum Language {
@@ -119,8 +128,14 @@ typedef struct Specialdata {
     int           _Shuffle;      /* 0 => false, 1 => true*/
     int           _Endianness;   /* 1 =>little, 2 => big*/
     int           _Fill ;        /* 0 => false, 1 => true WATCHOUT: this is inverse of NOFILL*/
-    int           _Netcdf4 ;     /* 0 => false, 1 => true */
 } Specialdata;
+
+typedef struct GlobalSpecialdata {
+    int           _Format ;      /* kflag */
+    const char*   _NCProperties ;    
+    int           _IsNetcdf4 ;   /* 0 => false, 1 => true */
+    int           _Superblock  ; /* HDF5 file superblock version */
+} GlobalSpecialData;
 
 /* Track a set of dimensions*/
 /* (Note: the netcdf type system is deficient here)*/

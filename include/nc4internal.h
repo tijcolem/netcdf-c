@@ -25,8 +25,8 @@
 #include "netcdf.h"
 #include "netcdf_f.h"
 
-#ifdef ENABLE_PROPATTR
-#include "ncprops.h"
+#ifdef ENABLE_FILEINFO
+#include "ncinfo.h"
 #endif
 
 /* Always needed */
@@ -318,8 +318,8 @@ typedef struct  NC_HDF5_FILE_INFO
    nc_bool_t hdf4;              /* True for HDF4 file */
    int sdid;
 #endif /* USE_HDF4 */
-#ifdef ENABLE_PROPATTR
-   struct NCProperties properties;
+#ifdef ENABLE_FILEINFO
+   struct NCFILEINFO fileinfo;
 #endif
 } NC_HDF5_FILE_INFO_T;
 
@@ -426,5 +426,15 @@ int log_metadata_nc(NC *nc);
 /* Define accessors for the dispatchdata */
 #define NC4_DATA(nc) ((NC_HDF5_FILE_INFO_T*)(nc)->dispatchdata)
 #define NC4_DATA_SET(nc,data) ((nc)->dispatchdata = (void*)(data))
+
+/* Reserved Attributes */
+extern const char* NC_RESERVED_VARATT_LIST[];
+extern const char* NC_RESERVED_ATT_LIST[];
+#define NC_ATT_REFERENCE_LIST "REFERENCE_LIST"
+#define NC_ATT_CLASS "CLASS"
+#define NC_ATT_DIMENSION_LIST "DIMENSION_LIST"
+#define NC_ATT_NAME "NAME"
+#define NC_ATT_COORDINATES "COORDINATES"
+#define NC_ATT_FORMAT "_Format"
 
 #endif /* _NETCDF4_ */
