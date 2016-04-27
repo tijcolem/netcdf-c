@@ -3887,6 +3887,11 @@ void
 reportobject(hid_t id, unsigned int type)
 {
 #   define MAXNAME 1024
+#if 1
+#define REPORT(f,e1,e2) {fprintf(stdout,f,e1,e2); fprintf(stdout,"\n"); fflush(stdout);}
+#else
+#define REPORT(f,e1,e2) LOG((0,f,e1,e2))
+#endif
     char name[MAXNAME];
     ssize_t len;
        
@@ -3896,22 +3901,22 @@ reportobject(hid_t id, unsigned int type)
 
     switch (type) {
     case H5F_OBJ_FILE:
-	LOG((0,"Type = File(%8u) name='%s'",id,name));
+	REPORT("Type = File(%8u) name='%s'",id,name);
 	break;
     case H5F_OBJ_DATASET:
-	LOG((0,"Type = Dataset(%8u) name='%s'",id,name));
+	REPORT("Type = Dataset(%8u) name='%s'",id,name);
 	break;
     case H5F_OBJ_GROUP:
-	LOG((0,"Type = Group(%8u) name='%s'",id,name));
+	REPORT("Type = Group(%8u) name='%s'",id,name);
 	break;
     case H5F_OBJ_DATATYPE:
-	LOG((0,"Type = Datatype(%8u) name='%s'",id,name));
+	REPORT("Type = Datatype(%8u) name='%s'",id,name);
 	break;
     case H5F_OBJ_ATTR:
 	len = H5Aget_name(id, MAXNAME, name);
         if(len < 0) return;
         name[len] = '\0';
-	LOG((0,"Type = Attribute(%8u) name='%s'",id,name));
+	REPORT("Type = Attribute(%8u) name='%s'",id,name);
 	break;
     default: return;
     }
@@ -3924,9 +3929,13 @@ reportopenobjectsT(hid_t fid, int ntypes, unsigned int* otypes)
 {
     int t,i;
     ssize_t ocount;
-    size_t maxobjs = 100;
-    hid_t idlist[100];
+    size_t maxobjs = -1;
+    hid_t* idlist = NULL;
 
+    fprintf(stdout,"\nReport: open objects on %d\n",fid);
+    maxobjs = H5Fget_obj_count(fid,H5F_OBJ_ALL);
+    if(idlist != NULL) free(idlist);
+    idlist = (hid_t*)malloc(sizeof(hid_t)*maxobjs);
     for(t=0;t<ntypes;t++) {    
 	unsigned int ot = otypes[t];
 	if(ot < 0) break;
@@ -3936,6 +3945,7 @@ reportopenobjectsT(hid_t fid, int ntypes, unsigned int* otypes)
 	    reportobject(o,ot);
 	}
     }
+    if(idlist != NULL) free(idlist);
 }
 
 void

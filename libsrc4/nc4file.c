@@ -462,9 +462,6 @@ nc4_create_file(const char *path, int cmode, MPI_Comm comm, MPI_Info info,
    nc4_info->flags |= NC_INDEF;
 
 #ifdef ENABLE_FILEINFO
-#if 0
-   nc4_info->properties.flags |= NCP_CREATE;   
-#endif
    nc4_info->fileinfo.propattr = globalpropinfo; /* Initialize */
    NC_get_fileinfo(nc4_info);
    NC_put_propattr(nc4_info);
@@ -1859,7 +1856,7 @@ exit:
 static int
 read_grp_atts(NC_GRP_INFO_T *grp)
 {
-   hid_t attid = 0;
+   hid_t attid = -1;
    hsize_t num_obj, i;
    NC_ATT_INFO_T *att;
    NC_TYPE_INFO_T *type;
@@ -1871,23 +1868,21 @@ read_grp_atts(NC_GRP_INFO_T *grp)
    num_obj = H5Aget_num_attrs(grp->hdf_grpid);
    for (i = 0; i < num_obj; i++)
    {
-      /* Close an attribute from previous loop iteration */
-      /* (Should be from 'continue' statement, below) */
-      if (attid && H5Aclose(attid) < 0)
-         BAIL(NC_EHDFERR);
-
       if ((attid = H5Aopen_idx(grp->hdf_grpid, (unsigned int)i)) < 0)
          BAIL(NC_EATTMETA);
       if (H5Aget_name(attid, NC_MAX_NAME + 1, obj_name) < 0)
          BAIL(NC_EATTMETA);
       LOG((3, "reading attribute of _netCDF group, named %s", obj_name));
 
-      /* See if this a hidden attribute */
+      /* See if this a hidden, global attribute */
       if(grp->nc4_info->root_grp == grp) {
 	const char** reserved = NC_RESERVED_ATT_LIST;
 	hidden = 0;
 	for(;*reserved;reserved++) {
-	    if(strcmp(*reserved,obj_name)==0) {hidden = 1; break;}
+	    if(strcmp(*reserved,obj_name)==0) {
+		hidden = 1;
+		break;
+	    }
 	}
       }
 
@@ -1909,26 +1904,37 @@ read_grp_atts(NC_GRP_INFO_T *grp)
          strncpy(att->name, obj_name, max_len);
          att->name[max_len] = 0;
          att->attnum = grp->natts++;
-         if ((retval = read_hdf5_att(grp, attid, att)))
-         {
-            if (NC_EBADTYPID == retval)
-            {
-               if ((retval = nc4_att_list_del(&grp->att, att)))
+         retval = read_hdf5_att(grp, attid, att);
+         if(retval == NC_EBADTYPID) {
+               if((retval = nc4_att_list_del(&grp->att, att)))
                   BAIL(retval);
-               continue;
-            }
-            else
+	 } else if(retval) {
                BAIL(retval);
-         }
-         att->created = NC_TRUE;
-         if ((retval = nc4_find_type(grp->nc4_info, att->nc_typeid, &type)))
-            BAIL(retval);
+         } else {
+             att->created = NC_TRUE;
+	     if ((retval = nc4_find_type(grp->nc4_info, att->nc_typeid, &type)))
+            	BAIL(retval);
+	 }
       }
+      /* Unconditionally close the open attribute */
+      H5Aclose(attid);
+fprintf(stdout,"\n====\n");
+fprintf(stdout,"iteration=%d\n",i);
+fprintf(stdout,"\thidden=%d\n",hidden);
+fprintf(stdout,"\tname=%s\n",obj_name);
+reportopenobjects(grp->nc4_info->hdfid);
+fprintf(stdout,"====\n");
+      attid = -1;
    }
 
-  exit:
-   if (attid > 0 && H5Aclose(attid) < 0)
-      BAIL2(NC_EHDFERR);
+exit:
+   if (attid > 0) {
+	if(H5Aclose(attid) < 0)
+            BAIL2(NC_EHDFERR);
+   }
+fprintf(stdout,"\n----\n");
+reportopenobjects(grp->nc4_info->hdfid);
+fprintf(stdout,"----\n");
    return retval;
 }
 
@@ -3149,7 +3155,10 @@ close_netcdf4_file(NC_HDF5_FILE_INFO_T *h5, int abort)
 	  * out. */
          LOG((0, "There are %d HDF5 objects open!", nobjs));
 	 /* Print them out */
+fprintf(stdout,"\n-------------------------\n");
+         fprintf(stdout,"There are %d HDF5 objects open!", nobjs);
 	 reportopenobjects(h5->hdfid);
+fprintf(stdout,"\n-------------------------\n");
 #endif
 	}
       }
@@ -3387,5 +3396,7 @@ static void
 checkcreate(NC* nc0, const char* path)
 {
     unsigned int FT[1] = {H5F_OBJ_FILE};
-    reportopenobjectsT(H5F_OBJ_ALL,1,FT);
+#if 0
+    reportopenobjects(H5F_OBJ_ALL);
+#endif
 }
