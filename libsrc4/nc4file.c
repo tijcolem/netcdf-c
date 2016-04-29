@@ -27,6 +27,11 @@ COPYRIGHT file for copying and redistribution conditions.
 #include <hdf5_hl.h>
 #endif
 
+/* When we have open objects at file close, should
+   we log them or print to stdout. Default is to log
+*/
+#define LOGOPEN 1
+
 /* This is to track opened HDF5 objects to make sure they are
  * closed. */
 #ifdef EXTRA_TESTS
@@ -42,8 +47,7 @@ static const int ILLEGAL_OPEN_FLAGS = (NC_MMAP|NC_64BIT_OFFSET);
 
 static const int ILLEGAL_CREATE_FLAGS = (NC_NOWRITE|NC_MMAP|NC_INMEMORY|NC_64BIT_OFFSET|NC_CDF5);
 
-extern void reportopenobjectsT(hid_t,int,unsigned int*);
-extern void reportopenobjects(hid_t);
+extern void reportopenobjects(int log, hid_t);
 
 /*! Struct to track information about objects in a group, for nc4_rec_read_metadata()
 
@@ -74,7 +78,6 @@ typedef struct NC4_rec_read_metadata_ud
 static int NC4_enddef(int ncid);
 static int nc4_rec_read_metadata(NC_GRP_INFO_T *grp);
 static int close_netcdf4_file(NC_HDF5_FILE_INFO_T *h5, int abort);
-static void checkcreate(NC* nc, const char* path);
 
 /* Define the names of attributes to ignore
  * added by the HDF5 dimension scale; these
@@ -88,6 +91,7 @@ NC_ATT_DIMENSION_LIST,
 NC_ATT_NAME,
 NC_ATT_COORDINATES,
 NC_DIMID_ATT_NAME,
+NULL
 };
 
 /* Define the names of attributes to ignore
@@ -104,6 +108,16 @@ SUPERBLOCKATT,
 #endif
 NULL
 };
+
+#ifdef ENABLE_FILEINFO
+/* Define the subset of the reserved list that is readable by name only */
+const char* NC_RESERVED_SPECIAL_LIST[] = {
+ISNETCDF4ATT,
+SUPERBLOCKATT,
+NCPROPS,
+NULL
+};
+#endif
 
 /* These are the default chunk cache sizes for HDF5 files created or
  * opened with netCDF-4. */
@@ -438,7 +452,6 @@ nc4_create_file(const char *path, int cmode, MPI_Comm comm, MPI_Info info,
       BAIL(NC_EHDFERR);
 
    /* Create the file. */
-   checkcreate(nc,path);
    if ((nc4_info->hdfid = H5Fcreate(path, flags, fcpl_id, fapl_id)) < 0)
         /*Change the return error from NC_EFILEMETADATA to
           System error EACCES because that is the more likely problem */
@@ -450,8 +463,7 @@ nc4_create_file(const char *path, int cmode, MPI_Comm comm, MPI_Info info,
       BAIL(NC_EFILEMETA);
 
    /* Release the property lists. */
-   if (H5Pclose(fapl_id) < 0 ||
-       H5Pclose(fcpl_id) < 0)
+   if (H5Pclose(fapl_id) < 0 || H5Pclose(fcpl_id) < 0)
       BAIL(NC_EHDFERR);
 #ifdef EXTRA_TESTS
    num_plists--;
@@ -462,9 +474,8 @@ nc4_create_file(const char *path, int cmode, MPI_Comm comm, MPI_Info info,
    nc4_info->flags |= NC_INDEF;
 
 #ifdef ENABLE_FILEINFO
-   nc4_info->fileinfo.propattr = globalpropinfo; /* Initialize */
-   NC_get_fileinfo(nc4_info);
-   NC_put_propattr(nc4_info);
+   NC4_get_fileinfo(nc4_info,&globalpropinfo);
+   NC4_put_propattr(nc4_info);
 #endif  
 
    return NC_NOERR;
@@ -1918,12 +1929,6 @@ read_grp_atts(NC_GRP_INFO_T *grp)
       }
       /* Unconditionally close the open attribute */
       H5Aclose(attid);
-fprintf(stdout,"\n====\n");
-fprintf(stdout,"iteration=%d\n",i);
-fprintf(stdout,"\thidden=%d\n",hidden);
-fprintf(stdout,"\tname=%s\n",obj_name);
-reportopenobjects(grp->nc4_info->hdfid);
-fprintf(stdout,"====\n");
       attid = -1;
    }
 
@@ -1932,9 +1937,6 @@ exit:
 	if(H5Aclose(attid) < 0)
             BAIL2(NC_EHDFERR);
    }
-fprintf(stdout,"\n----\n");
-reportopenobjects(grp->nc4_info->hdfid);
-fprintf(stdout,"----\n");
    return retval;
 }
 
@@ -2278,7 +2280,6 @@ nc4_open_file(const char *path, int mode, void* parameters, NC *nc)
       BAIL(NC_EHDFERR);
 #endif
 
-
 #ifdef USE_PARALLEL4
    /* If this is a parallel file create, set up the file creation
       property list. */
@@ -2373,7 +2374,7 @@ nc4_open_file(const char *path, int mode, void* parameters, NC *nc)
 #endif
 
 #ifdef ENABLE_FILEINFO
-    NC_get_fileinfo(nc4_info);
+   NC4_get_fileinfo(nc4_info,NULL);
 #endif
 
    return NC_NOERR;
@@ -3139,6 +3140,11 @@ close_netcdf4_file(NC_HDF5_FILE_INFO_T *h5, int abort)
               MPI_Info_free(&h5->info);
       }
 #endif
+
+#ifdef ENABLE_FILEINFO
+      if(h5->fileinfo) free(h5->fileinfo);
+#endif
+
       if (H5Fclose(h5->hdfid) < 0)
       {
 	int nobjs;
@@ -3149,18 +3155,22 @@ close_netcdf4_file(NC_HDF5_FILE_INFO_T *h5, int abort)
           BAIL_QUIET(NC_EHDFERR);
 	} else if(nobjs > 0) {
 #ifdef LOGGING
+	 char msg[1024];
+	 int logit = 1;
 	 /* If the close doesn't work, probably there are still some HDF5
 	  * objects open, which means there's a bug in the library. So
 	  * print out some info on to help the poor programmer figure it
 	  * out. */
-         LOG((0, "There are %d HDF5 objects open!", nobjs));
-	 /* Print them out */
-fprintf(stdout,"\n-------------------------\n");
-         fprintf(stdout,"There are %d HDF5 objects open!", nobjs);
-	 reportopenobjects(h5->hdfid);
-fprintf(stdout,"\n-------------------------\n");
+	snprintf(msg,sizeof(msg),"There are %d HDF5 objects open!", nobjs);
+#ifdef LOGOPEN
+         LOG((0, msg));
+#else
+         fprintf(stdout,msg);
+	 logit = 0;
 #endif
+	 reportopenobjects(logit,h5->hdfid);
 	}
+#endif
       }
    }
 
@@ -3391,12 +3401,3 @@ nc_use_parallel_enabled()
    return 0;
 }
 #endif /* USE_PARALLEL4 */
-
-static void
-checkcreate(NC* nc0, const char* path)
-{
-    unsigned int FT[1] = {H5F_OBJ_FILE};
-#if 0
-    reportopenobjects(H5F_OBJ_ALL);
-#endif
-}

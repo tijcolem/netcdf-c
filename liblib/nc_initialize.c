@@ -11,7 +11,6 @@
 
 #include "ncdispatch.h"
 #include "nc4internal.h"
-#include "ncinfo.h"
 
 extern int NC3_initialize(void);
 extern int NC3_finalize(void);
@@ -71,7 +70,7 @@ nc_initialize()
 #endif /* USE_NETCDF4 */
 
 #ifdef ENABLE_FILEINFO
-    stat = NC_fileinfo_init();
+    stat = NC4_fileinfo_init();
 #endif
 
 done:
