@@ -37,8 +37,8 @@ typedef int ssize_t;
 #ifdef HAVE_LOCALE_H
 #include <locale.h>
 #endif	/* HAVE_LOCALE_H */
-#include <netcdf.h>
-#include <netcdf_mem.h>
+#include "netcdf.h"
+#include "netcdf_mem.h"
 #include "utils.h"
 #include "nccomps.h"
 #include "nctime0.h"		/* new iso time and calendar stuff */
@@ -48,8 +48,7 @@ typedef int ssize_t;
 #include "indent.h"
 #include "isnan.h"
 #include "cdl.h"
-#include "nc.h" /* to get name of the special properties file */
-#include "ncinfo.h"
+#include "nc4internal.h" /* to get name of the special properties file */
 
 #define XML_VERSION "1.0"
 
@@ -1105,18 +1104,16 @@ pr_att_hidden(
             printf(" = %d ;\n",sbversion);
         }
     }
-#if 0
-    /* _Netcdf4 */
-    stat = nc_inq_att(ncid,NC_GLOBAL,NETCDF4ATT,NULL,&len);
+    /* _IsNetcdf4 */
+    stat = nc_inq_att(ncid,NC_GLOBAL,ISNETCDF4ATT,NULL,&len);
     if(stat == NC_NOERR && len == 1) {
         int isnc4;
-        stat = nc_get_att_int(ncid,NC_GLOBAL,NETCDF4ATT,&isnc4);
+        stat = nc_get_att_int(ncid,NC_GLOBAL,ISNETCDF4ATT,&isnc4);
         if(stat == NC_NOERR) {
-            pr_att_name(ncid, "", NETCDF4ATT);
-            printf(" = \"%s\" ;\n",isnc4?"true":"false");
+            pr_att_name(ncid, "", ISNETCDF4ATT);
+            printf(" = \"%\" ;\n",isnc4?1:0);
         }
     }
-#endif
 }
 #endif /* ENABLE_FILEINFO */
 

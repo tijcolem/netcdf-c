@@ -25,10 +25,6 @@
 #include "netcdf.h"
 #include "netcdf_f.h"
 
-#ifdef ENABLE_FILEINFO
-#include "ncinfo.h"
-#endif
-
 /* Always needed */
 #include "nc.h"
 
@@ -103,6 +99,11 @@ typedef enum {VAR, DIM, ATT} NC_OBJ_T;
 
 /* Boolean type, to make the code easier to read */
 typedef enum {NC_FALSE = 0, NC_TRUE = 1} nc_bool_t;
+
+#ifdef ENABLE_FILEINFO
+/*Forward*/
+struct NCFILEINFO;
+#endif
 
 /* Generic doubly-linked list node */
 typedef struct NC_LIST_NODE
@@ -290,6 +291,7 @@ typedef struct NC_GRP_INFO
 #define NC_NDIRTY 0x40	/* numrecs has changed */
 #define NC_HDIRTY 0x80  /* header info has changed */
 
+
 /* This is the metadata we need to keep track of for each
    netcdf-4/HDF5 file. */
 typedef struct  NC_HDF5_FILE_INFO
@@ -319,7 +321,7 @@ typedef struct  NC_HDF5_FILE_INFO
    int sdid;
 #endif /* USE_HDF4 */
 #ifdef ENABLE_FILEINFO
-   struct NCFILEINFO fileinfo;
+   struct NCFILEINFO* fileinfo;
 #endif
 } NC_HDF5_FILE_INFO_T;
 
@@ -414,8 +416,8 @@ int nc4_normalize_name(const char *name, char *norm_name);
 int nc4_check_dup_name(NC_GRP_INFO_T *grp, char *norm_name);
 
 /* HDF5 initialization */
-static int nc4_hdf5_initialized;
-void nc4_hdf5_initialize(void);
+extern int nc4_hdf5_initialized;
+extern void nc4_hdf5_initialize(void);
 
 /* This is only included if --enable-logging is used for configure; it
    prints info about the metadata to stderr. */
@@ -430,11 +432,61 @@ int log_metadata_nc(NC *nc);
 /* Reserved Attributes */
 extern const char* NC_RESERVED_VARATT_LIST[];
 extern const char* NC_RESERVED_ATT_LIST[];
+extern const char* NC_RESERVED_SPECIAL_LIST[];
 #define NC_ATT_REFERENCE_LIST "REFERENCE_LIST"
 #define NC_ATT_CLASS "CLASS"
 #define NC_ATT_DIMENSION_LIST "DIMENSION_LIST"
 #define NC_ATT_NAME "NAME"
 #define NC_ATT_COORDINATES "COORDINATES"
 #define NC_ATT_FORMAT "_Format"
+
+/**************************************************/
+/**
+For netcdf4 files, capture state information about the following:
+1. Global: netcdf library version
+2. Global: hdf5 library version
+3. Per file: superblock version
+4. Per File: was it created by netcdf-4?
+5. Per file: _NCProperties attribute
+*/
+
+#ifdef ENABLE_FILEINFO
+
+#define NCPROPS "_NCProperties"
+#define NCPROPS_VERSION (1)
+#define NCPROPSSEP  '|'
+#define NCPROPS_LENGTH (8192)
+
+/* Currently used properties */
+#define NCPVERSION "version" /* Of the properties format */
+#define NCPHDF5LIBVERSION "hdf5libversion"
+#define NCPNCLIBVERSION "netcdflibversion"
+
+/* Other hidden attributes */
+#define ISNETCDF4ATT "_IsNetcdf4"
+#define SUPERBLOCKATT "_SuperblockVersion"
+
+struct NCFILEINFO {
+    int superblockversion;
+    /* Following is filled from NCPROPS attribute or from global version */
+    struct NCPROPINFO {
+        int version; /* 0 => not defined */
+        char hdf5ver[NC_MAX_NAME+1];
+        char netcdfver[NC_MAX_NAME+1];
+        char text[NCPROPS_LENGTH+1]; /* Value of the NCPROPS attribute */
+    } propattr;
+};
+
+extern struct NCPROPINFO globalpropinfo;
+
+extern int NC4_fileinfo_init(void); /*libsrc4/ncinfo.c*/
+extern int NC4_get_fileinfo(struct NC_HDF5_FILE_INFO* info, struct NCPROPINFO*); /*libsrc4/ncinfo.c*/
+extern int NC4_put_propattr(struct NC_HDF5_FILE_INFO* info); /*libsrc4/ncinfo.c*/
+
+/* ENABLE_FILEINFO => ENABLE_NETCDF4 */
+extern int NC4_hdf5get_libversion(unsigned*,unsigned*,unsigned*);/*libsrc4/nc4hdf.c*/
+extern int NC4_hdf5get_superblock(struct NC_HDF5_FILE_INFO*, int*);/*libsrc4/nc4hdf.c*/
+extern int NC4_isnetcdf4(struct NC_HDF5_FILE_INFO*); /*libsrc4/nc4hdf.c*/
+#endif /*ENABLE_FILEINFO*/
 
 #endif /* _NETCDF4_ */

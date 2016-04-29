@@ -22,13 +22,6 @@ conditions.
 #endif
 
 #ifdef ENABLE_FILEINFO
-static const char* SPECIAL_LIST[] = {
-ISNETCDF4ATT,
-SUPERBLOCKATT,
-NCPROPS,
-NULL
-};
-
 static int nc4_get_att_special(NC_HDF5_FILE_INFO_T*, const char*, nc_type, int, void*, size_t*, int*);
 #endif
 
@@ -75,7 +68,7 @@ nc4_get_att(int ncid, NC *nc, int varid, const char *name,
 #ifdef ENABLE_FILEINFO
    if(nc->ext_ncid == ncid && varid == NC_GLOBAL) {	
 	const char** sp;
-	for(sp = SPECIAL_LIST;*sp;sp++) {
+	for(sp = NC_RESERVED_SPECIAL_LIST;*sp;sp++) {
 	    if(strcmp(name,*sp)==0) {
 		return nc4_get_att_special(h5, norm_name, mem_type, is_long, data, lenp, attnum);
 	    }
@@ -259,7 +252,7 @@ nc4_put_att(int ncid, NC *nc, int varid, const char *name,
 #ifdef ENABLE_FILEINFO
    if(nc->ext_ncid == ncid && varid == NC_GLOBAL) {	
 	const char** sp;
-	for(sp = SPECIAL_LIST;*sp;sp++) {
+	for(sp = NC_RESERVED_SPECIAL_LIST;*sp;sp++) {
 	    if(strcmp(name,*sp)==0) {
 		return NC_ENOTATT; /* Not settable */
 	    }
@@ -961,25 +954,30 @@ nc4_get_att_special(NC_HDF5_FILE_INFO_T *h5, const char* name, nc_type mem_type,
 {
     /* Always make the attr id be -1 */
     if(idp) *idp = -1;
-    if(strcmp(name,ISNETCDF4ATT)==0) {
-    } else if(strcmp(name,NCPROPS)==0) {
-	if(h5->fileinfo.propattr.version == 0)
+
+    if(strcmp(name,NCPROPS)==0) {
+	if(h5->fileinfo->propattr.version == 0)
 	    return NC_ENOTATT;
-	if(lenp) *lenp = strlen(h5->fileinfo.propattr.text);
-	if(data) strcpy((char*)data,h5->fileinfo.propattr.text);
-    } else if(strcmp(name,SUPERBLOCKATT)==0) {
-	unsigned long long sbv = (unsigned long long)h5->fileinfo.superblockversion;
+	if(lenp) *lenp = strlen(h5->fileinfo->propattr.text);
+	if(data) strcpy((char*)data,h5->fileinfo->propattr.text);
+    } else if(strcmp(name,ISNETCDF4ATT)==0
+              || strcmp(name,SUPERBLOCKATT)==0) {
+	unsigned long long iv = 0;
+	if(strcmp(name,SUPERBLOCKATT)==0)
+	    iv = (unsigned long long)h5->fileinfo->superblockversion;
+	else /* strcmp(name,ISNETCDF4ATT)==0 */
+	    iv = NC4_isnetcdf4(h5);
 	if(lenp) *lenp = 1;
 	if(data)
 	switch (mem_type) {
-	case NC_BYTE: *((char*)data) = (char)sbv; break;
-	case NC_SHORT: *((short*)data) = (short)sbv; break;
-	case NC_INT: *((int*)data) = (int)sbv; break;
-	case NC_UBYTE: *((unsigned char*)data) = (unsigned char)sbv; break;
-	case NC_USHORT: *((unsigned short*)data) = (unsigned short)sbv; break;
-	case NC_UINT: *((unsigned int*)data) = (unsigned int)sbv; break;
-	case NC_INT64: *((long long*)data) = (long long)sbv; break;
-	case NC_UINT64: *((unsigned long long*)data) = (unsigned long long)sbv; break;
+	case NC_BYTE: *((char*)data) = (char)iv; break;
+	case NC_SHORT: *((short*)data) = (short)iv; break;
+	case NC_INT: *((int*)data) = (int)iv; break;
+	case NC_UBYTE: *((unsigned char*)data) = (unsigned char)iv; break;
+	case NC_USHORT: *((unsigned short*)data) = (unsigned short)iv; break;
+	case NC_UINT: *((unsigned int*)data) = (unsigned int)iv; break;
+	case NC_INT64: *((long long*)data) = (long long)iv; break;
+	case NC_UINT64: *((unsigned long long*)data) = (unsigned long long)iv; break;
 	default:
 	    return NC_ERANGE;
 	}

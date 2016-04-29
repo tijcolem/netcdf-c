@@ -7,22 +7,27 @@
 Test _NCProperties and other special attributes
 */
 
-#include <hdf5.h>
-#include <nc_tests.h>
-#include <netcdf.h>
-#include "ncinfo.h"
+#include "config.h"
+#ifdef HAVE_UNISTD_H
+#include "unistd.h"
+#endif
 
-#define NC3FILE "nc3_ncproperties.nc"
-#define NC4FILE "nc4_ncproperties.nc"
-#define HDFFILE "hdf5_ncproperties.hdf"
+#include <hdf5.h>
+#include "nc_tests.h"
+#include "netcdf.h"
+#include "nc4internal.h"
+
+#define NC4FILE "nc4_fileinfo.nc"
+#define HDFFILE "hdf5_fileinfo.hdf"
 #define INT_ATT_NAME "int_attr"
 #define INT_VAR_NAME "int_var"
 #define GROUPNAME "subgroup"
+#define DIMNAME "time"
 
 int
 main(int argc, char **argv)
 {
-    printf("\n*** Testing '_NCProperties' attribute.\n");
+    printf("\n*** Testing 'Fileinfo attributes.\n");
 
     if(0) {
 	hid_t fileid;
@@ -66,11 +71,12 @@ main(int argc, char **argv)
     }
 
     {
-	int root, grpid, varid, stat;
+	int root, grpid, varid, stat, natts;
 	int data = 17;
 	const char* sdata = "text";
 	char ncprops[8192];
 	size_t len;
+	int dimid;
 
         printf("*** creating netcdf-4 test file using netCDF %s...", NC4FILE);
 			
@@ -87,8 +93,17 @@ main(int argc, char **argv)
 	if(nc_put_att_int(grpid,NC_GLOBAL,INT_ATT_NAME,NC_INT,1,&data)!=0) ERR;
 	/* Create _NCProperties as var attr and as subgroup attribute */
 	if(nc_put_att_text(grpid,NC_GLOBAL,NCPROPS,strlen(sdata),sdata)!=0) ERR;
-	stat = nc_put_att_text(root,varid,NCPROPS,strlen(sdata),sdata);
-	if(stat != NC_ENAMEINUSE) ERR;
+	if(nc_put_att_text(root,varid,NCPROPS,strlen(sdata),sdata)!=0) ERR;
+	/* Create var + dimension to cause e.g. dimscales to appear */
+	if(nc_def_dim(root,DIMNAME,(size_t)4,&dimid)!=0) ERR;
+	if(nc_def_var(root,DIMNAME,NC_INT,1,&dimid,&varid)!=0) ERR; /* same name */
+	/* Close, then re-open */
+	if(nc_close(root)) ERR;
+	if(nc_open(NC4FILE,NC_WRITE|NC_NETCDF4,&root)!=0) ERR;
+
+	/* Is all invisible attributes actually invisible vis-a-vis nc_inq? */
+        if(nc_inq(root,NULL,NULL,&natts,NULL)!=0) ERR;
+	if(natts != 1) ERR;
 
 	/* Now, fiddle with the NCPROPS attribute */
 
@@ -100,12 +115,46 @@ main(int argc, char **argv)
 	stat = nc_put_att_text(root,NC_GLOBAL,NCPROPS,strlen(sdata),sdata);
 	if(stat == NC_NOERR) ERR;
 
-	/* Delete */
+	/* Delete; should fail */
 	stat = nc_del_att(root,NC_GLOBAL,NCPROPS);
         if(stat != NC_ENOTATT) ERR;
 
+	/* Ditto _SuperblockVersion */
+
+	/* Get its value */
+	if(nc_inq_att(root,NC_GLOBAL,SUPERBLOCKATT,NULL,&len)!=0) ERR;
+	if(len != 1) ERR;
+	if(nc_get_att_int(root,NC_GLOBAL,SUPERBLOCKATT,&data)!=0) ERR;
+
+	/*Overwrite; should fail */
+	stat = nc_put_att_int(root,NC_GLOBAL,NCPROPS,NC_INT,1,&data);
+	if(stat == NC_NOERR) ERR;
+
+	/* Delete; should fail */
+	stat = nc_del_att(root,NC_GLOBAL,SUPERBLOCKATT);
+        if(stat == NC_NOERR) ERR;
+
+	/* Ditto _IsNetcdf4 */
+
+	/* Get its value */
+	if(nc_inq_att(root,NC_GLOBAL,ISNETCDF4ATT,NULL,&len)!=0) ERR;
+	if(len != 1) ERR;
+	if(nc_get_att_int(root,NC_GLOBAL,ISNETCDF4ATT,&data)!=0) ERR;
+
+	/*Overwrite; should fail */
+	stat = nc_put_att_int(root,NC_GLOBAL,ISNETCDF4ATT,NC_INT,1,&data);
+	if(stat == NC_NOERR) ERR;
+
+	/* Delete; should fail */
+	stat = nc_del_att(root,NC_GLOBAL,ISNETCDF4ATT);
+        if(stat == NC_NOERR) ERR;
+
 	if(nc_close(root)!=0) ERR;
     }        
+
+    /* Delete created files */
+    unlink(NC4FILE);
+    unlink(HDFFILE);
 
     SUMMARIZE_ERR;
     FINAL_RESULTS;

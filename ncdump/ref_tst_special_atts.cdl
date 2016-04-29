@@ -45,7 +45,8 @@ variables:
 		var5:_NoFill = "true" ;
 
 // global attributes:
-		:_SuperblockVersion = 0 ;
+		:_NCProperties="";
+		:_SuperblockVersion=;
 		:_Format = "netCDF-4" ;
 data:
 }

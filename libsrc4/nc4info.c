@@ -24,7 +24,7 @@ struct NCdata {
 };
 
 int
-NC_fileinfo_init(void)
+NC4_fileinfo_init(void)
 {
     int stat = NC_NOERR;
     unsigned major,minor,release;
@@ -67,7 +67,7 @@ done:
 }
 
 static int
-NC_properties_parse(struct NCPROPINFO* ncprops)
+NC4_properties_parse(struct NCPROPINFO* ncprops)
 {
     size_t len;
     char propdata[NCPROPS_LENGTH]; /* match nc.h struct NCProperties */
@@ -113,10 +113,8 @@ NC_properties_parse(struct NCPROPINFO* ncprops)
     return NC_NOERR;
 }
 
-extern void reportopenobjects(hid_t);
-
 static int
-NC_get_propattr(NC_HDF5_FILE_INFO_T* h5)
+NC4_get_propattr(NC_HDF5_FILE_INFO_T* h5)
 {
     int ncstat = NC_NOERR;
     size_t size;
@@ -130,7 +128,7 @@ NC_get_propattr(NC_HDF5_FILE_INFO_T* h5)
     herr_t herr = 0;
 
     /* Get root group */
-    grp = H5Gopen(h5->hdfid,"/"); /* get root group */
+    grp = h5->root_grp->hdf_grpid; /* get root group */
     /* Try to extract the NCPROPS attribute */
     attid = H5Aopen_name(grp, NCPROPS);
     if(attid >= 0) {
@@ -145,23 +143,21 @@ NC_get_propattr(NC_HDF5_FILE_INFO_T* h5)
         HCHECK((ntype = H5Tget_native_type(atype, H5T_DIR_ASCEND)));
         HCHECK((H5Aread(attid, ntype, text)));
 	/* Try to parse text */
-	strncpy(h5->fileinfo.propattr.text,text,NCPROPS_LENGTH);
-	h5->fileinfo.propattr.text[NCPROPS_LENGTH-1] = '\0';
-	ncstat = NC_properties_parse(&h5->fileinfo.propattr);
+	strncpy(h5->fileinfo->propattr.text,text,NCPROPS_LENGTH);
+	h5->fileinfo->propattr.text[NCPROPS_LENGTH-1] = '\0';
+	ncstat = NC4_properties_parse(&h5->fileinfo->propattr);
 	herr = 0;
     }    
 done:
-    herr = 0;
-    herr = H5Aclose(attid);
-    herr = H5Sclose(aspace);
-    herr = H5Tclose(ntype);
-    herr = H5Tclose(atype);
-    herr = H5Gclose(grp);
+    if(attid >= 0) HCHECK((H5Aclose(attid)));
+    if(aspace >= 0) HCHECK((H5Sclose(aspace)));
+    if(ntype >= 0) HCHECK((H5Tclose(ntype)));
+    if(atype >= 0) HCHECK((H5Tclose(atype)));
     return ncstat;
 }
 
 int
-NC_put_propattr(NC_HDF5_FILE_INFO_T* h5)
+NC4_put_propattr(NC_HDF5_FILE_INFO_T* h5)
 {
     int ncstat = NC_NOERR;
     char text[NCPROPS_LENGTH+1];
@@ -175,7 +171,7 @@ NC_put_propattr(NC_HDF5_FILE_INFO_T* h5)
     herr_t herr = 0;
 
     /* Get root group */
-    HCHECK((grp = H5Gopen(h5->hdfid,"/"))); /* get root group */
+    grp = h5->root_grp->hdf_grpid; /* get root group */
     /* See if the NCPROPS attribute exists */
     exists = H5Aopen_name(grp, NCPROPS);
     if(exists < 0) {/* Does not exist */
@@ -186,30 +182,34 @@ NC_put_propattr(NC_HDF5_FILE_INFO_T* h5)
         HCHECK((H5Tset_size(atype, NCPROPS_LENGTH)));
 	HCHECK((aspace = H5Screate(H5S_SCALAR)));
 	HCHECK((attid = H5Acreate(grp, NCPROPS, atype, aspace, H5P_DEFAULT)));
-
-        HCHECK((H5Awrite(attid, atype, h5->fileinfo.propattr.text)));
+        HCHECK((H5Awrite(attid, atype, h5->fileinfo->propattr.text)));
 	herr = 0;
     }
 done:
-    herr = 0;
-    herr = H5Aclose(attid);
-    herr = H5Sclose(aspace);
-    herr = H5Tclose(atype);
-    herr = H5Aclose(exists);
-    herr = H5Gclose(grp);
+    if(exists >= 0) HCHECK((H5Aclose(exists)));
+    if(attid >= 0) HCHECK((H5Aclose(attid)));
+    if(aspace >= 0) HCHECK((H5Sclose(aspace)));
+    if(atype >= 0) HCHECK((H5Tclose(atype)));
     return ncstat;
 }
 
-
 int
-NC_get_fileinfo(NC_HDF5_FILE_INFO_T* h5)
+NC4_get_fileinfo(NC_HDF5_FILE_INFO_T* h5, struct NCPROPINFO* init)
 {
     int ncstat = NC_NOERR;
+
+    /* Allocate the fileinfo in h5 */
+    h5->fileinfo = (struct NCFILEINFO*)calloc(1,sizeof(struct NCFILEINFO));
+    if(h5->fileinfo == NULL)
+	{ncstat = NC_ENOMEM; goto done;}
+
     /* Get superblock version */
-    NCHECK((ncstat = NC4_hdf5get_superblock(h5,&h5->fileinfo.superblockversion)));
+    NCHECK((ncstat = NC4_hdf5get_superblock(h5,&h5->fileinfo->superblockversion)));
     /* Get properties attribute if not already defined */
-    if(h5->fileinfo.propattr.version == 0) {
-        NCHECK((ncstat = NC_get_propattr(h5)));
+    if(init == NULL) {
+        NCHECK((ncstat = NC4_get_propattr(h5)));
+    } else { /*init != NULL*/
+       h5->fileinfo->propattr = *init; /* Initialize */
     }
 done:
     return ncstat;    

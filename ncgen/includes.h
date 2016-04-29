@@ -47,7 +47,7 @@
 #include "util.h"
 #include "debug.h"
 #include "nc.h"
-#include "ncinfo.h"
+#include "nc4internal.h"
 
 extern int specialconstants;
 
