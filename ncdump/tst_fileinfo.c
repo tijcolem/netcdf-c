@@ -29,7 +29,7 @@ main(int argc, char **argv)
 {
     printf("\n*** Testing 'Fileinfo attributes.\n");
 
-    if(0) {
+    {
 	hid_t fileid;
 	hid_t fcplid;
 	hid_t scalar_spaceid;
@@ -151,10 +151,6 @@ main(int argc, char **argv)
 
 	if(nc_close(root)!=0) ERR;
     }        
-
-    /* Delete created files */
-    unlink(NC4FILE);
-    unlink(HDFFILE);
 
     SUMMARIZE_ERR;
     FINAL_RESULTS;
