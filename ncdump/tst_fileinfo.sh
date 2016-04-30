@@ -21,9 +21,20 @@ export verbose
 export srcdir
 export builddir
 
-NCF=nc4_fileinfo.nc
-HDF=hdf5_fileinfo.hdf
 EXIT=0
+
+NCF=$srcdir/nc4_fileinfo.nc
+HDF=$srcdir/hdf5_fileinfo.hdf
+NF=ref_tst_compounds4.nc
+
+# Do a false negative test 
+rm -f ./tmp
+if $builddir/ncdump -s $builddir/$NF | fgrep '_IsNetcdf4 = 0' > ./tmp ; then
+   echo "Pass: False negative for file: $NF"
+else
+   echo "FAIL: False negative for file: $NF"
+fi
+rm -f ./tmp
 
 if ./tst_fileinfo > /dev/null ; then
    # look at the _IsNetcdf4 flag
