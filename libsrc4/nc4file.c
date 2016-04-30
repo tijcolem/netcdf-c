@@ -3169,17 +3169,15 @@ close_netcdf4_file(NC_HDF5_FILE_INFO_T *h5, int abort)
 	 logit = 0;
 #endif
 	 reportopenobjects(logit,h5->hdfid);
-	}
 #endif
       }
+    }
    }
-
 exit:
    /* Free the nc4_info struct; above code should have reclaimed
       everything else */
    if(h5 != NULL)
        free(h5);
-
    return retval;
 }
 
