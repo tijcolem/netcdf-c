@@ -437,7 +437,7 @@ extern const char* NC_RESERVED_SPECIAL_LIST[];
 #define NC_ATT_CLASS "CLASS"
 #define NC_ATT_DIMENSION_LIST "DIMENSION_LIST"
 #define NC_ATT_NAME "NAME"
-#define NC_ATT_COORDINATES "COORDINATES"
+#define NC_ATT_COORDINATES COORDINATES /*defined above*/
 #define NC_ATT_FORMAT "_Format"
 
 /**************************************************/

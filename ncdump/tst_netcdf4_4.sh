@@ -85,8 +85,9 @@ else # Non-MINGW Platforms
 #    rm -f tst_ncf213.cdl tst_ncf213.nc
     ../ncgen/ncgen -b -o tst_ncf213.nc $srcdir/ref_tst_ncf213.cdl
     ./ncdump -s -h tst_ncf213.nc \
-    | sed -e 's|_NCProperties.*|_NCProperties="";|' \
-    | sed -e 's|_SuperblockVersion.*|_SuperblockVersion=;|' \
+    | sed -e 's/netcdflibversion=.*[|]/netcdflibversion=0.0.0|/' \
+    | sed -e 's/hdf5libversion=.*"/hdf5libversion=0.0.0"/' \
+    | sed -e 's|_SuperblockVersion = [0-9]|_SuperblockVersion = 0|' \
     | cat  >tst_ncf213.cdl
     # Now compare
     ok=1;

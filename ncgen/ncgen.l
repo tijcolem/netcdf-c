@@ -126,7 +126,7 @@ struct Specialtoken specials[] = {
 {"_Endianness",_ENDIANNESS,_ENDIAN_FLAG},
 {"_NoFill",_NOFILL,_NOFILL_FLAG},
 {"_NCProperties",_NCPROPS,_NCPROPS_FLAG},
-{"_IsNetCDF4",_ISNETCDF4,_ISNETCDF4_FLAG},
+{"_IsNetcdf4",_ISNETCDF4,_ISNETCDF4_FLAG},
 {"_SuperblockVersion",_SUPERBLOCK,_SUPERBLOCK_FLAG},
 {NULL,0} /* null terminate */
 };
@@ -206,7 +206,7 @@ NUMBER       [+-]?[0-9][0-9]*[Uu]?([BbSs]|[Ll]|[Ll][Ll])?
 DBLNUMBER    [+-]?[0-9]*\.[0-9]*{exp}?[LlDd]?|[+-]?[0-9]*{exp}[LlDd]?
 FLTNUMBER    [+-]?[0-9]*\.[0-9]*{exp}?[Ff]|[+-]?[0-9]*{exp}[Ff]
 
-SPECIAL "_FillValue"|"_Format"|"_Storage"|"_ChunkSizes"|"_Fletcher32"|"_DeflateLevel"|"_Shuffle"|"_Endianness"|"_NoFill"|"_NCProperties"|"_NetCDF4"|"_SuperblockVersion"
+SPECIAL "_FillValue"|"_Format"|"_Storage"|"_ChunkSizes"|"_Fletcher32"|"_DeflateLevel"|"_Shuffle"|"_Endianness"|"_NoFill"|"_NCProperties"|"_IsNetcdf4"|"_SuperblockVersion"
 
 USASCII   [\x01-\x7F]
 

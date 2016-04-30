@@ -1111,7 +1111,7 @@ pr_att_hidden(
         stat = nc_get_att_int(ncid,NC_GLOBAL,ISNETCDF4ATT,&isnc4);
         if(stat == NC_NOERR) {
             pr_att_name(ncid, "", ISNETCDF4ATT);
-            printf(" = \"%\" ;\n",isnc4?1:0);
+            printf(" = %d ;\n",isnc4?1:0);
         }
     }
 }
