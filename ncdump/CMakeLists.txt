@@ -86,7 +86,7 @@ IF(MSVC)
     ${CMAKE_CURRENT_BINARY_DIR})
   SET_TARGET_PROPERTIES(tst_dimsizes PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE
     ${CMAKE_CURRENT_BINARY_DIR})
-  SET_TARGET_PROPERTIES(tst_ncproperties PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE
+  SET_TARGET_PROPERTIES(tst_fileinfo PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE
     ${CMAKE_CURRENT_BINARY_DIR})
 ENDIF()
 
@@ -185,8 +185,6 @@ ENDIF()
     add_sh_test(ncdump tst_grp_spec)
     add_sh_test(ncdump tst_mud)
     add_sh_test(ncdump_shell tst_h_scalar)
-
-    add_bin_test(ncdump tst_ncproperties)
 
   ENDIF()
 
