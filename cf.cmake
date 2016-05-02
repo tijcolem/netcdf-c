@@ -1,6 +1,6 @@
 # Is visual studio being used?
 #VS=yes
-#CYGWIN=yes
+CYGWIN=yes
 
 if test "x$VS" = x ; then
 #CC=mpicc
