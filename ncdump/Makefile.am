@@ -4,8 +4,6 @@
 
 # $Id: Makefile.am,v 1.147 2010/05/29 00:50:39 dmh Exp $
 
-AM_TESTS_FD_REDIRECT = 9>&2
-
 # Put together AM_CPPFLAGS and AM_LDFLAGS.
 include $(top_srcdir)/lib_flags.am
 LDADD = ${top_builddir}/liblib/libnetcdf.la
