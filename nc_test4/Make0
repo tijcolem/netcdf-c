@@ -1,5 +1,5 @@
 # Test c output
-T=tst_dims2
+T=tst_chunk_hdf4
 #CMD=valgrind --leak-check=full
 CMD=gdb --args
 
