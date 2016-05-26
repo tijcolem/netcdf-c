@@ -22,6 +22,7 @@ conditions.
 #define MEGABYTE 1048576
 
 #undef DEBUGH5
+
 #ifdef DEBUGH5
 /* Provide a catchable error reporting function */
 static herr_t
@@ -30,15 +31,6 @@ h5catch(void* ignored)
     H5Eprint(NULL);
     return 0;
 }
-
-#define CATCH &h5catch
-#define NOCATCH CATCH
-
-#else
-
-#define NOCATCH NULL
-#define CATCH &H5Eprint
-
 #endif
 
 
@@ -68,7 +60,11 @@ int nc4_hdf5_initialized = 0;
 static herr_t
 set_auto(void* func, void *client_data) 
 {
+#ifdef DEBUGH5
+    return H5Eset_auto2(H5E_DEFAULT,(H5E_auto2_t)h5catch,client_data);
+#else
     return H5Eset_auto2(H5E_DEFAULT,(H5E_auto2_t)func,client_data);
+#endif
 }
 
 /*
@@ -79,7 +75,7 @@ of the HDF5 library.
 void
 nc4_hdf5_initialize(void)
 {
-    if (set_auto(NOCATCH, stderr) < 0)
+    if (set_auto(NULL, NULL) < 0)
 	LOG((0, "Couldn't turn off HDF5 error messages!"));
     LOG((1, "HDF5 error messages have been turned off."));
     nc4_hdf5_initialized = 1;
@@ -1430,7 +1426,7 @@ nc_set_log_level(int new_level)
       fails, so just ignore the return code. */
    if (new_level == NC_TURN_OFF_LOGGING)
    {
-      set_auto(NOCATCH, stderr);
+      set_auto(NULL,NULL);
       LOG((1, "HDF5 error messages turned off!"));
    }
 
@@ -1438,7 +1434,7 @@ nc_set_log_level(int new_level)
    if (new_level > NC_TURN_OFF_LOGGING &&
        nc_log_level <= NC_TURN_OFF_LOGGING)
    {
-      if (set_auto(CATCH, stderr) < 0)
+      if (set_auto((H5E_auto_t)&H5Eprint, stderr) < 0)
 	 LOG((0, "H5Eset_auto failed!"));
       LOG((1, "HDF5 error messages turned on."));
    }
